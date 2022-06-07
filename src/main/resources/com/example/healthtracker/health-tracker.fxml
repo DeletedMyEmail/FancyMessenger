@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<VBox alignment="TOP_RIGHT" spacing="30.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.healthtracker.HTController">
+    <padding>
+        <Insets right="40.0"/>
+    </padding>
+
+    <Label fx:id="welcomeText"/>
+    <Button fx:id = "analyticsButton" text="Analytics" onAction="#onAnalyticsButtonClick" background="red"/>
+</VBox>
