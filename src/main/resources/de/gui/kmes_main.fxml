@@ -5,12 +5,9 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.Button?>
-<VBox alignment="TOP_RIGHT" spacing="30.0" xmlns:fx="http://javafx.com/fxml"
+<VBox alignment="CENTER" spacing="30.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="de.gui.HTController">
-    <padding>
-        <Insets right="40.0"/>
-    </padding>
 
-    <Label fx:id="welcomeText"/>
+    <Label fx:id="top_label"/>
     <Button fx:id = "show_login_button" text="Login" onAction="#onShowLoginButtonClick"/>
 </VBox>

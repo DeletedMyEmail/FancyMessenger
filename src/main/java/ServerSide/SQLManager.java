@@ -6,14 +6,11 @@ import java.sql.*;
 
 class SQLManager {
 
-    private final DatabaseConnector connector;
-
     private Connection con;
     private PreparedStatement stmt;
 
     protected SQLManager() throws SQLException {
         con = DriverManager.getConnection("kmes.db");
-        connector = new DatabaseConnector("", 0, "kmes.db", "", "");
 
     }
 
