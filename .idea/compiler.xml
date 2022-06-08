@@ -6,17 +6,17 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="HealthTracker" />
+        <module name="KMesRework" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="HealthTracker" target="16" />
+      <module name="KMesRework" target="16" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_STRING" value="--add-modules javafx.application" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="HealthTracker" options="" />
+      <module name="KMesRework" options="" />
     </option>
   </component>
 </project>

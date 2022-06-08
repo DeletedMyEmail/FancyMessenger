@@ -60,7 +60,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.healthtracker/com.example.healthtracker.HTApplication</mainClass>
+                            <mainClass>com.example.healthtracker/gui_javafx.HTApplication</mainClass>
                         </configuration>
                     </execution>
                 </executions>
