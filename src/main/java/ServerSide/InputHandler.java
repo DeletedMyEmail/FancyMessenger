@@ -13,10 +13,10 @@ import java.util.ArrayList;
 class InputHandler extends Thread {
 
     private ClientAcceptor clientManager;
-    private SQLHandler sqlmanager;
+    private SQLManager sqlmanager;
 
     protected InputHandler() throws IOException, SQLException {
-        sqlmanager = new SQLHandler();
+        sqlmanager = new SQLManager();
         clientManager = new ClientAcceptor();
         clientManager.start();
     }
@@ -117,10 +117,5 @@ class InputHandler extends Thread {
 
     private void sendMessageToUser(int index, String message) throws IOException {
         clientManager.outputs.get(index).writeUTF(message);
-    }
-
-    public static void main(String[] args) throws SQLException, IOException {
-        ServerSideKmes server = new ServerSideKmes();
-        server.start();
     }
 }
