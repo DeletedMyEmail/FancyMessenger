@@ -1,5 +1,7 @@
 package ServerSide;
 
+import SQL.SQLManager;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,11 +14,11 @@ import java.util.ArrayList;
  * */
 class InputHandler extends Thread {
 
-    private ClientAcceptor clientManager;
-    private SQLManager sqlmanager;
+    private final ClientAcceptor clientManager;
+    private final SQLManager sqlmanager;
 
-    protected InputHandler() throws IOException, SQLException {
-        sqlmanager = new SQLManager();
+    protected InputHandler() throws IOException, SQLException, ClassNotFoundException {
+        sqlmanager = new SQLManager("/src/main/java/SQL/kmes.db");
         clientManager = new ClientAcceptor();
         clientManager.start();
     }
@@ -61,7 +63,7 @@ class InputHandler extends Thread {
                         sendMessageToUser(index,"FromKmesServer;loginFailed");
                         return;
                     }
-                    if (sqlmanager.onQuery("SELECT username FROM kmes.kmesuser WHERE (username = ? AND pw = ?);", new String[] {message[2],message[3]}).next())
+                    if (sqlmanager.onQuery("SELECT username FROM User WHERE (username = ? AND password_hash = ?);", new String[] {message[2],message[3]}).next())
                     {
                         sendMessageToUser(index,"FromKmesServer;loginSuccessful;"+message[2]);
                         clientManager.clients.get(index).set(1, message[2]);
@@ -75,9 +77,9 @@ class InputHandler extends Thread {
                 case "register":
 
                     // If username doesn't exist in table: insert
-                    if (!sqlmanager.onQuery("SELECT * FROM kmes.kmesuser WHERE username=?;", new String[] {message[2]}).next())
+                    if (!sqlmanager.onQuery("SELECT * FROM User WHERE username=?;", new String[] {message[2]}).next())
                     {
-                        sqlmanager.onExecute("INSERT INTO kmes.kmesuser (username, pw) VALUES (?, ?);", new String[] {message[2],message[3]});
+                        sqlmanager.onExecute("INSERT INTO User (user_id, username, password_hash) VALUES (?, ?, ?);", new String[] {message[2],message[3]});
                         sendMessageToUser(index,"FromKmesServer;registrationSuccessful;"+message[2]);
                     }
                     // Else: send fail message to client
