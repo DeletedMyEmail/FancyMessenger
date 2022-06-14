@@ -46,10 +46,6 @@ public class SQLManager {
         }
     }
 
-    protected void input_testdata() throws SQLException {
-        onExecute("INSERT INTO User VALUES(123, \"TestUSer\", \"djhbjbi2\")", null);
-    }
-
     public static void main(String[] args) {
         try {
             SQLManager sqlm = new SQLManager("C:\\Users\\derdi\\Documents\\Dev\\KMesRework\\src\\main\\java\\SQL\\kmes.db");

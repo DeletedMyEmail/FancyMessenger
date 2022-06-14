@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="30.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="de.gui.HTController">
 
-    <Label fx:id="top_label"/>
-    <Button fx:id = "show_login_button" text="Login" onAction="#onShowLoginButtonClick"/>
-</VBox>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Text layoutX="48.0" layoutY="133.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+      <HBox layoutX="-42.0" layoutY="-37.0" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Button alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="70.0" text="Button">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

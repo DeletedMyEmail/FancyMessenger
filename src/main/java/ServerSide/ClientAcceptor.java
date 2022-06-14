@@ -21,12 +21,12 @@ class ClientAcceptor extends Thread{
     protected ArrayList<DataInputStream> inputs;
     protected ArrayList<DataOutputStream> outputs;
 
-    protected ServerSocket socket;
+    private ServerSocket socket;
 
     protected ClientAcceptor() throws IOException
     {
         socket = new ServerSocket(3141);
-        clients = new ArrayList<ArrayList<Object>>();
+        clients = new ArrayList<>();
         outputs = new ArrayList<>();
         inputs = new ArrayList<>();
     }
