@@ -13,7 +13,7 @@ public class HTController {
     @FXML
     private Label top_label;
 
-    public void onAccountButtonClick(ActionEvent actionEvent) {
-        top_label.setStyle("-fx-background-color: #873");
-    }
+
+
+
 }

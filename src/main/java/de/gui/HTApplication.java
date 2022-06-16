@@ -12,7 +12,7 @@ import java.util.Objects;
 public class HTApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(HTApplication.class.getResource("kmes_main.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("kmes_main.fxml")));
         Scene scene = new Scene(root);
         scene.getStylesheets().add(Objects.requireNonNull(HTApplication.class.getResource("styles.css")).toExternalForm());
 

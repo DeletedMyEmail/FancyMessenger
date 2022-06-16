@@ -16,15 +16,15 @@ public class PasswordHasher {
 
     private final static String algorithm_name = "PBKDF2WithHmacSHA512";
 
-    private final SecureRandom random;
+    //private final SecureRandom random;
 
-    private final byte[] salt;
+    private final byte[] salt = {0,1,0,1,1,1,1,0,1,0,1,1,1,0,1,0};
 
     public PasswordHasher()
     {
-        random = new SecureRandom();
-        salt = new byte[cost];
-        random.nextBytes(salt);
+        //random = new SecureRandom();
+        //salt = new byte[cost];
+        //random.nextBytes(salt);
     }
 
     protected String getHash(String password) {
