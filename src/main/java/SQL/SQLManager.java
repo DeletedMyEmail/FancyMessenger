@@ -40,18 +40,15 @@ public class SQLManager {
 
     public boolean check_login(String username, String hashed_password)
     {
-        try {
+        try
+        {
             ResultSet rs = onQuery("SELECT username FROM User WHERE username=? AND password_hash=?",
                     new String[]{ username, hashed_password});
-            if (rs.isClosed() || rs.getString(1) == "")
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        } catch (SQLException e) {
+
+            return !(rs.isClosed() || rs.getString(1) == "");
+
+        } catch (SQLException e)
+        {
             e.printStackTrace();
             return false;
         }

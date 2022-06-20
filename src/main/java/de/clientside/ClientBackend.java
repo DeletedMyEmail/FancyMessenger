@@ -1,5 +1,7 @@
 package de.clientside;
 
+import javafx.event.ActionEvent;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -11,6 +13,8 @@ import java.net.Socket;
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend extends Thread {
+
+    private static ActionEvent lastActionEvent = null;
 
     private static Socket client;
     private static DataInputStream input;
@@ -27,6 +31,10 @@ public class ClientBackend extends Thread {
     }
 
     protected static String getUsername() { return username; }
+
+    protected static void setLastActionEvent(ActionEvent actionEvent) {
+        lastActionEvent = actionEvent;
+    }
 
     protected boolean isConnected()
     {

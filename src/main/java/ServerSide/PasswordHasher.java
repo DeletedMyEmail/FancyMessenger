@@ -37,7 +37,6 @@ public class PasswordHasher {
             byte[] hash_value = key_factory.generateSecret(spec).getEncoded();
             Base64.Encoder encoder = Base64.getEncoder();
             hash_str = encoder.encodeToString(hash_value);
-            System.out.printf("Salt: %s \n",encoder.encodeToString(salt));
         }
         catch (Exception ex)
         {
@@ -46,4 +45,8 @@ public class PasswordHasher {
         return hash_str;
     }
 
+    public static void main(String[] args) {
+        PasswordHasher pwhasher = new PasswordHasher();
+        System.out.println(pwhasher.getHash("TestPw"));
+    }
 }

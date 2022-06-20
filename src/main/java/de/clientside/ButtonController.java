@@ -22,13 +22,39 @@ public class ButtonController {
     private static boolean logedIn = false;
 
     @FXML
-    private Text usernameText;
+    public Text usernameText;
+
+    @FXML
+    public TextField usernameField;
+
+    @FXML
+    public PasswordField passwordField;
+
+    @FXML
+    public void initialize()
+    {
+        init();
+    }
+
+    protected void init()
+    {
+
+    }
 
     protected static void setLoginState(boolean bool)
     {
         logedIn = bool;
     }
 
+    private void switchScene(ActionEvent event, String pXMLFileName) throws IOException {
+        root = FXMLLoader.load(ButtonController.class.getResource(pXMLFileName));
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
     public void switchToAccScene(ActionEvent event) throws IOException {
         String filename;
         if (logedIn)
@@ -40,37 +66,26 @@ public class ButtonController {
             filename = "login_scene.fxml";
         }
 
-        root = FXMLLoader.load(ButtonController.class.getResource(filename));
-        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        switchScene(event, filename);
+
         if (logedIn)
         {
             usernameText.setText("Current User"+ClientBackend.getUsername());
         }
     }
 
+    @FXML
     public void switchToMainScene(ActionEvent event) throws IOException {
-        root = FXMLLoader.load(getClass().getResource("kmes_main.fxml"));
-        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        switchScene(event, "kmes_main.fxml");
     }
 
     public void onAccountButtonClick(ActionEvent actionEvent) {
 
     }
 
-    @FXML
-    private TextField usernameField;
-
-    @FXML
-    private PasswordField passwordField;
-
     public void onLoginButtonClick(ActionEvent actionEvent) throws IOException {
-        ClientBackend.sendToServer("KMES;login;"+usernameField+";"+passwordField);
+        ClientBackend.setLastActionEvent(actionEvent);
+        ClientBackend.sendToServer("KMES;login;"+usernameField.getText()+";"+passwordField.getText());
     }
 
 }
