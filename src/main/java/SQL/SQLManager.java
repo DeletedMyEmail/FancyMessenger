@@ -38,19 +38,29 @@ public class SQLManager {
         stmt.clearParameters();
     }
 
-    protected void print_db() throws SQLException {
-        ResultSet rs = onQuery("SELECT Username FROM User", null);
-        while (rs.next())
-        {
-            System.out.println(rs.getString(1));
+    public boolean check_login(String username, String hashed_password)
+    {
+        try {
+            ResultSet rs = onQuery("SELECT username FROM User WHERE username=? AND password_hash=?",
+                    new String[]{ username, hashed_password});
+            if (rs.isClosed() || rs.getString(1) == "")
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            SQLManager sqlm = new SQLManager("C:\\Users\\derdi\\Documents\\Dev\\KMesRework\\src\\main\\java\\SQL\\kmes.db");
-            sqlm.print_db();
-        } catch (Exception ex) { System.out.println(ex.toString());}
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        SQLManager sqlmnanager = new SQLManager("src/main/java/SQL/kmes.db");
+        System.out.println(sqlmnanager.onQuery("SELECT username FROM User WHERE username=? AND password_hash=?",
+                new String[]{ "Admin", "fddsnfse"}).getString(1));
     }
 }
 

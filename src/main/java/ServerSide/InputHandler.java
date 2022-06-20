@@ -2,122 +2,111 @@ package ServerSide;
 
 import SQL.SQLManager;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Server backend for Kmes messenger
  *
- * @version 1.0 | 13.12.2021
- * @author Joshua Hartjes | KaitoKunTatsu
+ * @version 18.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
 
-    private final ClientAcceptor clientManager;
+    private final SocketAcceptor socketAcceptor;
     private final SQLManager sqlmanager;
 
+    List<List<Object>> clients_in_out = SocketAcceptor.getSockets();
+
+    private boolean running;
+
     protected InputHandler() throws IOException, SQLException, ClassNotFoundException {
-        sqlmanager = new SQLManager("/src/main/java/SQL/kmes.db");
-        clientManager = new ClientAcceptor();
-        clientManager.start();
+        socketAcceptor = new SocketAcceptor();
+        socketAcceptor.start();
+        sqlmanager = new SQLManager("src/main/java/SQL/kmes.db");
+        running = true;
+    }
+
+    private void handleLoginRequest(int socket_index, String request[]) throws IOException {
+        PasswordHasher hasher = new PasswordHasher();
+        String username = request[2];
+        String password = hasher.getHash(request[3]);
+
+        if (sqlmanager.check_login(username, password))
+        {
+            clients_in_out.get(socket_index).set(3, username);
+            writeToSocket(socket_index, "KMES;loggedIn;"+username);
+        }
+    }
+
+    private void writeToSocket(int socket_index, String str) throws IOException {
+        try {
+            ((DataOutputStream)clients_in_out.get(socket_index).get(1)).writeUTF(str);
+        } catch (IOException e) {
+            SocketAcceptor.closeSocket(socket_index);
+        }
     }
 
     /**
-     *  Main of the server, iterating through all connected clients and handling requests
+     *
      * */
     public void run() {
+        while (running)
+        {
+            for (int i = 0; i < clients_in_out.toArray().length; i++)
+            {
+                Socket current_socket = ((Socket)clients_in_out.get(i).get(0));
+                DataInputStream current_input_stream = ((DataInputStream)clients_in_out.get(i).get(2));
+                DataInputStream current_output_stream = ((DataInputStream)clients_in_out.get(i).get(2));
 
-        while (true) {
-            try {
-                wait(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            for (int i = 0; i < clientManager.clients.size(); i++) {
+                // Closing socket if disconnected
+                System.out.printf("Checking socket [%d]..\n", i+1);
                 try {
-                    String mes = clientManager.inputs.get(i).readUTF();
-                    if (mes.startsWith("WannaSendMessageKmesServer;")) {
-                        handleClientRequest(i, mes.split(";",0));
+                    if (current_socket.isClosed() || !current_socket.isConnected() || current_input_stream.readLine() == null)
+                    {
+                        SocketAcceptor.closeSocket(i);
+                        System.out.println("Socket closed");
+                        i--;
+                        continue;
                     }
-                } catch (IOException | SQLException e) {
-                    e.printStackTrace();
+                    else
+                    {
+                        System.out.println("Socket connected");
+                    }
+                } catch (IOException e) {
+                    clients_in_out.remove(i);
+                    System.out.println("Socket closed");
+                    i--;
+                    continue;
                 }
+
+                // Client requests
+                try
+                {
+                    String[] request = current_input_stream.readUTF().split(";");
+                    if (!request[0].equals("KMES"))
+                    {
+                        current_socket.close();
+                        clients_in_out.remove(i);
+                        continue;
+                    }
+                    switch (request[1])
+                    {
+                        case "login": handleLoginRequest(i, request);
+                    }
+
+                } catch (IOException e) {e.printStackTrace();}
+
             }
         }
     }
 
-    /**
-     * Handles client requests based on the incoming String
-     *
-     * @param index Index of the client in list from {@link ClientAcceptor}
-     * @param message Input as String Array
-     * */
-    private void handleClientRequest(int index, String[] message) throws SQLException {
-        try {
-            switch (message[1]) {
-                // User wants to log in
-                case "login":
-                    if (message.length < 4)
-                    {
-                        sendMessageToUser(index,"FromKmesServer;loginFailed");
-                        return;
-                    }
-                    if (sqlmanager.onQuery("SELECT username FROM User WHERE (username = ? AND password_hash = ?);", new String[] {message[2],message[3]}).next())
-                    {
-                        sendMessageToUser(index,"FromKmesServer;loginSuccessful;"+message[2]);
-                        clientManager.clients.get(index).set(1, message[2]);
-                    }
-                    else
-                    {
-                        sendMessageToUser(index,"FromKmesServer;loginFailed");
-                    }
-                    break;
-                // User asks for a registration
-                case "register":
-
-                    // If username doesn't exist in table: insert
-                    if (!sqlmanager.onQuery("SELECT * FROM User WHERE username=?;", new String[] {message[2]}).next())
-                    {
-                        sqlmanager.onExecute("INSERT INTO User (user_id, username, password_hash) VALUES (?, ?, ?);", new String[] {message[2],message[3]});
-                        sendMessageToUser(index,"FromKmesServer;registrationSuccessful;"+message[2]);
-                    }
-                    // Else: send fail message to client
-                    else
-                    {
-                        sendMessageToUser(index, "FromKmesServer;registrationFailed;");
-                    }
-                    break;
-                //
-                case "send":
-                    if (message.length == 3)
-                    {
-                        String usn = clientManager.clients.get(index).get(1).toString();
-                        if (!usn.equals(""))
-                        {
-                            for (ArrayList<Object> x : clientManager.clients)
-                            {
-                                if (x.get(1).equals(usn))
-                                {
-                                    clientManager.outputs.get(clientManager.clients.indexOf(x.get(0))).writeUTF(
-                                            "FromKmesServer;sent;"+x.get(1)+message[2]);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
-        }
-        catch (IndexOutOfBoundsException | IOException ignored) { }
-    }
-
-    static protected void incomingMessage(String from, String msg)
-    {
-
-    }
-
-    private void sendMessageToUser(int index, String message) throws IOException {
-        clientManager.outputs.get(index).writeUTF(message);
+    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
+        InputHandler inputHandler = new InputHandler();
+        inputHandler.run();
     }
 }

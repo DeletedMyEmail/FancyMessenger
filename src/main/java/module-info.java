@@ -5,6 +5,8 @@ module com.example.healthtracker {
     requires java.sql;
 
 
-    opens de.gui to javafx.fxml;
-    exports de.gui;
+    opens de.clientside to javafx.fxml;
+    exports de.clientside;
+    exports ServerSide;
+    opens ServerSide to javafx.fxml;
 }
