@@ -3,10 +3,7 @@ package de.clientside;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
@@ -15,7 +12,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Objects;
 
-public class ButtonController {
+public class GUIController {
 
     private static Scene loginScene = null;
     private static Scene settingsScene = null;
@@ -42,16 +39,13 @@ public class ButtonController {
     protected void init() throws IOException {
     }
 
-    protected static void setScenes(Scene pMainSscene) throws IOException {
-        loginScene = new Scene(FXMLLoader.load(Objects.requireNonNull(ButtonController.class.getResource("login_scene.fxml"))));
-        settingsScene = new Scene(FXMLLoader.load(Objects.requireNonNull(ButtonController.class.getResource("settings_scene.fxml"))));
-        mainScene = pMainSscene;
+    protected static void setScenes() throws IOException {
+        stage =
+        loginScene = new Scene(FXMLLoader.load(Objects.requireNonNull(GUIController.class.getResource("login_scene.fxml"))));
+        settingsScene = new Scene(FXMLLoader.load(Objects.requireNonNull(GUIController.class.getResource("settings_scene.fxml"))));
+        mainScene = ;
     }
 
-    protected static void setStage(Stage pStage)
-    {
-        stage = pStage;
-    }
     protected static void setLoginState(boolean bool)
     {
         logedIn = bool;

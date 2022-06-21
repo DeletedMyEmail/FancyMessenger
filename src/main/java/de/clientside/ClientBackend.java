@@ -23,11 +23,11 @@ public class ClientBackend extends Thread {
     private static String username;
     private final String host = "localhost";
 
-    private final ButtonController buttonController;
+    private final GUIController GUIController;
 
     public ClientBackend()
     {
-        buttonController = new ButtonController();
+        GUIController = new GUIController();
     }
 
     protected static String getUsername() { return username; }
@@ -48,8 +48,8 @@ public class ClientBackend extends Thread {
 
     private void logIn(String pUsername) throws IOException {
         username = pUsername;
-        ButtonController.setLoginState(true);
-        buttonController.switchToAccScene();
+        GUIController.setLoginState(true);
+        GUIController.switchToAccScene();
     }
 
     public void run() {
@@ -80,10 +80,9 @@ public class ClientBackend extends Thread {
         new Thread() {
             @Override
             public void run() {
-                javafx.application.Application.launch(GUIInitializer.class);
+                new ClientBackend().run();
             }
         }.start();
-        ClientBackend ac = new ClientBackend();
-        ac.run();
+        javafx.application.Application.launch(GUIInitializer.class);
     }
 }
