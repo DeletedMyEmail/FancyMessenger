@@ -46,16 +46,10 @@ public class ClientBackend extends Thread {
         output.writeUTF(message);
     }
 
-    protected String[] getServerInput() throws IOException
-    {
-        if (isConnected()) return input.readUTF().split(";");
-        else return null;
-    }
-
     private void logIn(String pUsername) throws IOException {
         username = pUsername;
         ButtonController.setLoginState(true);
-        buttonController.switchToAccScene(null);
+        buttonController.switchToAccScene();
     }
 
     public void run() {

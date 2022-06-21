@@ -1,6 +1,7 @@
 package de.clientside;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,5 +20,8 @@ public class GUIInitializer extends Application {
         stage.setTitle("Kmes | Messenger by J.H.");
         stage.setScene(scene);
         stage.show();
+
+        ButtonController.setScenes(scene);
+        ButtonController.setStage(stage);
     }
 }

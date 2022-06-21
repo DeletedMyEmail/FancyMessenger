@@ -75,11 +75,10 @@ class InputHandler extends Thread {
                         SocketAcceptor.closeSocket(i);
                         System.out.printf("[%d]Socket closed\n", i+1);
                         i--;
-                        continue;
                     }
                     else
                     {
-                        System.out.printf("[%d]Socket still connected\n", i+1);
+                        System.out.printf("[%d]Socket still connected."+input+"\n", i+1);
                         String[] request = input.split(";");
                         if (!request[0].equals("KMES"))
                         {

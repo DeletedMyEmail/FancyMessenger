@@ -13,12 +13,16 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class ButtonController {
 
+    private static Scene loginScene = null;
+    private static Scene settingsScene = null;
+    private static Scene mainScene = null;
+
     private static Stage stage;
-    private static Scene scene;
-    private static Parent root;
+
     private static boolean logedIn = false;
 
     @FXML
@@ -31,52 +35,47 @@ public class ButtonController {
     public PasswordField passwordField;
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() throws IOException {
         init();
     }
 
-    protected void init()
-    {
-
+    protected void init() throws IOException {
     }
 
+    protected static void setScenes(Scene pMainSscene) throws IOException {
+        loginScene = new Scene(FXMLLoader.load(Objects.requireNonNull(ButtonController.class.getResource("login_scene.fxml"))));
+        settingsScene = new Scene(FXMLLoader.load(Objects.requireNonNull(ButtonController.class.getResource("settings_scene.fxml"))));
+        mainScene = pMainSscene;
+    }
+
+    protected static void setStage(Stage pStage)
+    {
+        stage = pStage;
+    }
     protected static void setLoginState(boolean bool)
     {
         logedIn = bool;
     }
 
-    private void switchScene(ActionEvent event, String pXMLFileName) throws IOException {
-        root = FXMLLoader.load(ButtonController.class.getResource(pXMLFileName));
-        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
-
     @FXML
-    public void switchToAccScene(ActionEvent event) throws IOException {
-        String filename;
+    public void switchToAccScene() throws IOException
+    {
         if (logedIn)
         {
-            filename = "settings_scene.fxml";
+            stage.setScene(settingsScene);
+            usernameText.setText("Current User"+ClientBackend.getUsername());
         }
         else
         {
-            filename = "login_scene.fxml";
+            stage.setScene(loginScene);
         }
-
-        switchScene(event, filename);
-
-        if (logedIn)
-        {
-            usernameText.setText("Current User"+ClientBackend.getUsername());
-        }
-    }
+        stage.show();
+}
 
     @FXML
     public void switchToMainScene(ActionEvent event) throws IOException {
-        switchScene(event, "kmes_main.fxml");
+        stage.setScene(mainScene);
+        stage.show();
     }
 
     public void onAccountButtonClick(ActionEvent actionEvent) {
