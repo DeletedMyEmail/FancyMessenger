@@ -3,6 +3,7 @@ package de.clientside;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -20,6 +21,9 @@ public class LoginSceneController {
     public PasswordField passwordField;
 
     @FXML
+    public Button registerButton;
+    
+    @FXML
     public void initialize()
     {
         backend = SceneController.getBackend();
@@ -34,5 +38,8 @@ public class LoginSceneController {
     public void switchToMainScene(ActionEvent actionEvent)
     {
         SceneController.switchToHomeScene();
+    }
+
+    public void onRegisterButtonClick(ActionEvent actionEvent) {
     }
 }

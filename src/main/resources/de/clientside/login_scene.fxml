@@ -25,7 +25,7 @@
         <PasswordField layoutX="44.0" layoutY="175.0" fx:id="passwordField"/>
         <TextField layoutX="44.0" layoutY="139.0" fx:id="usernameField" />
         <Button layoutX="44.0" layoutY="224.0" mnemonicParsing="false" onAction="#onLoginButtonClick" text="Login" fx:id="loginButton"/>
-        <Button layoutX="133.0" layoutY="224.0" mnemonicParsing="false" text="Register" />
+        <Button layoutX="133.0" layoutY="224.0" mnemonicParsing="false" onAction="#onRegisterButtonClick" text="Register" fx:id="registerButton" />
         <Button alignment="CENTER" layoutX="500.0" layoutY="15.0" mnemonicParsing="false" onAction="#switchToMainScene" prefHeight="26.0" prefWidth="70.0" text="Home">
             <font>
                 <Font name="System Bold" size="10.0" />

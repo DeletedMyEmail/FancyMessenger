@@ -22,7 +22,7 @@ public class SettingsSceneController {
 
     protected void changeUsernameText(String pUsername)
     {
-        usernameText.setText(pUsername);
+        usernameText.setText("Current User: "+pUsername);
     }
 
     public void switchToMainScene(ActionEvent actionEvent)

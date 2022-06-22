@@ -3,7 +3,6 @@ package de.clientside;
 import java.io.*;
 import java.net.Socket;
 
-
 /**
  * Client backend for KMes Messenger
  *
@@ -17,39 +16,59 @@ public class ClientBackend {
     private DataOutputStream output;
 
     private static String username = "";
+
+    // Hostname/IP from KMes Server
     private final String host = "localhost";
+    // Port from KMes Server which accepts clients
     private final int port = 3141;
 
 
-    public ClientBackend()
-    {
-
-    }
-
+    /**
+     * @return Returns the username from current user or an empty string if not logged in.
+     * */
     protected static String getUsername() { return username; }
 
+    /**
+     * @return Returns the connection status to the KMes Server
+     * */
     protected boolean isConnected()
     {
         return client != null && !client.isClosed();
     }
 
-    protected void sendToServer(String message) throws IOException
+    /**
+     * Sends a string to the KMes server
+     *
+     * @param pMessage Message to send to server
+     * */
+    protected void sendToServer(String pMessage) throws IOException
     {
-        output.writeUTF(message);
+        output.writeUTF(pMessage);
     }
 
-    private void logIn(String pUsername) {
+    /**
+     * Updates the current user, the GUI and loads the account settings scene
+     *
+     * @param pUsername Username of the new logged in user
+     * */
+    private void updateCurrentUser(String pUsername) {
         username = pUsername;
         SceneController.getSettingsScene().changeUsernameText(username);
         SceneController.switchToSettingsScene();
     }
 
-    private void showNewMessageInGUI()
+    /**
+     * Updates the GUI to display new income messages
+     * */
+    protected void showNewMessageInGUI()
     {
 
     }
 
-    public void listenForServerInput () {
+    /**
+     * Creates a new Thread which listens to server inputs and handles them
+     * */
+    protected void listenForServerInput () {
         new Thread(new Runnable()
         {
             @Override
@@ -69,7 +88,7 @@ public class ClientBackend {
                         switch (input_str[1])
                         {
                             case "loggedIn":
-                                logIn(input_str[2]);
+                                updateCurrentUser(input_str[2]);
                         }
                     }
 
