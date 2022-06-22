@@ -14,13 +14,9 @@ import java.util.Objects;
 
 public class GUIController {
 
-    private static Scene loginScene = null;
-    private static Scene settingsScene = null;
-    private static Scene mainScene = null;
-
-    private static Stage stage;
-
     private static boolean logedIn = false;
+
+    private ClientBackend backend;
 
     @FXML
     public Text usernameText;
@@ -36,15 +32,16 @@ public class GUIController {
         init();
     }
 
-    protected void init() throws IOException {
+    protected void init() throws IOException
+    {
+        new Thread() {
+            @Override
+            public void run() {
+                new ClientBackend().run();
+            }
+        }.start();
     }
 
-    protected static void setScenes() throws IOException {
-        stage =
-        loginScene = new Scene(FXMLLoader.load(Objects.requireNonNull(GUIController.class.getResource("login_scene.fxml"))));
-        settingsScene = new Scene(FXMLLoader.load(Objects.requireNonNull(GUIController.class.getResource("settings_scene.fxml"))));
-        mainScene = ;
-    }
 
     protected static void setLoginState(boolean bool)
     {
@@ -54,22 +51,12 @@ public class GUIController {
     @FXML
     public void switchToAccScene() throws IOException
     {
-        if (logedIn)
-        {
-            stage.setScene(settingsScene);
-            usernameText.setText("Current User"+ClientBackend.getUsername());
-        }
-        else
-        {
-            stage.setScene(loginScene);
-        }
-        stage.show();
+
 }
 
     @FXML
     public void switchToMainScene(ActionEvent event) throws IOException {
-        stage.setScene(mainScene);
-        stage.show();
+
     }
 
     public void onAccountButtonClick(ActionEvent actionEvent) {
@@ -77,7 +64,6 @@ public class GUIController {
     }
 
     public void onLoginButtonClick(ActionEvent actionEvent) throws IOException {
-        ClientBackend.setLastActionEvent(actionEvent);
         ClientBackend.sendToServer("KMES;login;"+usernameField.getText()+";"+passwordField.getText());
     }
 

@@ -14,8 +14,6 @@ import java.net.Socket;
  * */
 public class ClientBackend extends Thread {
 
-    private static ActionEvent lastActionEvent = null;
-
     private static Socket client;
     private static DataInputStream input;
     private static DataOutputStream output;
@@ -23,18 +21,15 @@ public class ClientBackend extends Thread {
     private static String username;
     private final String host = "localhost";
 
-    private final GUIController GUIController;
+    private GUIController controller;
 
     public ClientBackend()
     {
-        GUIController = new GUIController();
+        ModelClass.addCommand("1");
     }
 
     protected static String getUsername() { return username; }
 
-    protected static void setLastActionEvent(ActionEvent actionEvent) {
-        lastActionEvent = actionEvent;
-    }
 
     protected boolean isConnected()
     {
@@ -49,7 +44,6 @@ public class ClientBackend extends Thread {
     private void logIn(String pUsername) throws IOException {
         username = pUsername;
         GUIController.setLoginState(true);
-        GUIController.switchToAccScene();
     }
 
     public void run() {
@@ -74,15 +68,5 @@ public class ClientBackend extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        new Thread() {
-            @Override
-            public void run() {
-                new ClientBackend().run();
-            }
-        }.start();
-        javafx.application.Application.launch(GUIInitializer.class);
     }
 }
