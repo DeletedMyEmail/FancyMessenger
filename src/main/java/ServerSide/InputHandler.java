@@ -89,7 +89,15 @@ class InputHandler extends Thread {
                         }
                         switch (request[1])
                         {
-                            case "login": handleLoginRequest(i, request);
+                            case "login":
+                                handleLoginRequest(i, request);
+                                break;
+                            case "send":
+                                
+                                break;
+                            case "logout":
+                                break;
+                            default:
                         }
                     }
 
