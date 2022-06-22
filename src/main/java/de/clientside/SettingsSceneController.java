@@ -1,12 +1,15 @@
 package de.clientside;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
-
+/**
+ * Controller for the GUI settings scene
+ *
+ * @version 22.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class SettingsSceneController {
 
     private ClientBackend backend;
@@ -17,7 +20,7 @@ public class SettingsSceneController {
     @FXML
     public void initialize()
     {
-        backend = SceneController.getBackend();
+        backend = SceneManager.getBackend();
     }
 
     protected void changeUsernameText(String pUsername)
@@ -27,7 +30,7 @@ public class SettingsSceneController {
 
     public void switchToMainScene(ActionEvent actionEvent)
     {
-        SceneController.switchToHomeScene();
+        SceneManager.switchToHomeScene();
     }
 }
 

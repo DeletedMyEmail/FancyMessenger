@@ -2,14 +2,17 @@ package de.clientside;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
 import java.io.IOException;
 
+/**
+ * Controller for the GUI login scene
+ *
+ * @version 22.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class LoginSceneController {
 
     private ClientBackend backend;
@@ -26,7 +29,7 @@ public class LoginSceneController {
     @FXML
     public void initialize()
     {
-        backend = SceneController.getBackend();
+        backend = SceneManager.getBackend();
     }
 
     @FXML
@@ -37,7 +40,7 @@ public class LoginSceneController {
 
     public void switchToMainScene(ActionEvent actionEvent)
     {
-        SceneController.switchToHomeScene();
+        SceneManager.switchToHomeScene();
     }
 
     public void onRegisterButtonClick(ActionEvent actionEvent) {

@@ -8,9 +8,10 @@ import java.sql.*;
 import java.util.List;
 
 /**
- *  Server backend for Kmes messenger
+ * Server backend for Kmes messenger<br/>
+ * Manages all inputs from user clients
  *
- * @version 18.06.2022
+ * @version 22.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
@@ -78,7 +79,7 @@ class InputHandler extends Thread {
                     }
                     else
                     {
-                        System.out.printf("[%d]Socket still connected."+input+"\n", i+1);
+                        System.out.printf("[%d]Socket still connected\n", i+1);
                         String[] request = input.split(";");
                         if (!request[0].equals("KMES"))
                         {

@@ -3,9 +3,12 @@ package de.clientside;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
-
+/**
+ * Controller for the GUI home scene
+ *
+ * @version 22.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class HomeSceneController {
 
     private ClientBackend backend;
@@ -16,7 +19,7 @@ public class HomeSceneController {
     @FXML
     public void initialize()
     {
-        backend = SceneController.getBackend();
+        backend = SceneManager.getBackend();
     }
 
     @FXML
@@ -24,11 +27,11 @@ public class HomeSceneController {
     {
         if (!ClientBackend.getUsername().equals(""))
         {
-            SceneController.switchToSettingsScene();
+            SceneManager.switchToSettingsScene();
         }
         else
         {
-            SceneController.switchToLoginScene();
+            SceneManager.switchToLoginScene();
         }
     }
 }

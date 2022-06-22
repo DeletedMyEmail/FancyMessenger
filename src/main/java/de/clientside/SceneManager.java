@@ -8,7 +8,13 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class SceneController extends Application {
+/**
+ * Class which contains all scenes and stages for the GUI
+ *
+ * @version 22.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
+public class SceneManager extends Application {
 
     private static Stage stage;
     private static Scene settingsScene, loginScene, homeScene;
@@ -19,17 +25,17 @@ public class SceneController extends Application {
 
     private void setScenes() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(SceneController.class.getResource("settings_scene.fxml"));
+        loader.setLocation(SceneManager.class.getResource("settings_scene.fxml"));
         settingsScene = new Scene(loader.load());
         settingsController = loader.getController();
 
         loader = new FXMLLoader();
-        loader.setLocation(SceneController.class.getResource("home_scene.fxml"));
+        loader.setLocation(SceneManager.class.getResource("home_scene.fxml"));
         homeScene = new Scene(loader.load());
         homeController = loader.getController();
 
         loader = new FXMLLoader();
-        loader.setLocation(SceneController.class.getResource("login_scene.fxml"));
+        loader.setLocation(SceneManager.class.getResource("login_scene.fxml"));
         loginScene = new Scene(loader.load());
         loginController = loader.getController();
     }
@@ -101,6 +107,6 @@ public class SceneController extends Application {
     }
 
     public static void main(String[] args) {
-        SceneController.launch();
+        SceneManager.launch();
     }
 }

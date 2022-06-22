@@ -2,12 +2,15 @@ package ServerSide;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+/**
+ * Hasher class to encode strings to hashes
+ *
+ * @version 22.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class PasswordHasher {
 
     private final static int cost = 16;

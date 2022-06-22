@@ -11,9 +11,9 @@ import java.util.List;
 
 
 /**
- * Thread accepting new clients connecting to the KMes messenger or closing disconnected ones.
+ * Thread accepting new clients connecting to the KMes messenger
  *
- * @version 18.06.2022
+ * @version 22.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread{

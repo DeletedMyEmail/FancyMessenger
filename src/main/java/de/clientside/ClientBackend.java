@@ -6,7 +6,7 @@ import java.net.Socket;
 /**
  * Client backend for KMes Messenger
  *
- * @version 18.06.2022
+ * @version 22.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -53,8 +53,8 @@ public class ClientBackend {
      * */
     private void updateCurrentUser(String pUsername) {
         username = pUsername;
-        SceneController.getSettingsScene().changeUsernameText(username);
-        SceneController.switchToSettingsScene();
+        SceneManager.getSettingsScene().changeUsernameText(username);
+        SceneManager.switchToSettingsScene();
     }
 
     /**
