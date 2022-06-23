@@ -30,7 +30,46 @@ class InputHandler extends Thread {
         running = true;
     }
 
-    private void handleLoginRequest(int socket_index, String request[]) throws IOException {
+
+    private void handleSendRequest(int socket_index, String[] request) throws IOException
+    {
+
+    }
+
+    private void handleRegistrationRequest(int socket_index, String[] request) throws IOException
+    {
+        if (request.length<4)
+        {
+            writeToSocket(socket_index, "KMES;error;Password or username incorrect");
+            System.out.println("Password invalid");
+        }
+        else if (clients_in_out.get(socket_index).get(3).equals(""))
+        {
+            String username = request[2];
+            if (!sqlmanager.userExists(username))
+            {
+                PasswordHasher hasher = new PasswordHasher();
+                sqlmanager.insertNewUser(username,  hasher.getHash(request[3]));
+            }
+            else
+            {
+                writeToSocket(socket_index, "KMES;error;Please choose another username");
+            }
+        }
+        else
+        {
+            writeToSocket(socket_index, "KMES;error;Log out before registration");
+        }
+    }
+
+    private void handleLoginRequest(int socket_index, String[] request) throws IOException {
+        if (request.length<4)
+        {
+            writeToSocket(socket_index, "KMES;error;Password or username incorrect");
+            System.out.println("Password invalid");
+            return;
+        }
+
         PasswordHasher hasher = new PasswordHasher();
         String username = request[2];
         String password = hasher.getHash(request[3]);
@@ -44,6 +83,7 @@ class InputHandler extends Thread {
         }
         else
         {
+            writeToSocket(socket_index, "KMES;error;Password or username incorrect");
             System.out.println("Password invalid");
         }
     }
@@ -71,7 +111,7 @@ class InputHandler extends Thread {
                 System.out.printf("Checking socket[%d]..\n", i+1);
                 try {
                     String input = reader.readUTF();
-                    if (current_socket.isClosed() || !current_socket.isConnected() || input == null)
+                    if (current_socket.isClosed() || !current_socket.isConnected())
                     {
                         SocketAcceptor.closeSocket(i);
                         System.out.printf("[%d]Socket closed\n", i+1);
@@ -92,8 +132,11 @@ class InputHandler extends Thread {
                             case "login":
                                 handleLoginRequest(i, request);
                                 break;
+                            case "register":
+                                handleRegistrationRequest(i, request);
+                                break;
                             case "send":
-                                
+                                handleSendRequest(i, request);
                                 break;
                             case "logout":
                                 break;

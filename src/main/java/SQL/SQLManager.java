@@ -45,13 +45,34 @@ public class SQLManager {
             ResultSet rs = onQuery("SELECT username FROM User WHERE username=? AND password_hash=?",
                     new String[]{ username, hashed_password});
 
-            return !(rs.isClosed() || rs.getString(1) == "");
+            return !(rs.isClosed() || rs.getString(1).equals(""));
 
         } catch (SQLException e)
         {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean userExists(String pUsername)
+    {
+        try {
+            ResultSet rs = onQuery("SELECT username FROM User WHERE username=", new String[]{pUsername});
+            return !(rs.isClosed() || rs.getString(1).equals(""));
+        }
+        catch (SQLException ex)
+        {
+            return false;
+        }
+    }
+
+    public void insertNewUser(String username, String hashed_password)
+    {
+        try
+        {
+            onExecute("INSERT INTO User VALUES(?, ?)", new String[]{ username, hashed_password});
+        }
+        catch (SQLException ex) { }
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {

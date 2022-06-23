@@ -43,6 +43,7 @@ public class LoginSceneController {
         SceneManager.switchToHomeScene();
     }
 
-    public void onRegisterButtonClick(ActionEvent actionEvent) {
+    public void onRegisterButtonClick(ActionEvent actionEvent) throws IOException {
+        backend.sendToServer("KMES;register;"+usernameField.getText()+";"+passwordField.getText());
     }
 }

@@ -1,5 +1,8 @@
 package de.clientside;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -89,6 +92,11 @@ public class ClientBackend {
                         {
                             case "loggedIn":
                                 updateCurrentUser(input_str[2]);
+                                break;
+                            case "error":
+                                System.out.println("dd");
+                                SceneManager.showError(Alert.AlertType.ERROR, input_str[2], ButtonType.OK);
+                                break;
                         }
                     }
 
