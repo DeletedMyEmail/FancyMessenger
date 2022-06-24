@@ -96,14 +96,16 @@ public class SceneManager extends Application {
         });
     }
 
-    protected static void showError(Alert.AlertType pType, String pErrorMessage, ButtonType... pButtons)
+    protected static void showError(Alert.AlertType pType,String pContent, String pHeader, ButtonType... pButtons)
     {
         Platform.runLater(new Runnable()
         {
             @Override
             public void run()
             {
-                Alert alert = new Alert(pType, pErrorMessage, pButtons);
+                Alert alert = new Alert(pType, pContent, pButtons);
+                alert.setTitle("Error");
+                alert.setHeaderText(pHeader);
                 alert.showAndWait();
             }
         });

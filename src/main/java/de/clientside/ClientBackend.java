@@ -14,7 +14,7 @@ import java.net.Socket;
  * */
 public class ClientBackend {
 
-    private Socket client;
+    private Socket server;
     private DataInputStream input;
     private DataOutputStream output;
 
@@ -36,7 +36,7 @@ public class ClientBackend {
      * */
     protected boolean isConnected()
     {
-        return client != null && !client.isClosed();
+        return server != null && !server.isClosed();
     }
 
     /**
@@ -78,28 +78,37 @@ public class ClientBackend {
             public void run()
             {
                 try {
-                    System.out.println("Connecting to server...");
-                    client = new Socket(host, port);
-                    output = new DataOutputStream(client.getOutputStream());
-                    input = new DataInputStream(client.getInputStream());
-                    System.out.println("Successfully connected");
-
-                    while (isConnected()) {
-                        String[] input_str = input.readUTF().split(";");
-                        if (!input_str[0].equals("KMES")) continue;
-
-                        switch (input_str[1])
+                    while (true)
+                    {
+                        while (!isConnected())
                         {
-                            case "loggedIn":
-                                updateCurrentUser(input_str[2]);
-                                break;
-                            case "error":
-                                System.out.println("dd");
-                                SceneManager.showError(Alert.AlertType.ERROR, input_str[2], ButtonType.OK);
-                                break;
+                            System.out.println("Connecting to server...");
+                            server = new Socket(host, port);
+                            output = new DataOutputStream(server.getOutputStream());
+                            input = new DataInputStream(server.getInputStream());
+                            System.out.println("Successfully connected");
+                        }
+                        while (isConnected())
+                        {
+                            String[] input_str = input.readUTF().split(";");
+                            if (!input_str[0].equals("KMES"))
+                            {
+                                server.close();
+                            }
+                            else
+                            {
+                                switch (input_str[1]) {
+                                    case "loggedIn":
+                                        updateCurrentUser(input_str[2]);
+                                        break;
+                                    case "error":
+                                        SceneManager.showError(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
+                                        break;
+                                }
+                            }
+
                         }
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

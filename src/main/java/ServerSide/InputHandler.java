@@ -40,7 +40,7 @@ class InputHandler extends Thread {
     {
         if (request.length<4)
         {
-            writeToSocket(socket_index, "KMES;error;Password or username incorrect");
+            writeToSocket(socket_index, "KMES;error;Please fill out every text field;Registration failed");
             System.out.println("Password invalid");
         }
         else if (clients_in_out.get(socket_index).get(3).equals(""))
@@ -50,22 +50,23 @@ class InputHandler extends Thread {
             {
                 PasswordHasher hasher = new PasswordHasher();
                 sqlmanager.insertNewUser(username,  hasher.getHash(request[3]));
+                writeToSocket(socket_index, "KMES;loggedIn;"+username);
             }
             else
             {
-                writeToSocket(socket_index, "KMES;error;Please choose another username");
+                writeToSocket(socket_index, "KMES;error;This username is already taken, please choose another one;Registration Failed");
             }
         }
         else
         {
-            writeToSocket(socket_index, "KMES;error;Log out before registration");
+            writeToSocket(socket_index, "KMES;error;Log out before registration;Registration Failed");
         }
     }
 
     private void handleLoginRequest(int socket_index, String[] request) throws IOException {
         if (request.length<4)
         {
-            writeToSocket(socket_index, "KMES;error;Password or username incorrect");
+            writeToSocket(socket_index, "KMES;error;Please fill out every text field;Login failed");
             System.out.println("Password invalid");
             return;
         }
@@ -83,7 +84,7 @@ class InputHandler extends Thread {
         }
         else
         {
-            writeToSocket(socket_index, "KMES;error;Password or username incorrect");
+            writeToSocket(socket_index, "KMES;error;Password or username incorrect;Login failed");
             System.out.println("Password invalid");
         }
     }
@@ -125,22 +126,25 @@ class InputHandler extends Thread {
                         {
                             current_socket.close();
                             clients_in_out.remove(i);
-                            continue;
                         }
-                        switch (request[1])
+                        else
                         {
-                            case "login":
-                                handleLoginRequest(i, request);
-                                break;
-                            case "register":
-                                handleRegistrationRequest(i, request);
-                                break;
-                            case "send":
-                                handleSendRequest(i, request);
-                                break;
-                            case "logout":
-                                break;
-                            default:
+                            for (String x : request) { System.out.println(x);}
+                            switch (request[1])
+                            {
+                                case "login":
+                                    handleLoginRequest(i, request);
+                                    break;
+                                case "register":
+                                    handleRegistrationRequest(i, request);
+                                    break;
+                                case "send":
+                                    handleSendRequest(i, request);
+                                    break;
+                                case "logout":
+                                    break;
+                                default:
+                            }
                         }
                     }
 
