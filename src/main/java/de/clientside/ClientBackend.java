@@ -126,6 +126,9 @@ public class ClientBackend {
                                     case "error":
                                         SceneManager.showError(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
                                         break;
+                                    case "message":
+                                        SceneManager.getHomeScene().showNewMessage(input_str[2], input_str[3]);
+                                        break;
                                 }
                             }
 

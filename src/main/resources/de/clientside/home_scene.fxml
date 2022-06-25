@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.clientside.HomeSceneController">
    <children>
       <HBox layoutX="-42.0" layoutY="-37.0" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Text fx:id="titleText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="KMes Messenger">
+            <Text fx:id="titleText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #7ac490;" text="KMes Messenger">
                <HBox.margin>
                   <Insets left="20.0" top="20.0" />
                </HBox.margin>
@@ -29,8 +25,9 @@
             <Font name="System Bold" size="10.0" />
          </font>
       </Button>
-      <TextArea layoutX="128.0" layoutY="58.0" prefHeight="279.0" prefWidth="472.0" style="-fx-border-color: #6bc490; -fx-border-width: 3px;" />
-      <TextField layoutX="164.0" layoutY="350.0" prefHeight="40.0" prefWidth="402.0" />
-      <VBox layoutY="58.0" prefHeight="342.0" prefWidth="131.0" style="-fx-border-style: solid; -fx-border-width: 3px; -fx-border-color: #6bc490;" />
+      <TextField layoutX="142.0" layoutY="346.0" prefHeight="40.0" prefWidth="402.0" />
+      <VBox layoutY="58.0" prefHeight="342.0" prefWidth="131.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #6bc490;" />
+      <VBox fx:id="message_box" layoutX="132.0" layoutY="74.0" prefHeight="258.0" prefWidth="469.0" spacing="20" />
+      <Button fx:id="sendButton" onAction="#onSendButtonClick" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="34.0" />
    </children>
 </AnchorPane>

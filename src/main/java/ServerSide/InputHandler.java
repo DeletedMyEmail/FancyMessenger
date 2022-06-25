@@ -31,9 +31,18 @@ class InputHandler extends Thread {
     }
 
 
-    private void handleSendRequest(int socket_index, String[] request) throws IOException
+    private void handleSendRequest(int author_socket_index, String[] request) throws IOException
     {
-
+        String receiver = request[2];
+        for (List<Object> client : clients_in_out)
+        {
+            if (client.get(3).equals(receiver) && !clients_in_out.get(author_socket_index).equals(receiver))
+            {
+                writeToSocket(clients_in_out.indexOf(client), "KMES;message;"+receiver+";"+request[3]);
+                return;
+            }
+        }
+        writeToSocket(author_socket_index, "KMES;error;User not found or you tried to message yourself;Couldn't send message");
     }
 
     private void handleRegistrationRequest(int socket_index, String[] request) throws IOException
@@ -54,12 +63,12 @@ class InputHandler extends Thread {
             }
             else
             {
-                writeToSocket(socket_index, "KMES;error;This username is already taken, please choose another one;Registration Failed");
+                writeToSocket(socket_index, "KMES;error;This username is already taken, please choose another one;Registration failed");
             }
         }
         else
         {
-            writeToSocket(socket_index, "KMES;error;Log out before registration;Registration Failed");
+            writeToSocket(socket_index, "KMES;error;Log out before registration;Registration failed");
         }
     }
 
