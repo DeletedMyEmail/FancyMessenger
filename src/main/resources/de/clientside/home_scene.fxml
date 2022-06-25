@@ -14,7 +14,7 @@
    <children>
       <HBox layoutX="-42.0" layoutY="-37.0" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="KMes Messenger" fx:id="titleText">
+            <Text fx:id="titleText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="KMes Messenger">
                <HBox.margin>
                   <Insets left="20.0" top="20.0" />
                </HBox.margin>
@@ -29,5 +29,8 @@
             <Font name="System Bold" size="10.0" />
          </font>
       </Button>
+      <TextArea layoutX="128.0" layoutY="58.0" prefHeight="279.0" prefWidth="472.0" style="-fx-border-color: #6bc490; -fx-border-width: 3px;" />
+      <TextField layoutX="164.0" layoutY="350.0" prefHeight="40.0" prefWidth="402.0" />
+      <VBox layoutY="58.0" prefHeight="342.0" prefWidth="131.0" style="-fx-border-style: solid; -fx-border-width: 3px; -fx-border-color: #6bc490;" />
    </children>
 </AnchorPane>

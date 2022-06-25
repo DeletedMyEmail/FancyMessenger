@@ -129,7 +129,6 @@ class InputHandler extends Thread {
                         }
                         else
                         {
-                            for (String x : request) { System.out.println(x);}
                             switch (request[1])
                             {
                                 case "login":
@@ -142,6 +141,7 @@ class InputHandler extends Thread {
                                     handleSendRequest(i, request);
                                     break;
                                 case "logout":
+                                    clients_in_out.get(i).set(3,"");
                                     break;
                                 default:
                             }

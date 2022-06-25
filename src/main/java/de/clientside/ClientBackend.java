@@ -29,7 +29,29 @@ public class ClientBackend {
     /**
      * @return Returns the username from current user or an empty string if not logged in.
      * */
-    protected static String getUsername() { return username; }
+    protected String getUsername() { return username; }
+
+    /**
+     *
+     * */
+    protected void logOut() {
+        username = "";
+        try
+        {
+            sendToServer("KMES;logout");
+        }
+        catch (IOException ex)
+        {
+            try
+            {
+                server.close();
+            }
+            catch (IOException e)
+            {
+                server = null;
+            }
+        }
+    }
 
     /**
      * @return Returns the connection status to the KMes Server

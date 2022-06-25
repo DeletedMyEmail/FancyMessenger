@@ -29,7 +29,7 @@
             <Font name="Arial Bold" size="14.0" />
          </font>
       </Text>
-      <Button layoutX="510.0" layoutY="80.0" mnemonicParsing="false" text="Log out" fx:id="logoutButton"/>
+      <Button layoutX="510.0" layoutY="80.0" mnemonicParsing="false" text="Log out" onAction="#logOut" fx:id="logoutButton"/>
       <Button alignment="CENTER" contentDisplay="CENTER" layoutX="500.0" layoutY="15.0" mnemonicParsing="false" onAction="#switchToMainScene" prefHeight="26.0" prefWidth="70.0" text="Home">
          <font>
             <Font name="System Bold" size="10.0" />

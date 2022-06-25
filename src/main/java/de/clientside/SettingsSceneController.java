@@ -32,5 +32,11 @@ public class SettingsSceneController {
     {
         SceneManager.switchToHomeScene();
     }
+
+    public void logOut(ActionEvent actionEvent)
+    {
+        backend.logOut();
+        SceneManager.switchToLoginScene();
+    }
 }
 

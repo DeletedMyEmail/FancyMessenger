@@ -25,7 +25,7 @@ public class HomeSceneController {
     @FXML
     public void onAccountButtonClick()
     {
-        if (!ClientBackend.getUsername().equals(""))
+        if (!backend.getUsername().equals(""))
         {
             SceneManager.switchToSettingsScene();
         }

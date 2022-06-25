@@ -57,7 +57,7 @@ public class SQLManager {
     public boolean userExists(String pUsername)
     {
         try {
-            ResultSet rs = onQuery("SELECT username FROM User WHERE username=", new String[]{pUsername});
+            ResultSet rs = onQuery("SELECT username FROM User WHERE username=?", new String[]{pUsername});
             return !(rs.isClosed() || rs.getString(1).equals(""));
         }
         catch (SQLException ex)
