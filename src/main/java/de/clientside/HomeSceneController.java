@@ -28,7 +28,7 @@ public class HomeSceneController {
     public Text titleText;
 
     @FXML
-    public VBox message_box;
+    public VBox message_box, contactsVBox;
 
     @FXML
     public TextField messageTextField;
@@ -72,6 +72,11 @@ public class HomeSceneController {
                 message_box.getChildren().addAll(hbox);
             }
         });
+    }
+
+    protected void showNewContact(String username)
+    {
+        contactsVBox.getChildren().add(new Text(username));
     }
 
     public void onSendButtonClick(ActionEvent actionEvent) throws IOException

@@ -5,6 +5,8 @@ import javafx.scene.control.ButtonType;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Client backend for KMes Messenger
@@ -14,17 +16,32 @@ import java.net.Socket;
  * */
 public class ClientBackend {
 
-    private Socket server;
-    private DataInputStream input;
-    private DataOutputStream output;
-
-    private static String username = "";
-
     // Hostname/IP from KMes Server
     private final String host = "localhost";
     // Port from KMes Server which accepts clients
     private final int port = 3141;
 
+    private Socket server;
+    private DataInputStream input;
+    private DataOutputStream output;
+    private BufferedReader reader;
+    private BufferedWriter writer;
+
+    private List<String> contacts;
+
+    private static String username = "";
+
+    public ClientBackend() throws IOException {
+        reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
+        writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
+
+        contacts = new ArrayList<>();
+        String in;
+        while((in = reader.readLine()) != null)
+        {
+            contacts.add(in);
+        }
+    }
 
     /**
      * @return Returns the username from current user or an empty string if not logged in.
@@ -82,7 +99,10 @@ public class ClientBackend {
         SceneManager.switchToSettingsScene();
     }
 
-    public void addContact(String text) {
+    public void addContact(String username)
+    {
+        contacts.add(username);
+        SceneManager.getHomeScene().showNewContact(username);
     }
 
     /**

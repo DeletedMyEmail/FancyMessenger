@@ -28,12 +28,15 @@
       <TextField fx:id="messageTextField" layoutX="142.0" layoutY="346.0" prefHeight="40.0" prefWidth="402.0" />
       <VBox fx:id="message_box" layoutX="134.0" layoutY="74.0" prefHeight="258.0" prefWidth="467.0" spacing="20" />
       <Button fx:id="sendButton" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="26.0" prefWidth="34.0" />
-      <Button layoutX="35.0" layoutY="350.0" mnemonicParsing="false" text="Add Contact" fx:id="addContactButton" onAction="#onAddContactButtonClick">
+      <Button fx:id="addContactButton" layoutX="35.0" layoutY="350.0" mnemonicParsing="false" onAction="#onAddContactButtonClick" text="Add Contact">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
       <Pane layoutX="125.0" layoutY="60.0" prefHeight="340.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
-      <ScrollPane layoutX="4.0" layoutY="67.0" prefHeight="275.0" prefWidth="119.0" fx:id="contactsScrollpane"/>
+      <ScrollPane fx:id="contactsScrollpane" layoutX="4.0" layoutY="67.0" prefHeight="275.0" prefWidth="119.0">
+         <content>
+            <VBox fx:id="contactsVBox" prefHeight="258.0" prefWidth="112.0" />
+         </content></ScrollPane>
    </children>
 </AnchorPane>
