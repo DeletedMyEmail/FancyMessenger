@@ -4,6 +4,7 @@ import SQL.SQLManager;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.sql.*;
 import java.util.List;
 
@@ -36,13 +37,20 @@ class InputHandler extends Thread {
         String receiver = request[2];
         for (List<Object> client : clients_in_out)
         {
-            if (client.get(3).equals(receiver) && !clients_in_out.get(author_socket_index).equals(receiver))
+            if (client.get(3).equals(receiver))
             {
-                writeToSocket(clients_in_out.indexOf(client), "KMES;message;"+receiver+";"+request[3]);
+                if (!clients_in_out.get(author_socket_index).get(3).equals(receiver))
+                {
+                    writeToSocket(clients_in_out.indexOf(client), "KMES;message;"+receiver+";"+request[3]);
+                }
+                else
+                {
+                    writeToSocket(author_socket_index, "KMES;error;You can't message yourself;Couldn't send message");
+                }
                 return;
             }
         }
-        writeToSocket(author_socket_index, "KMES;error;User not found or you tried to message yourself;Couldn't send message");
+        writeToSocket(author_socket_index, "KMES;error;User not found;Couldn't send message");
     }
 
     private void handleRegistrationRequest(int socket_index, String[] request) throws IOException
@@ -157,9 +165,12 @@ class InputHandler extends Thread {
                         }
                     }
 
-                } catch (IOException e) {
+                }
+                catch (SocketTimeoutException ex) {}
+                catch (IOException e)
+                {
                     clients_in_out.remove(i);
-                    System.out.printf("[%d]Socket closed\n", i+1);
+                    System.out.printf("[%d]Socket closed due to IOExcception\n", i+1);
                     i--;
                 }
 

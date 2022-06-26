@@ -3,9 +3,14 @@ package de.clientside;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -26,8 +31,16 @@ public class HomeSceneController {
     public VBox message_box;
 
     @FXML
+    public TextField messageTextField;
+
+    @FXML
+    public ScrollPane contactsScrollpane;
+
+    @FXML
     public void initialize()
     {
+        contactsScrollpane.setFitToWidth(true);
+        //contactsScrollpane.setPannable(true);
         backend = SceneManager.getBackend();
     }
 
@@ -61,7 +74,16 @@ public class HomeSceneController {
         });
     }
 
-    public void onSendButtonClick(ActionEvent actionEvent) throws IOException {
-        backend.sendToServer("KMES;send;Admin;Test");
+    public void onSendButtonClick(ActionEvent actionEvent) throws IOException
+    {
+        String receiver = "Admin";
+        String msg = messageTextField.getText();
+        backend.sendToServer("KMES;send;"+receiver+";"+msg);
+        showNewMessage(receiver, msg);
+    }
+
+    public void onAddContactButtonClick(ActionEvent actionEvent)
+    {
+        SceneManager.showAddContactWindow();
     }
 }

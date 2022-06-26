@@ -41,6 +41,7 @@ class SocketAcceptor extends Thread{
             try
             {
                 Socket new_socket = serverSocket.accept();
+                new_socket.setSoTimeout(100);
                 clients_in_out.add(new ArrayList<>()
                 {{
                     add(new_socket);

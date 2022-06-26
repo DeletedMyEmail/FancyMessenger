@@ -25,9 +25,15 @@
             <Font name="System Bold" size="10.0" />
          </font>
       </Button>
-      <TextField layoutX="142.0" layoutY="346.0" prefHeight="40.0" prefWidth="402.0" />
-      <VBox layoutY="58.0" prefHeight="342.0" prefWidth="131.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #6bc490;" />
-      <VBox fx:id="message_box" layoutX="132.0" layoutY="74.0" prefHeight="258.0" prefWidth="469.0" spacing="20" />
-      <Button fx:id="sendButton" onAction="#onSendButtonClick" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="34.0" />
+      <TextField fx:id="messageTextField" layoutX="142.0" layoutY="346.0" prefHeight="40.0" prefWidth="402.0" />
+      <VBox fx:id="message_box" layoutX="134.0" layoutY="74.0" prefHeight="258.0" prefWidth="467.0" spacing="20" />
+      <Button fx:id="sendButton" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="26.0" prefWidth="34.0" />
+      <Button layoutX="35.0" layoutY="350.0" mnemonicParsing="false" text="Add Contact" fx:id="addContactButton" onAction="#onAddContactButtonClick">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Button>
+      <Pane layoutX="125.0" layoutY="60.0" prefHeight="340.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
+      <ScrollPane layoutX="4.0" layoutY="67.0" prefHeight="275.0" prefWidth="119.0" fx:id="contactsScrollpane"/>
    </children>
 </AnchorPane>

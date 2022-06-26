@@ -2,6 +2,7 @@ package de.clientside;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -18,7 +19,7 @@ import java.io.IOException;
  * */
 public class SceneManager extends Application {
 
-    private static Stage stage;
+    private static Stage stage, addContactStage;
     private static Scene settingsScene, loginScene, homeScene;
     private static SettingsSceneController settingsController;
     private static LoginSceneController loginController;
@@ -112,6 +113,34 @@ public class SceneManager extends Application {
     }
 
     protected static ClientBackend getBackend() { return backend;}
+
+    protected static void closeAddContactWindow()
+    {
+        if (addContactStage != null)
+        {
+            addContactStage.close();
+        }
+    }
+
+    protected static void showAddContactWindow()
+    {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    addContactStage = new Stage();
+                    addContactStage.setTitle("Add Contact");
+                    Scene scene = new Scene(FXMLLoader.load(SceneManager.class.getResource("addContact_scene.fxml")));
+                    addContactStage.setScene(scene);
+                    addContactStage.showAndWait();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     @Override
     public void start(Stage pStage) throws Exception {

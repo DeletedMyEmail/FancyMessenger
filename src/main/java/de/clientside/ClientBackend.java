@@ -82,12 +82,7 @@ public class ClientBackend {
         SceneManager.switchToSettingsScene();
     }
 
-    /**
-     * Updates the GUI to display new income messages
-     * */
-    protected void showNewMessageInGUI()
-    {
-
+    public void addContact(String text) {
     }
 
     /**
@@ -141,4 +136,5 @@ public class ClientBackend {
         }).start();
 
     }
+
 }
