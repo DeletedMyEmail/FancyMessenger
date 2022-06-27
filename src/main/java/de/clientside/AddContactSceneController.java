@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
+
 public class AddContactSceneController
 {
     private ClientBackend backend;
@@ -17,11 +19,10 @@ public class AddContactSceneController
         backend = SceneManager.getBackend();
     }
 
-    public void onAddButtonClick(ActionEvent actionEvent)
-    {
+    public void onAddButtonClick(ActionEvent actionEvent) throws IOException {
         if (!usernameTextfield.getText().equals(""))
         {
-            backend.addContact(usernameTextfield.getText());
+            backend.sendToServer("KMES;doesUserExist;"+usernameTextfield.getText());
             SceneManager.closeAddContactWindow();
         }
     }

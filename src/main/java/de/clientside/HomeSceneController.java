@@ -1,6 +1,9 @@
 package de.clientside;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * Controller for the GUI home scene
@@ -29,19 +33,45 @@ public class HomeSceneController {
     public Text titleText;
 
     @FXML
-    public VBox message_box, contactsVBox;
-
-    @FXML
     public TextField messageTextField;
 
     @FXML
     public ListView contactsList;
 
     @FXML
+    public ScrollPane messagesScrollpane;
+
+    @FXML
     public void initialize()
     {
         //contactsScrollpane.setPannable(true);
         backend = SceneManager.getBackend();
+        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Iterator iter;
+                ObservableList messagesVBox = ((VBox)messagesScrollpane.getContent()).getChildren();
+                while ((iter = messagesVBox.iterator()).hasNext())
+                {
+                    messagesVBox.remove(iter.next());
+                }
+
+                if (backend.getMessagesForUser(((Text)t1).getText()) != null)
+                {
+                    for (String msg : backend.getMessagesForUser(((Text)t1).getText()))
+                    {
+                        messagesVBox.add(createMessageHBox(msg));
+                    }
+                    System.out.println("New messages added");
+                }
+                else
+                {
+                    System.out.println("No messages available");
+                }
+            }
+        }));
     }
 
     @FXML
@@ -57,6 +87,16 @@ public class HomeSceneController {
         }
     }
 
+    private HBox createMessageHBox(String content)
+    {
+        String cssLayout = "-fx-border-color: #6bc490";
+        HBox hbox = new HBox();
+        hbox.setMaxWidth(350.0);
+        hbox.getChildren().add(new Text(content));
+        hbox.setStyle(cssLayout);
+        return hbox;
+    }
+
     protected void showNewMessage(String author, String message)
     {
         Platform.runLater(new Runnable()
@@ -64,27 +104,33 @@ public class HomeSceneController {
             @Override
             public void run()
             {
-                String cssLayout = "-fx-border-color: #6bc490";
-                final HBox hbox = new HBox();
-                hbox.setMaxWidth(350.0);
-                hbox.getChildren().add(new Text("**"+author+"**: "+message));
-                hbox.setStyle(cssLayout);
-                message_box.getChildren().addAll(hbox);
+                Text item = ((Text)contactsList.getSelectionModel().getSelectedItem());
+                if (item != null && item.getText().equals(author))
+                {
+                    ((VBox)messagesScrollpane.getContent()).getChildren().add(createMessageHBox(message));
+                }
             }
         });
     }
 
     protected void showNewContact(String username)
     {
-        contactsVBox.getChildren().add(new Text(username));
+        Platform.runLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                contactsList.getItems().add(new Text(username));
+            }
+        });
     }
 
     public void onSendButtonClick(ActionEvent actionEvent) throws IOException
     {
-        String receiver = "Admin";
+        String receiver = ((Text)contactsList.getSelectionModel().getSelectedItem()).getText();
         String msg = messageTextField.getText();
+        backend.addNewMessage(receiver, "**Sent**: "+msg);
         backend.sendToServer("KMES;send;"+receiver+";"+msg);
-        showNewMessage(receiver, msg);
     }
 
     public void onAddContactButtonClick(ActionEvent actionEvent)

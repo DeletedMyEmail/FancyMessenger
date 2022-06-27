@@ -41,7 +41,7 @@ class InputHandler extends Thread {
             {
                 if (!clients_in_out.get(author_socket_index).get(3).equals(receiver))
                 {
-                    writeToSocket(clients_in_out.indexOf(client), "KMES;message;"+receiver+";"+request[3]);
+                    writeToSocket(clients_in_out.indexOf(client), "KMES;message;"+clients_in_out.get(author_socket_index).get(3)+";"+request[3]);
                 }
                 else
                 {
@@ -160,6 +160,16 @@ class InputHandler extends Thread {
                                 case "logout":
                                     clients_in_out.get(i).set(3,"");
                                     break;
+                                case "doesUserExist":
+                                    String username = request[2];
+                                    if (sqlmanager.userExists(username))
+                                    {
+                                        writeToSocket(i, "KMES;userExists;"+username);
+                                    }
+                                    else
+                                    {
+                                        writeToSocket(i, "KMES;error;User does not exist: "+username+";Adding contact failed");
+                                    }
                                 default:
                             }
                         }

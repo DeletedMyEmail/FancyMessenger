@@ -105,7 +105,6 @@ public class SceneManager extends Application {
             public void run()
             {
                 Alert alert = new Alert(pType, pContent, pButtons);
-                alert.setTitle("Error");
                 alert.setHeaderText(pHeader);
                 alert.showAndWait();
             }
@@ -149,7 +148,14 @@ public class SceneManager extends Application {
         stage = pStage;
         setScenes();
         stage.setScene(homeScene);
+        stage.getOnCloseRequest();
         stage.show();
+    }
+
+    @Override
+    public void stop()
+    {
+        System.exit(0);
     }
 
     public static void main(String[] args) {

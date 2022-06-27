@@ -26,14 +26,18 @@
          </font>
       </Button>
       <TextField fx:id="messageTextField" layoutX="142.0" layoutY="346.0" prefHeight="40.0" prefWidth="402.0" />
-      <VBox fx:id="message_box" layoutX="134.0" layoutY="74.0" prefHeight="258.0" prefWidth="467.0" spacing="20" />
-      <Button fx:id="sendButton" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="26.0" prefWidth="34.0" />
+      <Button fx:id="sendButton" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="26.0" prefWidth="34.0" text="&gt;" />
       <Button fx:id="addContactButton" layoutX="35.0" layoutY="350.0" mnemonicParsing="false" onAction="#onAddContactButtonClick" text="Add Contact">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
       <Pane layoutX="125.0" layoutY="60.0" prefHeight="340.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
-      <ListView layoutX="4.0" layoutY="65.0" prefHeight="278.0" prefWidth="120.0" fx:id="contactsList" />
+      <ListView fx:id="contactsList" layoutX="4.0" layoutY="65.0" prefHeight="278.0" prefWidth="120.0" />
+      <ScrollPane layoutX="135.0" layoutY="66.0" prefHeight="272.0" prefWidth="461.0" fx:id="messagesScrollpane">
+         <content>
+            <VBox fx:id="message_box" prefHeight="198.0" prefWidth="197.0" spacing="20" />
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

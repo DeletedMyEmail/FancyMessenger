@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonType;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,10 +29,13 @@ public class ClientBackend {
     private BufferedWriter writer;
 
     private List<String> contacts;
+    private HashMap<String, List<String>> messages;
 
     private static String username = "";
 
     public ClientBackend() throws IOException {
+        messages = new HashMap<>();
+
         reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
         writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
 
@@ -41,6 +45,11 @@ public class ClientBackend {
         {
             contacts.add(in);
         }
+    }
+
+    protected List<String> getMessagesForUser(String user)
+    {
+        return messages.get(user);
     }
 
     /**
@@ -99,10 +108,17 @@ public class ClientBackend {
         SceneManager.switchToSettingsScene();
     }
 
-    public void addContact(String username)
+    protected void addNewMessage(String pUsername, String pMessage)
     {
-        contacts.add(username);
-        SceneManager.getHomeScene().showNewContact(username);
+        if (messages.get(pUsername) != null)
+        {
+            messages.get(pUsername).add(pMessage);
+        }
+        else
+        {
+            messages.put(pUsername, new ArrayList<String>(){{add(pMessage);}});
+        }
+        SceneManager.getHomeScene().showNewMessage(pUsername, pMessage);
     }
 
     /**
@@ -142,8 +158,11 @@ public class ClientBackend {
                                         SceneManager.showError(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
                                         break;
                                     case "message":
-                                        SceneManager.getHomeScene().showNewMessage(input_str[2], input_str[3]);
+                                        addNewMessage(input_str[2], "Received: "+input_str[3]);
                                         break;
+                                    case "userExists":
+                                        SceneManager.getHomeScene().showNewContact(input_str[2]);
+                                        SceneManager.showError(Alert.AlertType.CONFIRMATION, "Successfully added new contact: "+input_str[2], "New contact", ButtonType.OK);
                                 }
                             }
 
