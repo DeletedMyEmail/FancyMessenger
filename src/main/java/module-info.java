@@ -1,4 +1,4 @@
-module com.example.healthtracker {
+module clientside.kmesrework {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;

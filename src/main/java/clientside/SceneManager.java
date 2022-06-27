@@ -141,14 +141,16 @@ public class SceneManager extends Application {
     }
 
     @Override
-    public void start(Stage pStage) throws Exception {
-        backend = new ClientBackend();
-        backend.listenForServerInput();
-        stage = pStage;
-        setScenes();
-        stage.setScene(homeScene);
-        stage.getOnCloseRequest();
-        stage.show();
+    public void start(Stage pStage) {
+
+        try {
+            backend = new ClientBackend();
+            backend.listenForServerInput();
+            stage = pStage;
+            setScenes();
+            stage.setScene(homeScene);
+            stage.show();
+        } catch (Exception ex) { ex.printStackTrace();}
     }
 
     @Override
