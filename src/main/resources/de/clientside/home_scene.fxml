@@ -34,9 +34,6 @@
          </font>
       </Button>
       <Pane layoutX="125.0" layoutY="60.0" prefHeight="340.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
-      <ScrollPane fx:id="contactsScrollpane" layoutX="4.0" layoutY="67.0" prefHeight="275.0" prefWidth="119.0">
-         <content>
-            <VBox fx:id="contactsVBox" prefHeight="258.0" prefWidth="112.0" />
-         </content></ScrollPane>
+      <ListView layoutX="4.0" layoutY="65.0" prefHeight="278.0" prefWidth="120.0" fx:id="contactsList" />
    </children>
 </AnchorPane>

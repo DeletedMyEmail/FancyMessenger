@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -34,12 +35,11 @@ public class HomeSceneController {
     public TextField messageTextField;
 
     @FXML
-    public ScrollPane contactsScrollpane;
+    public ListView contactsList;
 
     @FXML
     public void initialize()
     {
-        contactsScrollpane.setFitToWidth(true);
         //contactsScrollpane.setPannable(true);
         backend = SceneManager.getBackend();
     }
