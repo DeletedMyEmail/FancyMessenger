@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * Class which contains all scenes and stages for the GUI
  *
- * @version 22.06.2022
+ * @version 27.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class SceneManager extends Application {

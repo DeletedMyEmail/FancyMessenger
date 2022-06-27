@@ -2,6 +2,12 @@ package SQL;
 
 import java.sql.*;
 
+/**
+ * Class that provides methods for safe SQL statements in Java and specified ones for KMes
+ *
+ * @version 27.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class SQLManager {
 
     private Connection con;
@@ -73,12 +79,6 @@ public class SQLManager {
             onExecute("INSERT INTO User VALUES(?, ?)", new String[]{ username, hashed_password});
         }
         catch (SQLException ex) { }
-    }
-
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        SQLManager sqlmnanager = new SQLManager("src/main/java/SQL/kmes.db");
-        System.out.println(sqlmnanager.onQuery("SELECT username FROM User WHERE username=? AND password_hash=?",
-                new String[]{ "Admin", "fddsnfse"}).getString(1));
     }
 }
 

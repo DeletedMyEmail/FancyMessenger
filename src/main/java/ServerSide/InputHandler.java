@@ -12,7 +12,7 @@ import java.util.List;
  * Server backend for Kmes messenger<br/>
  * Manages all inputs from user clients
  *
- * @version 22.06.2022
+ * @version 27.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {

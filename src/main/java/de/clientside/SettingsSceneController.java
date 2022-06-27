@@ -7,7 +7,7 @@ import javafx.scene.text.Text;
 /**
  * Controller for the GUI settings scene
  *
- * @version 22.06.2022
+ * @version 27.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class SettingsSceneController {

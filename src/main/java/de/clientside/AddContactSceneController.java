@@ -6,6 +6,12 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
+/**
+ * Controller for GUI contact adding scene
+ *
+ * @version 27.06.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class AddContactSceneController
 {
     private ClientBackend backend;

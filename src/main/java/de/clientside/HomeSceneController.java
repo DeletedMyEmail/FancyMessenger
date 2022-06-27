@@ -22,7 +22,7 @@ import java.util.Iterator;
 /**
  * Controller for the GUI home scene
  *
- * @version 22.06.2022
+ * @version 27.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class HomeSceneController {
