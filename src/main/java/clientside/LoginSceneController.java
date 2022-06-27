@@ -1,4 +1,4 @@
-package de.clientside;
+package clientside;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

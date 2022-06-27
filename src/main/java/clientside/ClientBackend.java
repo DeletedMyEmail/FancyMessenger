@@ -1,4 +1,4 @@
-package de.clientside;
+package clientside;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -10,29 +10,36 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Client backend for KMes Messenger
+ * Client backend for KMes Messenger<br/>
+ * Handles input from the KMes server
  *
  * @version 27.06.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
 
-    // Hostname/IP from KMes Server
+    // Hostname/IP from KMes server
     private final String host = "localhost";
-    // Port from KMes Server which accepts clients
+    // Port of the KMes server which accepts clients
     private final int port = 3141;
 
+    // connection to KMes
     private Socket server;
     private DataInputStream input;
     private DataOutputStream output;
+
     private BufferedReader reader;
     private BufferedWriter writer;
 
     private List<String> contacts;
     private HashMap<String, List<String>> messages;
 
-    private static String username = "";
+    private static String currentUser = "";
 
+    /**
+     * Creates a ClientBackend instance, iniitializes attributes and transfers old saved messages into a HashMap
+     * in conjunction with the receiver/sender
+     * */
     public ClientBackend() throws IOException {
         messages = new HashMap<>();
 
@@ -43,25 +50,30 @@ public class ClientBackend {
         String in;
         while((in = reader.readLine()) != null)
         {
-            contacts.add(in);
+            //TODO
         }
     }
 
-    protected List<String> getMessagesForUser(String user)
+    /**
+     * @param pUsername Name of the user whose sent/received messages are to be returned
+     * @return Returns a list of strings including all sent messages with the specified user
+     * */
+    protected List<String> getMessagesForUser(String pUsername)
     {
-        return messages.get(user);
+        return messages.get(pUsername);
     }
 
     /**
-     * @return Returns the username from current user or an empty string if not logged in.
+     * @return Returns the username from the current user or an empty string if not logged in.
      * */
-    protected String getUsername() { return username; }
+    protected String getUsername() { return currentUser; }
 
     /**
-     *
+     * Logs out the current user.<br/>
+     * Both server and client will no longer associate a specific user with this socket.
      * */
     protected void logOut() {
-        username = "";
+        currentUser = "";
         try
         {
             sendToServer("KMES;logout");
@@ -90,7 +102,7 @@ public class ClientBackend {
     /**
      * Sends a string to the KMes server
      *
-     * @param pMessage Message to send to server
+     * @param pMessage Message to be sent
      * */
     protected void sendToServer(String pMessage) throws IOException
     {
@@ -100,14 +112,21 @@ public class ClientBackend {
     /**
      * Updates the current user, the GUI and loads the account settings scene
      *
-     * @param pUsername Username of the new logged in user
+     * @param pUsername Username of the new logged-in user
      * */
     private void updateCurrentUser(String pUsername) {
-        username = pUsername;
-        SceneManager.getSettingsScene().changeUsernameText(username);
+        currentUser = pUsername;
+        SceneManager.getSettingsScene().changeUsernameText(currentUser);
         SceneManager.switchToSettingsScene();
     }
 
+    /**
+     * Adds a new message to the list of messages with a specific user.
+     * If there is no such list in the HashMap in conjunction with this user, a new one will be added.
+     *
+     * @param pUsername Name of the user who sent/received this message
+     * @param pMessage Message content
+     * */
     protected void addNewMessage(String pUsername, String pMessage)
     {
         if (messages.get(pUsername) != null)
@@ -131,26 +150,21 @@ public class ClientBackend {
             public void run()
             {
                 try {
-                    while (true)
+                    while (true) // do not criticize obvious stupidity
                     {
-                        while (!isConnected())
-                        {
-                            System.out.println("Connecting to server...");
-                            server = new Socket(host, port);
-                            output = new DataOutputStream(server.getOutputStream());
-                            input = new DataInputStream(server.getInputStream());
-                            System.out.println("Successfully connected");
-                        }
+                        // Connects to the KMes server and iniitializes attributes for communication
+                        server = new Socket(host, port);
+                        output = new DataOutputStream(server.getOutputStream());
+                        input = new DataInputStream(server.getInputStream());
+
+                        // Handles inputs as long as the connection exists
                         while (isConnected())
                         {
                             String[] input_str = input.readUTF().split(";");
-                            if (!input_str[0].equals("KMES"))
+                            if (input_str[0].equals("KMES"))
                             {
-                                server.close();
-                            }
-                            else
-                            {
-                                switch (input_str[1]) {
+                                switch (input_str[1])
+                                {
                                     case "loggedIn":
                                         updateCurrentUser(input_str[2]);
                                         break;
@@ -162,8 +176,13 @@ public class ClientBackend {
                                         break;
                                     case "userExists":
                                         SceneManager.getHomeScene().showNewContact(input_str[2]);
-                                        SceneManager.showError(Alert.AlertType.CONFIRMATION, "Successfully added new contact: "+input_str[2], "New contact", ButtonType.OK);
+                                        SceneManager.showError(Alert.AlertType.CONFIRMATION, "Successfully added" +
+                                                " new contact: "+input_str[2], "New contact", ButtonType.OK);
                                 }
+                            }
+                            else
+                            {
+                                server.close();
                             }
 
                         }

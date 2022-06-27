@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.List;
 
 /**
- * Server backend for Kmes messenger<br/>
+ * Server backend for the KMes server<br/>
  * Manages all inputs from user clients
  *
  * @version 27.06.2022
@@ -124,7 +124,6 @@ class InputHandler extends Thread {
             {
                 Socket current_socket = ((Socket)clients_in_out.get(i).get(0));
                 DataInputStream reader = ((DataInputStream)clients_in_out.get(i).get(2));
-                //BufferedReader reader = new BufferedReader(new InputStreamReader(current_input_stream));
 
                 System.out.printf("Checking socket[%d]..\n", i+1);
                 try {
