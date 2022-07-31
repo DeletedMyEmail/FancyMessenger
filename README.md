@@ -20,8 +20,8 @@ First of all, this project is based on JavaIO sockets to establish all connectio
 
 Note that the server host is defined by default in [ClientBackend](src/main/java/clientside/ClientBackend.java) as "localhost".
 
-
-### Roadmap
+<!-- Roadmap -->
+## Roadmap
 
 1. Queue messages if a user is offline and send them if they get back online
 2. OTP encryption
