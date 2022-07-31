@@ -1,10 +1,15 @@
 package clientside;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,21 +78,16 @@ public class ClientBackend {
      * Both server and client will no longer associate a specific user with this socket.
      * */
     protected void logOut() {
-        currentUser = "";
         try
         {
             sendToServer("KMES;logout");
+            messages.clear();
+            SceneManager.getHomeScene().clearShowMessagesAndContacts();
+            currentUser = "";
         }
         catch (IOException ex)
         {
-            try
-            {
-                server.close();
-            }
-            catch (IOException e)
-            {
-                server = null;
-            }
+            SceneManager.showAlert(Alert.AlertType.ERROR, "Server doesn't respond", "Error accured while trying to log out", ButtonType.OK);
         }
     }
 
@@ -129,19 +129,22 @@ public class ClientBackend {
      * */
     protected void addNewMessage(String pUsername, String pMessage)
     {
-        if (messages.get(pUsername) != null)
+        if (messages.get(pUsername) == null)
         {
-            messages.get(pUsername).add(pMessage);
+            messages.put(pUsername, new ArrayList<>() {{
+                add(pMessage);
+            }});
+            SceneManager.getHomeScene().showNewContact(pUsername);
         }
         else
         {
-            messages.put(pUsername, new ArrayList<String>(){{add(pMessage);}});
+            messages.get(pUsername).add(pMessage);
         }
         SceneManager.getHomeScene().showNewMessage(pUsername, pMessage);
     }
 
     /**
-     * Creates a new Thread which listens to server inputs and handles them
+     * Creates a new Thread which listens for server inputs and handles them
      * */
     protected void listenForServerInput () {
         new Thread(new Runnable()
@@ -153,7 +156,8 @@ public class ClientBackend {
                     while (true) // do not criticize obvious stupidity
                     {
                         // Connects to the KMes server and iniitializes attributes for communication
-                        server = new Socket(host, port);
+                        server = new Socket();
+                        server.connect(new InetSocketAddress(host, port), 3000);
                         output = new DataOutputStream(server.getOutputStream());
                         input = new DataInputStream(server.getInputStream());
 
@@ -169,14 +173,14 @@ public class ClientBackend {
                                         updateCurrentUser(input_str[2]);
                                         break;
                                     case "error":
-                                        SceneManager.showError(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
+                                        SceneManager.showAlert(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
                                         break;
                                     case "message":
                                         addNewMessage(input_str[2], "Received: "+input_str[3]);
                                         break;
                                     case "userExists":
                                         SceneManager.getHomeScene().showNewContact(input_str[2]);
-                                        SceneManager.showError(Alert.AlertType.CONFIRMATION, "Successfully added" +
+                                        SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                                 " new contact: "+input_str[2], "New contact", ButtonType.OK);
                                 }
                             }
@@ -187,7 +191,18 @@ public class ClientBackend {
 
                         }
                     }
-                } catch (Exception e) {
+                }
+                catch (SocketTimeoutException | SocketException socketException)
+                {
+                    EventHandler onCloseHandler = new EventHandler() {
+                        @Override
+                        public void handle(Event event) {
+                            System.exit(0);
+                        }
+                    };
+                    SceneManager.showAlert(Alert.AlertType.ERROR, "", "Connection to the KMesServer couldn't be established", onCloseHandler, ButtonType.OK);
+                }
+                catch (Exception e) {
                     e.printStackTrace();
                 }
             }

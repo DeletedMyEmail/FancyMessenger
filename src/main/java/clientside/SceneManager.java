@@ -2,10 +2,12 @@ package clientside;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -96,7 +98,7 @@ public class SceneManager extends Application {
         });
     }
 
-    protected static void showError(Alert.AlertType pType,String pContent, String pHeader, ButtonType... pButtons)
+    protected static void showAlert(Alert.AlertType pType, String pContent, String pHeader, ButtonType... pButtons)
     {
         Platform.runLater(new Runnable()
         {
@@ -105,6 +107,21 @@ public class SceneManager extends Application {
             {
                 Alert alert = new Alert(pType, pContent, pButtons);
                 alert.setHeaderText(pHeader);
+                alert.showAndWait();
+            }
+        });
+    }
+
+    protected static void showAlert(Alert.AlertType pType, String pContent, String pHeader, EventHandler pEventHandler, ButtonType... pButtons)
+    {
+        Platform.runLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Alert alert = new Alert(pType, pContent, pButtons);
+                alert.setHeaderText(pHeader);
+                alert.setOnCloseRequest(pEventHandler);
                 alert.showAndWait();
             }
         });

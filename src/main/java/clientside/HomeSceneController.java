@@ -4,9 +4,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -36,6 +34,28 @@ public class HomeSceneController {
     @FXML
     public ScrollPane messagesScrollpane;
 
+    private void showAllMessages(Text pText) {
+        ObservableList messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
+        showAllMessages(pText, messageList);
+    }
+
+    private void showAllMessages(Text pText, ObservableList pMessageList)
+    {
+        if (backend.getMessagesForUser(pText.getText()) != null)
+        {
+            for (String msg : backend.getMessagesForUser(pText.getText()))
+            {
+                pMessageList.add(createMessageHBox(msg));
+            }
+            System.out.println("New messages added");
+        }
+    }
+
+    private void clearCurrentMessages() {
+        ObservableList messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
+        messageList.clear();
+    }
+
     @FXML
     public void initialize()
     {
@@ -45,31 +65,14 @@ public class HomeSceneController {
             @Override
             public void run()
             {
-                Iterator iter;
-                ObservableList messagesVBox = ((VBox)messagesScrollpane.getContent()).getChildren();
-                while ((iter = messagesVBox.iterator()).hasNext())
-                {
-                    messagesVBox.remove(iter.next());
-                }
-
-                if (backend.getMessagesForUser(((Text)t1).getText()) != null)
-                {
-                    for (String msg : backend.getMessagesForUser(((Text)t1).getText()))
-                    {
-                        messagesVBox.add(createMessageHBox(msg));
-                    }
-                    System.out.println("New messages added");
-                }
-                else
-                {
-                    System.out.println("No messages available");
-                }
+                clearCurrentMessages();
+                showAllMessages((Text)t1);
             }
         }));
     }
 
     @FXML
-    public void onAccountButtonClick()
+    protected void onAccountButtonClick()
     {
         if (!backend.getUsername().equals(""))
         {
@@ -119,16 +122,36 @@ public class HomeSceneController {
         });
     }
 
-    public void onSendButtonClick(ActionEvent actionEvent) throws IOException
+    @FXML
+    protected void onSendButtonClick(ActionEvent actionEvent) throws IOException
     {
-        String receiver = ((Text)contactsList.getSelectionModel().getSelectedItem()).getText();
+        Text selectedContact = ((Text)contactsList.getSelectionModel().getSelectedItem());
+        if (selectedContact == null) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
+            return;
+        }
+
+        String receiver = selectedContact.getText();
         String msg = messageTextField.getText();
-        backend.addNewMessage(receiver, "**Sent**: "+msg);
+        backend.addNewMessage(receiver, "Sent: "+msg);
         backend.sendToServer("KMES;send;"+receiver+";"+msg);
     }
 
-    public void onAddContactButtonClick(ActionEvent actionEvent)
+    @FXML
+    protected void onAddContactButtonClick(ActionEvent actionEvent)
     {
         SceneManager.showAddContactWindow();
+    }
+
+    private void clearContacts()
+    {
+        contactsList.getSelectionModel().clearSelection();
+        contactsList.getItems().clear();
+    }
+
+    protected void clearShowMessagesAndContacts()
+    {
+        clearCurrentMessages();
+        clearContacts();
     }
 }
