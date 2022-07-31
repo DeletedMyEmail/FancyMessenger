@@ -3,7 +3,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![Messenger Home Screen](/images/homescreen.png?raw=true)
+![Messenger Home Screen](/src/main/resources/images/homescreen.png?raw=true)
 
 Out of boredom and a school project, I started writing a messenger.
 The following things were important to me:

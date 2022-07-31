@@ -47,7 +47,7 @@ public class ClientBackend {
      * */
     public ClientBackend() throws IOException {
         messages = new HashMap<>();
-
+/*
         reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
         writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
 
@@ -56,7 +56,7 @@ public class ClientBackend {
         while((in = reader.readLine()) != null)
         {
             //TODO
-        }
+        }*/
     }
 
     /**

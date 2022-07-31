@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogEvent;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -158,16 +159,20 @@ public class SceneManager extends Application {
     }
 
     @Override
-    public void start(Stage pStage) {
-
-        try {
+    public void start(Stage pStage)
+    {
+        try
+        {
             backend = new ClientBackend();
             backend.listenForServerInput();
+
             stage = pStage;
             setScenes();
             stage.setScene(homeScene);
+            stage.getIcons().add(new Image(SceneManager.class.getResourceAsStream("/images/logo.png")));
             stage.show();
-        } catch (Exception ex) { ex.printStackTrace();}
+        }
+        catch (Exception ex) { ex.printStackTrace();}
     }
 
     @Override
