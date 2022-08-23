@@ -1,7 +1,8 @@
 package client;
 
-import javafx.event.Event;
-import javafx.event.EventHandler;
+// Own Library
+import KLibrary.Utils.EncryptionUtils;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes server
  *
- * @version 27.06.2022
+ * @version 23.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -36,10 +37,10 @@ public class ClientBackend {
     private BufferedReader reader;
     private BufferedWriter writer;
 
-    private List<String> contacts;
-    private HashMap<String, List<String>> messages;
+    private final HashMap<String, List<String>> messages;
+    private final EncryptionUtils encryptionUtils;
 
-    private static String currentUser = "";
+    private String currentUser = "";
 
     /**
      * Creates a ClientBackend instance, iniitializes attributes and transfers old saved messages into a HashMap
@@ -47,7 +48,8 @@ public class ClientBackend {
      * */
     public ClientBackend() throws IOException {
         messages = new HashMap<>();
-/*
+        encryptionUtils = new EncryptionUtils();
+        /*
         reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
         writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
 
@@ -87,7 +89,7 @@ public class ClientBackend {
         }
         catch (IOException ex)
         {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "Server doesn't respond", "Error accured while trying to log out", ButtonType.OK);
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMesServer", ButtonType.OK);
         }
     }
 
@@ -161,46 +163,36 @@ public class ClientBackend {
                         output = new DataOutputStream(server.getOutputStream());
                         input = new DataInputStream(server.getInputStream());
 
+                        establishRSA();
+
                         // Handles inputs as long as the connection exists
                         while (isConnected())
                         {
                             String[] input_str = input.readUTF().split(";");
                             if (input_str[0].equals("KMES"))
                             {
-                                switch (input_str[1])
-                                {
-                                    case "loggedIn":
-                                        updateCurrentUser(input_str[2]);
-                                        break;
-                                    case "error":
-                                        SceneManager.showAlert(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
-                                        break;
-                                    case "message":
-                                        addNewMessage(input_str[2], "Received: "+input_str[3]);
-                                        break;
-                                    case "userExists":
+                                switch (input_str[1]) {
+                                    case "loggedIn" -> updateCurrentUser(input_str[2]);
+                                    case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
+                                    case "message" -> addNewMessage(input_str[2], "Received: " + input_str[3]);
+                                    case "userExists" ->
+                                    {
+                                        messages.computeIfAbsent(input_str[2], k -> new ArrayList<>());
                                         SceneManager.getHomeScene().showNewContact(input_str[2]);
                                         SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
-                                                " new contact: "+input_str[2], "New contact", ButtonType.OK);
+                                                " new contact: " + input_str[2], "New contact", ButtonType.OK);
+                                    }
                                 }
                             }
-                            else
-                            {
-                                server.close();
-                            }
-
+                            else server.close();
                         }
                     }
                 }
                 catch (SocketTimeoutException | SocketException socketException)
                 {
-                    EventHandler onCloseHandler = new EventHandler() {
-                        @Override
-                        public void handle(Event event) {
-                            System.exit(0);
-                        }
-                    };
-                    SceneManager.showAlert(Alert.AlertType.ERROR, "", "Connection to the KMesServer couldn't be established", onCloseHandler, ButtonType.OK);
+                    SceneManager.showAlert(Alert.AlertType.ERROR, "",
+                            "Connection to the KMesServer couldn't be established",
+                            event -> System.exit(0), ButtonType.OK);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -210,4 +202,20 @@ public class ClientBackend {
 
     }
 
+    private void establishRSA() throws IOException
+    {
+        sendToServer("KMES");
+    }
+
+    public void sendMessage(String pReceiver, String pMessage)
+    {
+        try
+        {
+            sendToServer("KMES;send;"+pReceiver+";"+pMessage);
+            addNewMessage(pReceiver, "Sent: "+pMessage);
+        }
+        catch (IOException ex) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMesServer", ButtonType.OK);
+        }
+    }
 }

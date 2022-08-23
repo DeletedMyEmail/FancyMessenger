@@ -3,6 +3,7 @@ module clientside.kmesrework {
     requires javafx.fxml;
     requires javafx.graphics;
     requires java.sql;
+    requires org.xerial.sqlitejdbc;
 
 
     opens client to javafx.fxml;
