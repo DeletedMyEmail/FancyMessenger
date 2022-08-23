@@ -11,19 +11,19 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.7.1</junit.version>
+        <junit.version>5.9.0</junit.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>16</version>
+            <version>18.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>16</version>
+            <version>18.0.2</version>
         </dependency>
 
         <dependency>
@@ -67,7 +67,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>clientside.SceneManager</mainClass>
+                            <mainClass>client.SceneManager</mainClass>
                         </configuration>
                     </execution>
                 </executions>
@@ -86,7 +86,7 @@
                             <transformers>
                                 <transformer implementation=
                                                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>clientside.SceneManager</mainClass>
+                                    <mainClass>client.SceneManager</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

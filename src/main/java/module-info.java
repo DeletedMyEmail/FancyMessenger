@@ -5,8 +5,8 @@ module clientside.kmesrework {
     requires java.sql;
 
 
-    opens clientside to javafx.fxml;
-    exports clientside;
-    exports ServerSide;
-    opens ServerSide to javafx.fxml;
+    opens client to javafx.fxml;
+    exports client;
+    exports server;
+    opens server to javafx.fxml;
 }

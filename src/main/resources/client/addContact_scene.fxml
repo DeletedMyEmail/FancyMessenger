@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="150.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.AddContactSceneController">
+   <children>
+      <Button layoutX="74.0" layoutY="103.0" mnemonicParsing="false" style="-fx-background-color: #6bc490;" text="Add" onAction="#onAddButtonClick">
+         <font>
+            <Font name="System Bold" size="11.0" />
+         </font>
+      </Button>
+      <TextField layoutX="26.0" layoutY="50.0" promptText="Username" fx:id="usernameTextfield" />
+   </children>
+</AnchorPane>
