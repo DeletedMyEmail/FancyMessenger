@@ -34,10 +34,9 @@ public class ClientBackend {
     private BufferedReader reader;
     private BufferedWriter writer;
 
-    private List<String> contacts;
-    private HashMap<String, List<String>> messages;
+    private final HashMap<String, List<String>> messages;
 
-    private static String currentUser = "";
+    private String currentUser = "";
 
     /**
      * Creates a ClientBackend instance, iniitializes attributes and transfers old saved messages into a HashMap
@@ -171,7 +170,8 @@ public class ClientBackend {
                                     case "loggedIn" -> updateCurrentUser(input_str[2]);
                                     case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
                                     case "message" -> addNewMessage(input_str[2], "Received: " + input_str[3]);
-                                    case "userExists" -> {
+                                    case "userExists" ->
+                                    {
                                         messages.computeIfAbsent(input_str[2], k -> new ArrayList<>());
                                         SceneManager.getHomeScene().showNewContact(input_str[2]);
                                         SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
@@ -179,11 +179,7 @@ public class ClientBackend {
                                     }
                                 }
                             }
-                            else
-                            {
-                                server.close();
-                            }
-
+                            else server.close();
                         }
                     }
                 }
