@@ -1,7 +1,5 @@
-package clientside;
+package client;
 
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -87,7 +85,7 @@ public class ClientBackend {
         }
         catch (IOException ex)
         {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "Server doesn't respond", "Error accured while trying to log out", ButtonType.OK);
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMesServer", ButtonType.OK);
         }
     }
 
@@ -129,7 +127,6 @@ public class ClientBackend {
      * */
     protected void addNewMessage(String pUsername, String pMessage)
     {
-        System.out.println(messages.entrySet());
         if (messages.get(pUsername) == null)
         {
             messages.put(pUsername, new ArrayList<>() {{
@@ -162,6 +159,8 @@ public class ClientBackend {
                         output = new DataOutputStream(server.getOutputStream());
                         input = new DataInputStream(server.getInputStream());
 
+                        establishRSA();
+
                         // Handles inputs as long as the connection exists
                         while (isConnected())
                         {
@@ -173,6 +172,7 @@ public class ClientBackend {
                                     case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, input_str[2], input_str[3], ButtonType.OK);
                                     case "message" -> addNewMessage(input_str[2], "Received: " + input_str[3]);
                                     case "userExists" -> {
+                                        messages.computeIfAbsent(input_str[2], k -> new ArrayList<>());
                                         SceneManager.getHomeScene().showNewContact(input_str[2]);
                                         SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                                 " new contact: " + input_str[2], "New contact", ButtonType.OK);
@@ -201,4 +201,18 @@ public class ClientBackend {
 
     }
 
+    private void establishRSA() {
+    }
+
+    public void sendMessage(String pReceiver, String pMessage)
+    {
+        try
+        {
+            sendToServer("KMES;send;"+pReceiver+";"+pMessage);
+            addNewMessage(pReceiver, "Sent: "+pMessage);
+        }
+        catch (IOException ex) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMesServer", ButtonType.OK);
+        }
+    }
 }

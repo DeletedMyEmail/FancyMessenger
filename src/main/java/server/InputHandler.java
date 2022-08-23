@@ -1,4 +1,4 @@
-package ServerSide;
+package server;
 
 import SQL.SQLUtils;
 
@@ -8,7 +8,6 @@ import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,7 +44,7 @@ class InputHandler extends Thread {
                 if (!clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3).equals(pReveiver))
                 {
                     writeToSocket(clientConnnectionsAndStreams.indexOf(client), "KMES;message;"+
-                            pReveiver+";"+pMessage);
+                            clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3)+";"+pMessage);
                 }
                 else
                 {

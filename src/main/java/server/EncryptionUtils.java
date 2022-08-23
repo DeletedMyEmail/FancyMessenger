@@ -1,12 +1,10 @@
-package ServerSide;
+package server;
 
 import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 
 /**

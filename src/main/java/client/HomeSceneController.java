@@ -1,4 +1,4 @@
-package clientside;
+package client;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -84,17 +84,17 @@ public class HomeSceneController {
         }
     }
 
-    private HBox createMessageHBox(String content)
+    private HBox createMessageHBox(String pContent)
     {
         String cssLayout = "-fx-border-color: #6bc490";
         HBox hbox = new HBox();
         hbox.setMaxWidth(350.0);
-        hbox.getChildren().add(new Text(content));
+        hbox.getChildren().add(new Text(pContent));
         hbox.setStyle(cssLayout);
         return hbox;
     }
 
-    protected void showNewMessage(String author, String message)
+    protected void showNewMessage(String pAuthor, String pMessage)
     {
         Platform.runLater(new Runnable()
         {
@@ -102,22 +102,22 @@ public class HomeSceneController {
             public void run()
             {
                 Text item = ((Text)contactsList.getSelectionModel().getSelectedItem());
-                if (item != null && item.getText().equals(author))
+                if (item != null && item.getText().equals(pAuthor))
                 {
-                    ((VBox)messagesScrollpane.getContent()).getChildren().add(createMessageHBox(message));
+                    ((VBox)messagesScrollpane.getContent()).getChildren().add(createMessageHBox(pMessage));
                 }
             }
         });
     }
 
-    protected void showNewContact(String username)
+    protected void showNewContact(String pUsername)
     {
         Platform.runLater(new Runnable()
         {
             @Override
             public void run()
             {
-                contactsList.getItems().add(new Text(username));
+                contactsList.getItems().add(new Text(pUsername));
             }
         });
     }
@@ -131,10 +131,9 @@ public class HomeSceneController {
             return;
         }
 
-        String receiver = selectedContact.getText();
-        String msg = messageTextField.getText();
-        backend.addNewMessage(receiver, "Sent: "+msg);
-        backend.sendToServer("KMES;send;"+receiver+";"+msg);
+        String lReceiver = selectedContact.getText();
+        String lMsg = messageTextField.getText();
+        backend.sendMessage(lReceiver, lMsg);
     }
 
     @FXML
