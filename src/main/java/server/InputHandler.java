@@ -1,6 +1,8 @@
 package server;
 
-import SQL.SQLUtils;
+// Own Library
+import KLibrary.Utils.EncryptionUtils;
+import KLibrary.Utils.SQLUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -14,7 +16,7 @@ import java.util.List;
  * Server backend for the KMes server<br/>
  * Manages all inputs from user clients
  *
- * @version 27.06.2022
+ * @version 23.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
@@ -30,7 +32,7 @@ class InputHandler extends Thread {
         clientConnnectionsAndStreams = SocketAcceptor.getSockets();
         socketAcceptor = new SocketAcceptor();
         socketAcceptor.start();
-        sqlUtils = new SQLUtils("src/main/java/SQL/kmes.db");
+        sqlUtils = new SQLUtils("src/main/resources/kmes.db");
         running = true;
     }
 

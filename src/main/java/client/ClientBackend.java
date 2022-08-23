@@ -1,5 +1,8 @@
 package client;
 
+// Own Library
+import KLibrary.Utils.EncryptionUtils;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -16,7 +19,7 @@ import java.util.List;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes server
  *
- * @version 27.06.2022
+ * @version 23.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -35,6 +38,7 @@ public class ClientBackend {
     private BufferedWriter writer;
 
     private final HashMap<String, List<String>> messages;
+    private final EncryptionUtils encryptionUtils;
 
     private String currentUser = "";
 
@@ -44,7 +48,8 @@ public class ClientBackend {
      * */
     public ClientBackend() throws IOException {
         messages = new HashMap<>();
-/*
+        encryptionUtils = new EncryptionUtils();
+        /*
         reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
         writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
 
@@ -197,7 +202,9 @@ public class ClientBackend {
 
     }
 
-    private void establishRSA() {
+    private void establishRSA() throws IOException
+    {
+        sendToServer("KMES");
     }
 
     public void sendMessage(String pReceiver, String pMessage)
