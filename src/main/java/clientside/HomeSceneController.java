@@ -4,13 +4,13 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * Controller for the GUI home scene
@@ -35,7 +35,7 @@ public class HomeSceneController {
     public ScrollPane messagesScrollpane;
 
     private void showAllMessages(Text pText) {
-        ObservableList messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
+        ObservableList<Node> messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
         showAllMessages(pText, messageList);
     }
 

@@ -8,6 +8,7 @@ import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,16 +36,16 @@ class InputHandler extends Thread {
     }
 
 
-    private void handleSendRequest(int pAuthorSocketIndex, String[] pRequest) throws IOException
+    private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException
     {
-        String receiver = pRequest[2];
         for (List<Object> client : clientConnnectionsAndStreams)
         {
-            if (client.get(3).equals(receiver))
+            if (client.get(3).equals(pReveiver))
             {
-                if (!clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3).equals(receiver))
+                if (!clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3).equals(pReveiver))
                 {
-                    writeToSocket(clientConnnectionsAndStreams.indexOf(client), "KMES;message;"+ clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3)+";"+pRequest[3]);
+                    writeToSocket(clientConnnectionsAndStreams.indexOf(client), "KMES;message;"+
+                            pReveiver+";"+pMessage);
                 }
                 else
                 {
@@ -56,25 +57,19 @@ class InputHandler extends Thread {
         writeToSocket(pAuthorSocketIndex, "KMES;error;User not found;Couldn't send message");
     }
 
-    private void handleRegistrationRequest(int pSocketIndex, String[] pRequest) throws IOException, SQLException {
-        if (pRequest.length<4)
+    private void handleRegistrationRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, SQLException {
+        if (clientConnnectionsAndStreams.get(pSocketIndex).get(3).equals(""))
         {
-            writeToSocket(pSocketIndex, "KMES;error;Please fill out every text field;Registration failed");
-        }
-        else if (clientConnnectionsAndStreams.get(pSocketIndex).get(3).equals(""))
-        {
-            String username = pRequest[2];
-            if (!userExists(username))
+            if (!userExists(pUsername))
             {
-                String lHashedPassword;
                 try {
-                    lHashedPassword = EncryptionUtils.getHash(pRequest[3], new byte[]{'s','a','l','t'});
-                    sqlUtils.onExecute("INSERT INTO User VALUES(?, ?)", new String[]{ username, lHashedPassword});
+                    byte[] lSalt = EncryptionUtils.generateSalt();
+                    String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
+                    sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
+                    writeToSocket(pSocketIndex, "KMES;loggedIn;"+pUsername);
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                     writeToSocket(pSocketIndex, "KMES;error;Couldn't encrypt your password;Error occurred during registration process");
-                    return;
                 }
-                writeToSocket(pSocketIndex, "KMES;loggedIn;"+username);
             }
             else
             {
@@ -87,28 +82,20 @@ class InputHandler extends Thread {
         }
     }
 
-    private void handleLoginRequest(int pSocketIndex, String[] pRequest) throws IOException {
-        if (pRequest.length<4)
-        {
-            writeToSocket(pSocketIndex, "KMES;error;Please fill out every text field;Login failed");
-            System.out.println("Password invalid");
-            return;
-        }
-
-        String username = pRequest[2];
-        String password;
+    private void handleLoginRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException {
+        byte[] lSalt;
         try {
-            password = EncryptionUtils.getHash(pRequest[3], new byte[]{'s','a','l','t'});
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            writeToSocket(pSocketIndex, "KMES;error;Couldn't encrypt your password;Error occurred during login process");
+            lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
+        } catch (SQLException sqlEx) {
+            writeToSocket(pSocketIndex, "KMES;error;User not found;Login failed");
             return;
         }
 
         System.out.println("Password validation..");
-        if (checkLogin(username, password))
+        if (verifyLogin(pUsername, pPassword, lSalt))
         {
-            clientConnnectionsAndStreams.get(pSocketIndex).set(3, username);
-            writeToSocket(pSocketIndex, "KMES;loggedIn;"+username);
+            clientConnnectionsAndStreams.get(pSocketIndex).set(3, pUsername);
+            writeToSocket(pSocketIndex, "KMES;loggedIn;"+pUsername);
             System.out.println("Password valid");
         }
         else
@@ -160,26 +147,26 @@ class InputHandler extends Thread {
                             switch (request[1])
                             {
                                 case "login":
-                                    handleLoginRequest(i, request);
+                                    handleLoginRequest(i, request[2], request[3]);
                                     break;
                                 case "register":
-                                    handleRegistrationRequest(i, request);
+                                    handleRegistrationRequest(i, request[2], request[3]);
                                     break;
                                 case "send":
-                                    handleSendRequest(i, request);
+                                    handleSendRequest(i, request[2], request[3]);
                                     break;
                                 case "logout":
                                     clientConnnectionsAndStreams.get(i).set(3,"");
                                     break;
                                 case "doesUserExist":
-                                    String username = request[2];
-                                    if (userExists(username))
+                                    String lUsername = request[2];
+                                    if (userExists(lUsername))
                                     {
-                                        writeToSocket(i, "KMES;userExists;"+username);
+                                        writeToSocket(i, "KMES;userExists;"+lUsername);
                                     }
                                     else
                                     {
-                                        writeToSocket(i, "KMES;error;User does not exist: "+username+";Adding contact failed");
+                                        writeToSocket(i, "KMES;error;User does not exist: "+lUsername+";Adding contact failed");
                                     }
                                 default:
                             }
@@ -187,8 +174,17 @@ class InputHandler extends Thread {
                     }
 
                 }
-                catch (SQLException | SocketTimeoutException ignored) {}
-                catch (IOException e)
+                catch (SocketTimeoutException ignored) {}
+                catch (SQLException sqlEx) { sqlEx.printStackTrace();}
+                catch (IndexOutOfBoundsException ioobEx)
+                {
+                    try {
+                        writeToSocket(i, "KMES;error;Missing argument;Error occurred");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                catch (IOException ex)
                 {
                     clientConnnectionsAndStreams.remove(i);
                     System.out.printf("[%d]Socket closed due to IOExcception\n", i+1);
@@ -200,17 +196,21 @@ class InputHandler extends Thread {
     }
 
 
-    public boolean checkLogin(String pUsername, String pHashedPassword)
+    public boolean verifyLogin(String pUsername, String pPassword, byte[] pSalt)
     {
         try
         {
-            ResultSet rs = sqlUtils.onQuery("SELECT username FROM User WHERE username=? AND password_hash=?",
-                    new String[]{ pUsername, pHashedPassword});
+            ResultSet rs = sqlUtils.onQuery("SELECT hashedPassword FROM User WHERE username=?",
+                    new String[]{ pUsername, });
 
-            return !(rs.isClosed() || rs.getString(1).equals(""));
+            if (!rs.isClosed() && rs.next()) {
+                return EncryptionUtils.validate(pPassword, rs.getString("hashedPassword"), pSalt);
+            }
+            return false;
 
         }
         catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -229,7 +229,7 @@ class InputHandler extends Thread {
 
     public void stopListeningForInput() {running = false;}
 
-    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, SQLException {
         InputHandler inputHandler = new InputHandler();
         inputHandler.start();
     }
