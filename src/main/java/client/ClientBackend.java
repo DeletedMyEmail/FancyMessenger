@@ -204,7 +204,7 @@ public class ClientBackend {
 
     private void establishRSA() throws IOException
     {
-        sendToServer("KMES");
+
     }
 
     public void sendMessage(String pReceiver, String pMessage)
