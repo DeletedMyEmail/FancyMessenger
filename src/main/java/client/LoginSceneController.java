@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Controller for the GUI login scene
  *
- * @version 27.06.2022
+ * @version v2.0.0 | last edit: 24.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class LoginSceneController {

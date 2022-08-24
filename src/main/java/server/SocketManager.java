@@ -13,14 +13,13 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 /**
  * Thread accepting new clients connecting to the KMes messenger
  *
- * @version 24.08.2022
+ * @version v2.0.0 | last edit: 24.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketManager extends Thread{

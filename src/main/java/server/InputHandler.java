@@ -21,7 +21,7 @@ import java.util.List;
  * Server backend for the KMes server<br/>
  * Manages all inputs from user clients
  *
- * @version 23.08.2022
+ * @version v2.0.0 | last edit: 24.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
@@ -98,17 +98,13 @@ class InputHandler extends Thread {
             return;
         }
 
-        System.out.println("Password validation..");
         if (verifyLogin(pUsername, pPassword, lSalt))
         {
             clientConnnectionsAndStreams.get(pSocketIndex).set(3, pUsername);
             socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
-            System.out.println("Password valid");
         }
-        else
-        {
+        else {
             socketManager.writeToSocket(pSocketIndex, "error;;Password or username incorrect;;Login failed");
-            System.out.println("Password invalid");
         }
     }
 
@@ -125,7 +121,6 @@ class InputHandler extends Thread {
                 try
                 {
                     String lInput = socketManager.readFromSocket(i);
-                    System.out.println(lInput);
                     if (lCurrentSocket.isClosed() || !lCurrentSocket.isConnected())
                     {
                         socketManager.closeSocket(i);
@@ -135,7 +130,6 @@ class InputHandler extends Thread {
                     else
                     {
                         String[] lRequest = lInput.split(";;");
-                        System.out.println(Arrays.toString(lRequest));
                         switch (lRequest[0])
                         {
                             case "login":

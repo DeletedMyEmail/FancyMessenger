@@ -25,7 +25,7 @@ import java.util.List;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes Server
  *
- * @version 23.08.2022
+ * @version v2.0.0 | last edit: 24.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -167,7 +167,7 @@ public class ClientBackend {
                         while (isConnected())
                         {
                             String[] lInput = readFromServer().split(";;");
-                            System.out.println("Msg: "+Arrays.toString(lInput));
+
                             switch (lInput[0]) {
                                 case "loggedIn" -> updateCurrentUser(lInput[1]);
                                 case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
@@ -205,7 +205,6 @@ public class ClientBackend {
     {
         try {
             outStream.write(encryptionUtils.encryptRSA(pMessage, serversPublcKey));
-            System.out.println("Sent");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

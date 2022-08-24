@@ -10,7 +10,7 @@ The following things were important to me:
 
 * a good looking JavaFX frontend to learn something about the lib 
 * a pleasant user experience
-* security (check out the roadmap)
+* security (RSA for messages and password hashing)
 * a good grade
 
 <!-- GETTING STARTED -->
@@ -24,5 +24,4 @@ Note that the server host is defined by default in [ClientBackend](src/main/java
 ## Roadmap
 
 1. Queue messages if a user is offline and send them if they get back online
-2. Message encryption
-3. Suggest new stuff
+2. Suggest new stuff
