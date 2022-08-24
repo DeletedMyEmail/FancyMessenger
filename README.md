@@ -24,4 +24,5 @@ Note that the server host is defined by default in [ClientBackend](src/main/java
 ## Roadmap
 
 1. Queue messages if a user is offline and send them if they get back online
-2. Suggest new stuff
+2. Server terminal interface
+3. Suggest new stuff
