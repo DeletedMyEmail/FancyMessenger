@@ -133,7 +133,7 @@ public class HomeSceneController {
 
         String lReceiver = selectedContact.getText();
         String lMsg = messageTextField.getText();
-        backend.sendMessage(lReceiver, lMsg);
+        backend.sendMessageToOtherUser(lReceiver, lMsg);
     }
 
     @FXML
