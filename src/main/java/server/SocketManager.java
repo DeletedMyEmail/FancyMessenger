@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -42,6 +43,7 @@ class SocketManager extends Thread{
     }
 
     protected void writeToSocket(int pIndex, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        System.out.println(pMessage);
         writeToSocket(
                 (DataOutputStream)socketConnectionsAndStreams.get(pIndex).get(1),
                 (PublicKey) socketConnectionsAndStreams.get(pIndex).get(4),
@@ -54,11 +56,14 @@ class SocketManager extends Thread{
 
     private void writeToSocket(DataOutputStream pOutStream, PublicKey pSocketsPublicKey, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         byte[] lEncryptedMessage = encryptionUtils.encryptRSA(pMessage, pSocketsPublicKey);
-        pOutStream.writeUTF(new String(lEncryptedMessage));
+        System.out.println(pMessage);
+        pOutStream.write(lEncryptedMessage);
     }
 
     private String readFromSocket(DataInputStream pInStream) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        return encryptionUtils.decryptRSA(pInStream.readUTF().getBytes());
+        byte[] lInput = new byte[256];
+        pInStream.read(lInput);
+        return encryptionUtils.decryptRSA(lInput);
     }
 
     /**
@@ -74,15 +79,16 @@ class SocketManager extends Thread{
                 // Init new socket and streams
 
                 Socket lNewSocket = serverSocket.accept();
-                lNewSocket.setSoTimeout(200);
                 DataOutputStream lNewOutStream = new DataOutputStream(lNewSocket.getOutputStream());
                 DataInputStream lNewInStream = new DataInputStream(lNewSocket.getInputStream());
+                lNewSocket.setSoTimeout(400);
 
-                String lInput = lNewInStream.readUTF();
+                byte[] lInput = new byte[294];
+                lNewInStream.read(lInput);
 
                 // RSA key handshake
 
-                PublicKey lForeignPubKey = encryptionUtils.getPublicKeyFromString(lInput);
+                PublicKey lForeignPubKey = encryptionUtils.getPublicKeyFromBytes(lInput);
 
                 if (lForeignPubKey == null)  {
                     lNewSocket.close();
@@ -99,8 +105,8 @@ class SocketManager extends Thread{
                     add("");
                     add(lForeignPubKey);
                 }});
-                System.out.println(encryptionUtils.getPublicKeyAsString());
-                lNewOutStream.writeUTF(encryptionUtils.getPublicKeyAsString());
+                byte[] lEncodedOwnKey = encryptionUtils.getPublicKey().getEncoded();
+                lNewOutStream.write(lEncodedOwnKey, 0, lEncodedOwnKey.length);
 
                 System.out.printf("[%d]Client socket accepted\n", socketConnectionsAndStreams.toArray().length);
                 lNewSocket.setSoTimeout(100);

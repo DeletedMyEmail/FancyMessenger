@@ -33,7 +33,7 @@ public class AddContactSceneController
     public void onAddButtonClick(ActionEvent actionEvent) throws IOException {
         if (!usernameTextfield.getText().equals(""))
         {
-            backend.sendToServer("KMES;doesUserExist;"+usernameTextfield.getText());
+            backend.sendToServer("doesUserExist;;"+usernameTextfield.getText());
             SceneManager.closeAddContactWindow();
         }
     }

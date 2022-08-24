@@ -35,7 +35,7 @@ public class LoginSceneController {
     @FXML
     public void onLoginButtonClick(ActionEvent actionEvent) throws IOException
     {
-        backend.sendToServer("KMES;login;"+usernameField.getText()+";"+passwordField.getText());
+        backend.sendToServer("login;;"+usernameField.getText()+";;"+passwordField.getText());
     }
 
     public void switchToMainScene(ActionEvent actionEvent)
@@ -44,6 +44,6 @@ public class LoginSceneController {
     }
 
     public void onRegisterButtonClick(ActionEvent actionEvent) throws IOException {
-        backend.sendToServer("KMES;register;"+usernameField.getText()+";"+passwordField.getText());
+        backend.sendToServer("register;;"+usernameField.getText()+";;"+passwordField.getText());
     }
 }

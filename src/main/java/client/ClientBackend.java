@@ -17,7 +17,7 @@ import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Base64;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class ClientBackend {
      * Creates a ClientBackend instance, iniitializes attributes and transfers old saved messages into a HashMap
      * in conjunction with the receiver/sender
      * */
-    public ClientBackend() throws IOException {
+    public ClientBackend() {
         messages = new HashMap<>();
         encryptionUtils = new EncryptionUtils();
         /*
@@ -90,7 +90,7 @@ public class ClientBackend {
     protected void logOut() {
         try
         {
-            sendToServer("KMES;logout");
+            sendToServer("logout");
             messages.clear();
             SceneManager.getHomeScene().clearShowMessagesAndContacts();
             currentUser = "";
@@ -166,17 +166,17 @@ public class ClientBackend {
                         // Handles inputs as long as the connection exists
                         while (isConnected())
                         {
-                            String[] lInput = readFromServer();
-
-                            switch (lInput[1]) {
-                                case "loggedIn" -> updateCurrentUser(lInput[2]);
-                                case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[2], lInput[3], ButtonType.OK);
-                                case "message" -> addNewMessage(lInput[2], "Received: " + lInput[3]);
+                            String[] lInput = readFromServer().split(";;");
+                            System.out.println("Msg: "+Arrays.toString(lInput));
+                            switch (lInput[0]) {
+                                case "loggedIn" -> updateCurrentUser(lInput[1]);
+                                case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
+                                case "message" -> addNewMessage(lInput[1], "Received: " + lInput[2]);
                                 case "userExists" -> {
-                                    messages.computeIfAbsent(lInput[2], k -> new ArrayList<>());
-                                    SceneManager.getHomeScene().showNewContact(lInput[2]);
+                                    messages.computeIfAbsent(lInput[1], k -> new ArrayList<>());
+                                    SceneManager.getHomeScene().showNewContact(lInput[1]);
                                     SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
-                                            " new contact: " + lInput[2], "New contact", ButtonType.OK);
+                                            " new contact: " + lInput[1], "New contact", ButtonType.OK);
                                 }
                             }
                         }
@@ -203,29 +203,32 @@ public class ClientBackend {
      * */
     protected void sendToServer(String pMessage) throws IOException
     {
-        outStream.writeUTF(pMessage);
+        try {
+            outStream.write(encryptionUtils.encryptRSA(pMessage, serversPublcKey));
+            System.out.println("Sent");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private String[] readFromServer() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        String lRawInput = inStream.readUTF();
-        String lDecrypted = encryptionUtils.decryptRSA(lRawInput.getBytes());
-        return lDecrypted.split(";;");
+    private String readFromServer() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        byte[] lInput = new byte[256];
+        inStream.read(lInput);
+        return encryptionUtils.decryptRSA(lInput);
     }
 
-    private void establishRSA() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        sendToServer(encryptionUtils.getPublicKeyAsString());
-        String lRawInput = inStream.readUTF();
-        String lDecrypted = encryptionUtils.decryptRSA(lRawInput.getBytes());
-        serversPublcKey = encryptionUtils.getPublicKeyFromString(lDecrypted);
-        System.out.println("Key:");
-        System.out.println(encryptionUtils.getPublicKeyAsString(serversPublcKey));
+    private void establishRSA() throws IOException {
+        outStream.write(encryptionUtils.getPublicKey().getEncoded());
+        byte[] lKeyBytes = new byte[294];
+        inStream.read(lKeyBytes);
+        serversPublcKey = encryptionUtils.getPublicKeyFromBytes(lKeyBytes);
     }
 
     public void sendMessageToOtherUser(String pReceiver, String pMessage)
     {
         try
         {
-            sendToServer("send;;"+pReceiver+";;"+pMessage.replace(";;",""));
+            sendToServer("send;;"+pReceiver+";;"+pMessage.replace(";;",";"));
             addNewMessage(pReceiver, "Sent: "+pMessage.replace(";;",""));
         }
         catch (IOException ex) {

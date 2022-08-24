@@ -14,6 +14,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -48,17 +49,17 @@ class InputHandler extends Thread {
             {
                 if (!clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3).equals(pReveiver))
                 {
-                    socketManager.writeToSocket(clientConnnectionsAndStreams.indexOf(client), "KMES;message;"+
-                            clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3)+";"+pMessage);
+                    socketManager.writeToSocket(clientConnnectionsAndStreams.indexOf(client), "message;;"+
+                            clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3)+";;"+pMessage);
                 }
                 else
                 {
-                    socketManager.writeToSocket(pAuthorSocketIndex, "KMES;error;You can't message yourself;Couldn't send message");
+                    socketManager.writeToSocket(pAuthorSocketIndex, "error;;You can't message yourself;;Couldn't send message");
                 }
                 return;
             }
         }
-        socketManager.writeToSocket(pAuthorSocketIndex, "KMES;error;User not found;Couldn't send message");
+        socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
     }
 
     private void handleRegistrationRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, SQLException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
@@ -71,20 +72,20 @@ class InputHandler extends Thread {
                     byte[] lSalt = EncryptionUtils.generateSalt();
                     String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
                     sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
-                    socketManager.writeToSocket(pSocketIndex, "KMES;loggedIn;"+pUsername);
+                    socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
                 }
                 catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-                    socketManager.writeToSocket(pSocketIndex, "KMES;error;Couldn't encrypt your password;Error occurred during registration process");
+                    socketManager.writeToSocket(pSocketIndex, "error;;Couldn't encrypt your password;;Error occurred during registration process");
                 }
             }
             else
             {
-                socketManager.writeToSocket(pSocketIndex, "KMES;error;This username is already taken, please choose another one;Registration failed");
+                socketManager.writeToSocket(pSocketIndex, "error;;This username is already taken, please choose another one;;Registration failed");
             }
         }
         else
         {
-            socketManager.writeToSocket(pSocketIndex, "KMES;error;Log out before registration;Registration failed");
+            socketManager.writeToSocket(pSocketIndex, "error;;Log out before registration;;Registration failed");
         }
     }
 
@@ -93,7 +94,7 @@ class InputHandler extends Thread {
         try {
             lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
         } catch (SQLException sqlEx) {
-            socketManager.writeToSocket(pSocketIndex, "KMES;error;User not found;Login failed");
+            socketManager.writeToSocket(pSocketIndex, "error;;User not found;;Login failed");
             return;
         }
 
@@ -101,12 +102,12 @@ class InputHandler extends Thread {
         if (verifyLogin(pUsername, pPassword, lSalt))
         {
             clientConnnectionsAndStreams.get(pSocketIndex).set(3, pUsername);
-            socketManager.writeToSocket(pSocketIndex, "KMES;loggedIn;"+pUsername);
+            socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
             System.out.println("Password valid");
         }
         else
         {
-            socketManager.writeToSocket(pSocketIndex, "KMES;error;Password or username incorrect;Login failed");
+            socketManager.writeToSocket(pSocketIndex, "error;;Password or username incorrect;;Login failed");
             System.out.println("Password invalid");
         }
     }
@@ -124,6 +125,7 @@ class InputHandler extends Thread {
                 try
                 {
                     String lInput = socketManager.readFromSocket(i);
+                    System.out.println(lInput);
                     if (lCurrentSocket.isClosed() || !lCurrentSocket.isConnected())
                     {
                         socketManager.closeSocket(i);
@@ -133,31 +135,25 @@ class InputHandler extends Thread {
                     else
                     {
                         String[] lRequest = lInput.split(";;");
-
-                        switch (lRequest[1])
+                        System.out.println(Arrays.toString(lRequest));
+                        switch (lRequest[0])
                         {
                             case "login":
-                                handleLoginRequest(i, lRequest[2], lRequest[3]);
+                                handleLoginRequest(i, lRequest[1], lRequest[2]);
                                 break;
                             case "register":
-                                handleRegistrationRequest(i, lRequest[2], lRequest[3]);
+                                handleRegistrationRequest(i, lRequest[1], lRequest[2]);
                                 break;
                             case "send":
-                                handleSendRequest(i, lRequest[2], lRequest[3]);
+                                handleSendRequest(i, lRequest[1], lRequest[2]);
                                 break;
                             case "logout":
                                 clientConnnectionsAndStreams.get(i).set(3,"");
                                 break;
                             case "doesUserExist":
-                                String lUsername = lRequest[2];
-                                if (userExists(lUsername))
-                                {
-                                    socketManager.writeToSocket(i, "KMES;userExists;"+lUsername);
-                                }
-                                else
-                                {
-                                    socketManager.writeToSocket(i, "KMES;error;User does not exist: "+lUsername+";Adding contact failed");
-                                }
+                                String lUsername = lRequest[1];
+                                if (userExists(lUsername)) socketManager.writeToSocket(i, "userExists;;"+lUsername);
+                                else socketManager.writeToSocket(i, "error;;User does not exist: "+lUsername+";;Adding contact failed");
                             default:
                                 break;
                         }
@@ -167,7 +163,7 @@ class InputHandler extends Thread {
                 catch (IndexOutOfBoundsException ioobEx)
                 {
                     try {
-                        socketManager.writeToSocket(i, "KMES;error;Missing argument;Error occurred");
+                        socketManager.writeToSocket(i, "error;;Missing argument;;Error occurred");
                     } catch (IOException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
                         e.printStackTrace();
                     }
