@@ -14,12 +14,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Server backend for the KMes server<br/>
- * Manages all inputs from user clients
+ * This class acts as a backend for the KMes Server and processes all inputs from user sockets.
  *
  * @version v2.0.0 | last edit: 24.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
@@ -33,12 +31,16 @@ class InputHandler extends Thread {
 
     private boolean running;
 
-    protected InputHandler() throws IOException, SQLException {
-        socketManager = new SocketManager();
+    protected InputHandler(SocketManager pSocketManager) throws IOException, SQLException {
+        socketManager = pSocketManager;
         socketManager.start();
         clientConnnectionsAndStreams = socketManager.getSockets();
         sqlUtils = new SQLUtils("src/main/resources/kmes.db");
         running = true;
+    }
+
+    protected InputHandler() throws IOException, SQLException {
+        this(new SocketManager());
     }
 
 
@@ -209,5 +211,6 @@ class InputHandler extends Thread {
 
     public void stopListeningForInput() {running = false;}
 
-    public static void main(String[] args) throws IOException, SQLException { new InputHandler().start(); }
+    public SocketManager getSocketManager() { return socketManager;}
+
 }

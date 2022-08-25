@@ -24,13 +24,18 @@ import java.util.List;
  * */
 class SocketManager extends Thread{
 
-    private final List<List<Object>> socketConnectionsAndStreams = new ArrayList<>();;
-    private final ServerSocket serverSocket;
+    private static final int PORT = 3142;
+
+    private final List<List<Object>> socketConnectionsAndStreams;
     private final EncryptionUtils encryptionUtils;
+    private final ServerSocket serverSocket;
+
+    private boolean running;
 
     protected SocketManager() throws IOException
     {
-        serverSocket = new ServerSocket(3141);
+        socketConnectionsAndStreams = new ArrayList<>();
+        serverSocket = new ServerSocket(PORT);
         encryptionUtils = new EncryptionUtils();
     }
 
@@ -70,8 +75,8 @@ class SocketManager extends Thread{
      * */
     public void run()
     {
-        System.out.println("Server online\n");
-        while (true)
+        running = true;
+        while (running)
         {
             try
             {
@@ -113,5 +118,27 @@ class SocketManager extends Thread{
             catch (IOException e) { e.printStackTrace(); }
 
         }
+    }
+    protected void stopAcceptingSockets() { running = false; }
+
+    protected int amountOfConnections() { return socketConnectionsAndStreams.size(); }
+
+    protected void close()
+    {
+        running = false;
+        for (List<Object> connection : socketConnectionsAndStreams)
+        {
+            try
+            {
+                ((Socket) connection.get(0)).close();
+                ((DataOutputStream) connection.get(1)).close();
+                ((DataInputStream) connection.get(2)).close();
+            }
+            catch (IOException e) {e.printStackTrace();}
+            finally {
+                socketConnectionsAndStreams.remove(connection);
+            }
+        }
+        this.stop();
     }
 }
