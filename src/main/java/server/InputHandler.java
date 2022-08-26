@@ -1,6 +1,6 @@
 package server;
 
-// Own Library
+// Own Library https://github.com/KaitoKunTatsu/KLibrary
 import KLibrary.Utils.EncryptionUtils;
 import KLibrary.Utils.SQLUtils;
 

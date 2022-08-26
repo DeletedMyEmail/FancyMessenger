@@ -1,8 +1,14 @@
 package server;
 
 import java.io.*;
-import java.sql.SQLException;
 
+
+/**
+ * KMes Server cmd terminal
+ *
+ * @version v2.0.0 | last edit: 26.08.2022
+ * @author Joshua H. | KaitoKunTatsu#3656
+ * */
 public class ServerTerminal {
 
     private BufferedReader reader;
@@ -10,15 +16,6 @@ public class ServerTerminal {
     private InputHandler inputHandler;
 
     private boolean active;
-    private String helpText = """
-                        
-                        You can manage the server via the following commands:
-                                        
-                            - stopaccepting => Keep established connections but accept only one new socket
-                            - help => Print this list of commands
-                            - esc => Exit the application
-                                    
-                        """;
 
     public ServerTerminal() {
         try {
@@ -35,14 +32,14 @@ public class ServerTerminal {
     }
 
     public void run() {
-        System.out.println("KMes Server online!\n"+helpText);
+        printHelp();
 
         while (active) {
             try {
                 String input = reader.readLine().toLowerCase();
 
                 switch (input.strip()) {
-                    case "help" -> System.out.println(helpText);
+                    case "help" -> printHelp();
                     case "esc" -> {
                         active = false;
                         socketManager.close();
@@ -64,6 +61,18 @@ public class ServerTerminal {
                 System.out.println("Error occured:\n" + e.getMessage());
             }
         }
+    }
+
+    private void printHelp() {
+        System.out.println("""
+                        
+                        You can manage the server via the following commands:
+                                        
+                            - stopaccepting => Keep established connections but accept only one new socket
+                            - help => Print this list of commands
+                            - esc => Exit the application
+                                    
+                        """);
     }
 
     public static void main(String[] args) {
