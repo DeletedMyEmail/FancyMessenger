@@ -140,6 +140,5 @@ class SocketManager extends Thread{
                 socketConnectionsAndStreams.remove(connection);
             }
         }
-        this.stop();
     }
 }
