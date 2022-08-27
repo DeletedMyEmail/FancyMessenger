@@ -116,7 +116,6 @@ class InputHandler extends Thread {
      *
      * */
     public void run() {
-        System.out.println("Server online");
         while (running)
         {
             for (int i = 0; i < clientConnnectionsAndStreams.toArray().length; i++)

@@ -46,8 +46,8 @@ public class ClientBackend {
     private DataOutputStream outStream;
     private SecretKey AESKey;
 
-    private BufferedReader reader;
-    private BufferedWriter writer;
+    // private BufferedReader reader;
+    // private BufferedWriter writer;
 
     private String currentUser = "";
 
@@ -226,10 +226,8 @@ public class ClientBackend {
 
         // AES
         AESKey = EncryptionUtils.generateSymmetricKey();
-        System.out.println(AESKey.getEncoded().length);
         byte[] lEncryptedAESKey = encryptionUtils.encryptRSA(EncryptionUtils.encodeKey(AESKey), lServerRSAKey);
         outStream.write(lEncryptedAESKey);
-        System.out.println(lEncryptedAESKey.length);
     }
 
     public void sendMessageToOtherUser(String pReceiver, String pMessage)

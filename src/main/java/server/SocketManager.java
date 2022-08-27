@@ -81,18 +81,15 @@ class SocketManager extends Thread{
         running = true;
         while (running)
         {
-            System.out.println("Listening for sockets");
             try
             {
                 // Init new socket and streams
 
-                System.out.println("Accepting");
                 Socket lNewSocket = serverSocket.accept();
                 DataOutputStream lNewOutStream = new DataOutputStream(lNewSocket.getOutputStream());
                 DataInputStream lNewInStream = new DataInputStream(lNewSocket.getInputStream());
                 lNewSocket.setSoTimeout(300);
 
-                System.out.println("Accepted");
                 byte[] lInput = new byte[294];
                 lNewInStream.read(lInput);
 
