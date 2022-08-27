@@ -8,21 +8,21 @@
 Out of boredom and a school project, I started writing a messenger.
 The following things were important to me:
 
-* a good looking JavaFX frontend to learn something about the lib 
+* a good-looking JavaFX frontend to learn something about the lib 
 * a pleasant user experience
-* security (RSA for messages and password hashing)
+* security (password hashing and RSA + AES for messages)
 * a good grade
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-First of all, this project is based on Java.net sockets to establish all connections. Execute the main method of [InputHandler](src/main/java/server/InputHandler.java) to start the server and the one of [ClientBackend](src/main/java/client/ClientBackend.java) to create a client instance.
+Execute the main method of [InputHandler](src/main/java/server/ServerTerminal.java) to start the server and the one of [ClientBackend](src/main/java/client/ClientBackend.java) to create a client instance.
 
-Note that the server host is defined by default in [ClientBackend](src/main/java/client/ClientBackend.java) as "localhost".
+Note that the default server address in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **"localhost"** and the default port is **4242**.
 
 <!-- Roadmap -->
 ## Roadmap
 
 1. Queue messages if a user is offline and send them if they get back online
-2. Server terminal interface
+2. GUI update
 3. Suggest new stuff

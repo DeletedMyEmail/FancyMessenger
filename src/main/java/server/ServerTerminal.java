@@ -42,8 +42,8 @@ public class ServerTerminal {
                     case "help" -> printHelp();
                     case "esc" -> {
                         active = false;
-                        socketManager.close();
                         inputHandler.stopListeningForInput();
+                        socketManager.close();
                         System.out.println("Server stopped");
                         System.exit(0);
                     }
@@ -51,7 +51,7 @@ public class ServerTerminal {
                         int lSize = socketManager.amountOfConnections();
                         System.out.println("Current amount of connection: " + lSize);
                     }
-                    case "disablenewconnections" -> {
+                    case "stopaccepting" -> {
                         socketManager.stopAcceptingSockets();
                         System.out.println("The established connections are still alive but new sockets won't be able to connect anymore");
                     }
