@@ -69,6 +69,7 @@ public class ServerTerminal {
                         You can manage the server via the following commands:
                                         
                             - stopaccepting => Keep established connections but accept only one new socket
+                            - connections => Return the amount of connected clients
                             - help => Print this list of commands
                             - esc => Exit the application
                                     

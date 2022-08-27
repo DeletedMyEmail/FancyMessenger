@@ -112,7 +112,6 @@ class SocketManager extends Thread{
                 SecretKey lSocketsAESKey = EncryptionUtils.decodeAESKey(
                         encryptionUtils.decryptRSA(lInput));
 
-                System.out.println(Arrays.toString(lSocketsAESKey.getEncoded()));
                 socketConnectionsAndStreams.add(new ArrayList<>()
                 {{
                     add(lNewSocket);
