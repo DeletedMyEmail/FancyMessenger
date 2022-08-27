@@ -16,7 +16,7 @@ The following things were important to me:
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Execute the main method of [InputHandler](src/main/java/server/ServerTerminal.java) to start the server and the one of [ClientBackend](src/main/java/client/ClientBackend.java) to create a client instance.
+Execute the main method of [ServerTerminal](src/main/java/server/ServerTerminal.java) to start the server and the one of [Main](src/main/java/client/Main.java) to create a client instance.
 
 Note that the default server address in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **"localhost"** and the default port is **4242**.
 
