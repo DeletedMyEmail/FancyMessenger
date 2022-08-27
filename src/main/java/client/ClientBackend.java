@@ -1,23 +1,24 @@
 package client;
 
-// Own Library
+// Own Library https://github.com/KaitoKunTatsu/KLibrary
 import KLibrary.Utils.EncryptionUtils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,16 +26,16 @@ import java.util.List;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes Server
  *
- * @version v2.0.0 | last edit: 24.08.2022
+ * @version v2.0.1 | last edit: 27.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
 
     // Hostname/IP from KMes Server
-    private final String host = "localhost";
+    private static final String HOST = "localhost";
 
     // Port of the KMes Server which accepts clients
-    private final int port = 3141;
+    private static final int PORT = 4242;
 
     private final HashMap<String, List<String>> messages;
     private final EncryptionUtils encryptionUtils;
@@ -43,10 +44,10 @@ public class ClientBackend {
     private Socket server;
     private DataInputStream inStream;
     private DataOutputStream outStream;
-    private PublicKey serversPublcKey;
+    private SecretKey AESKey;
 
-    private BufferedReader reader;
-    private BufferedWriter writer;
+    // private BufferedReader reader;
+    // private BufferedWriter writer;
 
     private String currentUser = "";
 
@@ -157,11 +158,11 @@ public class ClientBackend {
                     {
                         // Connects to the KMes Server and iniitializes attributes for communication
                         server = new Socket();
-                        server.connect(new InetSocketAddress(host, port), 3000);
+                        server.connect(new InetSocketAddress(HOST, PORT), 4000);
                         outStream = new DataOutputStream(server.getOutputStream());
                         inStream = new DataInputStream(server.getInputStream());
 
-                        establishRSA();
+                        establishEncryption();
 
                         // Handles inputs as long as the connection exists
                         while (isConnected())
@@ -184,6 +185,7 @@ public class ClientBackend {
                 }
                 catch (SocketTimeoutException | SocketException socketException)
                 {
+                    socketException.printStackTrace();
                     SceneManager.showAlert(Alert.AlertType.ERROR, "",
                             "Connection to the KMesServer couldn't be established",
                             event -> System.exit(0), ButtonType.OK);
@@ -204,23 +206,28 @@ public class ClientBackend {
     protected void sendToServer(String pMessage) throws IOException
     {
         try {
-            outStream.write(encryptionUtils.encryptRSA(pMessage, serversPublcKey));
+            outStream.writeUTF(EncryptionUtils.encryptAES(pMessage, AESKey));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    private String readFromServer() throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        byte[] lInput = new byte[256];
-        inStream.read(lInput);
-        return encryptionUtils.decryptRSA(lInput);
+    private String readFromServer() throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        String lEncryptedInput = inStream.readUTF();
+        return EncryptionUtils.decryptAES(lEncryptedInput, AESKey);
     }
 
-    private void establishRSA() throws IOException {
+    private void establishEncryption() throws IOException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        // RSA
         outStream.write(encryptionUtils.getPublicKey().getEncoded());
         byte[] lKeyBytes = new byte[294];
         inStream.read(lKeyBytes);
-        serversPublcKey = encryptionUtils.getPublicKeyFromBytes(lKeyBytes);
+        PublicKey lServerRSAKey = EncryptionUtils.decodeRSAKey(lKeyBytes);
+
+        // AES
+        AESKey = EncryptionUtils.generateSymmetricKey();
+        byte[] lEncryptedAESKey = encryptionUtils.encryptRSA(EncryptionUtils.encodeKey(AESKey), lServerRSAKey);
+        outStream.write(lEncryptedAESKey);
     }
 
     public void sendMessageToOtherUser(String pReceiver, String pMessage)

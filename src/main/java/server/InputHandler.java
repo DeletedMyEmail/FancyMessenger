@@ -1,6 +1,6 @@
 package server;
 
-// Own Library
+// Own Library https://github.com/KaitoKunTatsu/KLibrary
 import KLibrary.Utils.EncryptionUtils;
 import KLibrary.Utils.SQLUtils;
 
@@ -10,18 +10,17 @@ import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Server backend for the KMes server<br/>
- * Manages all inputs from user clients
+ * This class acts as a backend for the KMes Server and processes all inputs from user sockets.
  *
- * @version v2.0.0 | last edit: 24.08.2022
+ * @version v2.0.1 | last edit: 27.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
@@ -33,16 +32,20 @@ class InputHandler extends Thread {
 
     private boolean running;
 
-    protected InputHandler() throws IOException, SQLException {
-        socketManager = new SocketManager();
+    protected InputHandler(SocketManager pSocketManager) throws IOException, SQLException {
+        socketManager = pSocketManager;
         socketManager.start();
         clientConnnectionsAndStreams = socketManager.getSockets();
         sqlUtils = new SQLUtils("src/main/resources/kmes.db");
         running = true;
     }
 
+    protected InputHandler() throws IOException, SQLException {
+        this(new SocketManager());
+    }
 
-    private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+
+    private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         for (List<Object> client : clientConnnectionsAndStreams)
         {
             if (client.get(3).equals(pReveiver))
@@ -62,7 +65,7 @@ class InputHandler extends Thread {
         socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
     }
 
-    private void handleRegistrationRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, SQLException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    private void handleRegistrationRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, SQLException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         if (clientConnnectionsAndStreams.get(pSocketIndex).get(3).equals(""))
         {
             if (!userExists(pUsername))
@@ -89,7 +92,7 @@ class InputHandler extends Thread {
         }
     }
 
-    private void handleLoginRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    private void handleLoginRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         byte[] lSalt;
         try {
             lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
@@ -158,7 +161,7 @@ class InputHandler extends Thread {
                 {
                     try {
                         socketManager.writeToSocket(i, "error;;Missing argument;;Error occurred");
-                    } catch (IOException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+                    } catch (IOException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
                         e.printStackTrace();
                     }
                 }
@@ -209,5 +212,6 @@ class InputHandler extends Thread {
 
     public void stopListeningForInput() {running = false;}
 
-    public static void main(String[] args) throws IOException, SQLException { new InputHandler().start(); }
+    public SocketManager getSocketManager() { return socketManager;}
+
 }
