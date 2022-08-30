@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
@@ -211,14 +212,19 @@ public class ClientBackend {
     protected void sendToServer(String pMessage) throws IOException
     {
         try {
-            outStream.writeUTF(EncryptionUtils.encryptAES(pMessage, AESKey));
+            byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, AESKey);
+            byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
+            ByteBuffer lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage);
+            outStream.write(lConcatenated.array());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     private String readFromServer() throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        String lEncryptedInput = inStream.readUTF();
+        int lSize = inStream.readInt();
+        byte[] lEncryptedInput = new byte[lSize];
+        inStream.read(lEncryptedInput);
         return EncryptionUtils.decryptAES(lEncryptedInput, AESKey);
     }
 
@@ -231,7 +237,7 @@ public class ClientBackend {
 
         // AES
         AESKey = EncryptionUtils.generateSymmetricKey();
-        byte[] lEncryptedAESKey = encryptionUtils.encryptRSA(EncryptionUtils.encodeKey(AESKey), lServerRSAKey);
+        byte[] lEncryptedAESKey = encryptionUtils.encryptRSA(AESKey.getEncoded(), lServerRSAKey);
         outStream.write(lEncryptedAESKey);
     }
 
@@ -239,8 +245,12 @@ public class ClientBackend {
     {
         try
         {
-            sendToServer("send;;"+pReceiver+";;"+pMessage.replace(";;",";"));
-            addNewMessage(pReceiver, "Sent: "+pMessage.replace(";;",";"));
+            char[] lMessage = pMessage.toCharArray();
+            if (lMessage[0] == ';') lMessage[0] = ',';
+            if (lMessage[lMessage.length-1] == ';') lMessage[lMessage.length-1] = ',';
+
+            sendToServer("send;;"+pReceiver+";;"+String.valueOf(lMessage));
+            addNewMessage(pReceiver, "Sent: "+String.valueOf(lMessage));
         }
         catch (UTFDataFormatException sizeEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "", "Input is too large", ButtonType.OK);

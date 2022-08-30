@@ -124,6 +124,7 @@ class InputHandler extends Thread {
                 try
                 {
                     String lInput = socketManager.readFromSocket(i);
+
                     if (lCurrentSocket.isClosed() || !lCurrentSocket.isConnected())
                     {
                         socketManager.closeSocket(i);
@@ -165,10 +166,10 @@ class InputHandler extends Thread {
                         e.printStackTrace();
                     }
                 }
-                catch (IOException ex)
+                catch (IOException ioEx)
                 {
                     clientConnnectionsAndStreams.remove(i);
-                    System.out.printf("[%d]Socket closed due to IOExcception\n", i+1);
+                    System.out.printf("[%d]Socket closed due to IOException\n", i+1);
                     i--;
                 }
                 catch (Exception ex) {
