@@ -5,6 +5,8 @@ import KLibrary.Utils.EncryptionUtils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.FileChooser;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -14,11 +16,14 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
@@ -235,10 +240,34 @@ public class ClientBackend {
         try
         {
             sendToServer("send;;"+pReceiver+";;"+pMessage.replace(";;",";"));
-            addNewMessage(pReceiver, "Sent: "+pMessage.replace(";;",""));
+            addNewMessage(pReceiver, "Sent: "+pMessage.replace(";;",";"));
+        }
+        catch (UTFDataFormatException sizeEx) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Input is too large", ButtonType.OK);
+        }
+        catch (IOException ioEx) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
+        }
+    }
+
+    public void fileButtonClick(String pReceiver) {
+        FileChooser lChooser = new FileChooser();
+        lChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg"));
+        lChooser.setTitle("Choose an image");
+        File lFile = lChooser.showOpenDialog(SceneManager.getStage());
+
+        if (lFile == null) return;
+
+        try {
+            FileInputStream lFileStream = new FileInputStream(lFile);
+            byte[] lImageBytes = new byte[(int) lFile.length()];
+            lFileStream.read(lImageBytes);
+            lFileStream.close();
+            sendMessageToOtherUser(pReceiver, "[image]"+Base64.getEncoder().encodeToString(lImageBytes));
         }
         catch (IOException ex) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can not convert this file");
         }
     }
 }

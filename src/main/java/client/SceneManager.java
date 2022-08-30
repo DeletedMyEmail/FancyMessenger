@@ -59,6 +59,11 @@ public class SceneManager extends Application {
         return homeController;
     }
 
+    protected static Stage getStage()
+    {
+        return stage;
+    }
+
     protected static void switchToSettingsScene()
     {
         Platform.runLater(new Runnable()
