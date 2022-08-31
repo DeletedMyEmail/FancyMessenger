@@ -66,17 +66,27 @@ class SocketManager extends Thread{
         pOutStream.write(lConcatenated.array());
     }
 
-    protected String readFromSocket(int pIndex) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        DataInputStream lInStream = (DataInputStream)socketConnectionsAndStreams.get(pIndex).get(2);
-        SecretKey lSecretKey = (SecretKey)socketConnectionsAndStreams.get(pIndex).get(4);
-        return readFromSocket(lInStream, lSecretKey);
+    protected String readFromSocket(int pIndex) throws IOException
+    {
+            DataInputStream lInStream = (DataInputStream)socketConnectionsAndStreams.get(pIndex).get(2);
+            SecretKey lSecretKey = (SecretKey)socketConnectionsAndStreams.get(pIndex).get(4);
+            return readFromSocket(lInStream, lSecretKey);
     }
 
-    private String readFromSocket(DataInputStream pInStream, SecretKey pKey) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        int lSize = pInStream.readInt();
-        byte[] lEncryptedInput = new byte[lSize];
-        pInStream.read(lEncryptedInput);
-        return EncryptionUtils.decryptAES(lEncryptedInput, pKey);
+    private String readFromSocket(DataInputStream pInStream, SecretKey pKey) throws IOException
+    {
+        try
+        {
+            int lSize = pInStream.readInt();
+            byte[] lEncryptedInput = new byte[lSize];
+            ;
+            pInStream.read(lEncryptedInput);
+            return EncryptionUtils.decryptAES(lEncryptedInput, pKey);
+        }
+        catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
+            ex.printStackTrace();
+            return "Unable to decrypt message";
+        }
     }
 
     /**
