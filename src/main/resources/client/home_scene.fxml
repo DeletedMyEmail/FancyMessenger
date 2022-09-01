@@ -6,39 +6,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.HomeSceneController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.HomeSceneController">
    <children>
-      <HBox layoutX="-42.0" layoutY="-37.0" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Text fx:id="titleText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #7ac490;" text="KMes Messenger">
-               <HBox.margin>
-                  <Insets left="20.0" top="20.0" />
-               </HBox.margin>
-               <font>
-                  <Font name="System Bold" size="18.0" />
-               </font>
-            </Text>
-         </children>
-      </HBox>
-      <Button alignment="CENTER" layoutX="500.0" layoutY="15.0" mnemonicParsing="false" onAction="#onAccountButtonClick" prefHeight="26.0" prefWidth="70.0" text="Account">
+      <HBox prefHeight="100.0" prefWidth="1080.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <TextField fx:id="messageTextField" layoutX="160.0" layoutY="594.0" prefHeight="40.0" prefWidth="787.0" />
+      <Button fx:id="fileButton" layoutX="959.0" layoutY="599.0" mnemonicParsing="false" onAction="#onFileButtonClick" prefHeight="30.0" prefWidth="44.0" text="📂">
          <font>
-            <Font name="System Bold" size="10.0" />
+            <Font size="13.0" />
+         </font></Button>
+      <Button fx:id="sendButton" layoutX="1012.0" layoutY="599.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="30.0" prefWidth="44.0" text="&gt;">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font></Button>
+      <Button fx:id="addContactButton" layoutX="29.0" layoutY="599.0" mnemonicParsing="false" onAction="#onAddContactButtonClick" text="Add Contact">
+         <font>
+            <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <TextField fx:id="messageTextField" layoutX="142.0" layoutY="346.0" prefHeight="40.0" prefWidth="363.0" />
-      <Button fx:id="fileButton" layoutX="512.0" layoutY="353.0" mnemonicParsing="false" onAction="#onFileButtonClick" prefHeight="26.0" prefWidth="34.0" text="📂" />
-      <Button fx:id="sendButton" layoutX="553.0" layoutY="353.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="26.0" prefWidth="34.0" text="&gt;" />
-      <Button fx:id="addContactButton" layoutX="35.0" layoutY="350.0" mnemonicParsing="false" onAction="#onAddContactButtonClick" text="Add Contact">
-         <font>
-            <Font size="10.0" />
-         </font>
-      </Button>
-      <Pane layoutX="125.0" layoutY="60.0" prefHeight="340.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
-      <ListView fx:id="contactsList" layoutX="4.0" layoutY="65.0" prefHeight="278.0" prefWidth="120.0" />
-      <ScrollPane fx:id="messagesScrollpane" layoutX="135.0" layoutY="66.0" prefHeight="272.0" prefWidth="461.0">
+      <Pane layoutX="145.0" layoutY="80.0" prefHeight="570.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
+      <ListView fx:id="contactsList" layoutX="9.0" layoutY="95.0" prefHeight="494.0" prefWidth="129.0" />
+      <ScrollPane fx:id="messagesScrollpane" layoutX="160.0" layoutY="94.0" prefHeight="494.0" prefWidth="902.0">
          <content>
             <VBox fx:id="message_box" prefHeight="198.0" prefWidth="197.0" spacing="20" />
          </content>
       </ScrollPane>
+      <Text fx:id="titleText" fill="WHITE" layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #7ac490;" text="KMes Messenger" wrappingWidth="287.0068359375">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Text>
+      <Button alignment="CENTER" layoutX="914.0" layoutY="25.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onAccountButtonClick" prefHeight="30.0" prefWidth="120.0" text="Account">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>
