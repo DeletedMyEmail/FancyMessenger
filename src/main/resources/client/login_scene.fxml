@@ -14,12 +14,22 @@
         <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="82.0" prefWidth="1080.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
         <PasswordField fx:id="passwordField" layoutX="455.0" layoutY="254.0" prefHeight="30.0" prefWidth="149.0" promptText="Password" />
         <TextField fx:id="usernameField" layoutX="455.0" layoutY="207.0" prefHeight="30.0" prefWidth="149.0" promptText="Username" />
-        <Button fx:id="loginButton" layoutX="455.0" layoutY="313.0" mnemonicParsing="false" onAction="#onLoginButtonClick" prefHeight="25.0" prefWidth="60.0" text="Login" />
-        <Button fx:id="registerButton" layoutX="540.0" layoutY="313.0" mnemonicParsing="false" onAction="#onRegisterButtonClick" text="Register" />
-      <Button alignment="CENTER" layoutX="924.0" layoutY="26.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#switchToMainScene" prefHeight="30.0" prefWidth="120.0" text="Home">
+        <Button fx:id="loginButton" layoutX="455.0" layoutY="313.0" mnemonicParsing="false" onAction="#onLoginButtonClick" prefHeight="25.0" prefWidth="60.0" styleClass="btn" stylesheets="@../styles.css" text="Login">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+        <Button fx:id="registerButton" layoutX="540.0" layoutY="313.0" mnemonicParsing="false" onAction="#onRegisterButtonClick" styleClass="btn" stylesheets="@../styles.css" text="Register">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+      <Button alignment="CENTER" layoutX="924.0" layoutY="26.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#switchToMainScene" prefHeight="30.0" prefWidth="120.0" stylesheets="@../styles.css" text="Home">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-border" />
+         </styleClass>
       </Button>
       <Text fx:id="titleText" fill="WHITE" layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #7ac490;" text="Login" wrappingWidth="287.0068359375">
          <font>

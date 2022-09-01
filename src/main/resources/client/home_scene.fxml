@@ -10,22 +10,22 @@
    <children>
       <HBox prefHeight="100.0" prefWidth="1080.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <TextField fx:id="messageTextField" layoutX="160.0" layoutY="594.0" prefHeight="40.0" prefWidth="787.0" />
-      <Button fx:id="fileButton" layoutX="959.0" layoutY="599.0" mnemonicParsing="false" onAction="#onFileButtonClick" prefHeight="30.0" prefWidth="44.0" text="📂">
+      <Button fx:id="fileButton" layoutX="959.0" layoutY="599.0" mnemonicParsing="false" onAction="#onFileButtonClick" prefHeight="30.0" prefWidth="44.0" styleClass="btn" stylesheets="@../styles.css" text="📂">
          <font>
             <Font size="13.0" />
          </font></Button>
-      <Button fx:id="sendButton" layoutX="1012.0" layoutY="599.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="30.0" prefWidth="44.0" text="&gt;">
+      <Button fx:id="sendButton" layoutX="1012.0" layoutY="599.0" mnemonicParsing="false" onAction="#onSendButtonClick" prefHeight="30.0" prefWidth="44.0" styleClass="btn" stylesheets="@../styles.css" text="&gt;">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Button>
-      <Button fx:id="addContactButton" layoutX="29.0" layoutY="599.0" mnemonicParsing="false" onAction="#onAddContactButtonClick" text="Add Contact">
+      <Button fx:id="addContactButton" layoutX="30.0" layoutY="602.0" mnemonicParsing="false" onAction="#onAddContactButtonClick" styleClass="btn" stylesheets="@../styles.css" text="Add Contact">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
       <Pane layoutX="145.0" layoutY="80.0" prefHeight="570.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
       <ListView fx:id="contactsList" layoutX="9.0" layoutY="95.0" prefHeight="494.0" prefWidth="129.0" />
-      <ScrollPane fx:id="messagesScrollpane" layoutX="160.0" layoutY="94.0" prefHeight="494.0" prefWidth="902.0">
+      <ScrollPane fx:id="messagesScrollpane" layoutX="160.0" layoutY="95.0" prefHeight="494.0" prefWidth="887.0">
          <content>
             <VBox fx:id="message_box" prefHeight="198.0" prefWidth="197.0" spacing="20" />
          </content>
@@ -35,10 +35,14 @@
             <Font name="System Bold" size="22.0" />
          </font>
       </Text>
-      <Button alignment="CENTER" layoutX="914.0" layoutY="25.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onAccountButtonClick" prefHeight="30.0" prefWidth="120.0" text="Account">
+      <Button alignment="CENTER" layoutX="914.0" layoutY="25.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onAccountButtonClick" prefHeight="30.0" prefWidth="120.0" stylesheets="@../styles.css" text="Account">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
+         <styleClass>
+            <String fx:value="btn" />
+            <String fx:value="btn-border" />
+         </styleClass>
       </Button>
    </children>
 </AnchorPane>

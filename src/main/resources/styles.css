@@ -1,0 +1,12 @@
+.btn {
+    -fx-background-color: #6bc490;
+    -fx-background-radius: 20px;
+    -fx-text-fill: #f2e3e6;
+}
+
+.btn-border {
+    -fx-border-color: #f2e3e6;
+    -fx-border-radius: 20px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+}

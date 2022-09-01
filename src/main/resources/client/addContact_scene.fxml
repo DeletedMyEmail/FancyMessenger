@@ -9,11 +9,11 @@
 
 <AnchorPane prefHeight="150.0" prefWidth="231.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.AddContactSceneController">
    <children>
-      <Button layoutX="93.0" layoutY="101.0" mnemonicParsing="false" onAction="#onAddButtonClick" style="-fx-background-color: #6bc490;" text="Add">
+      <Button layoutX="91.0" layoutY="97.0" mnemonicParsing="false" onAction="#onAddButtonClick" prefHeight="24.0" prefWidth="50.0" styleClass="btn" stylesheets="@../styles.css" text="Add">
          <font>
             <Font name="System Bold" size="11.0" />
          </font>
       </Button>
-      <TextField fx:id="usernameTextfield" layoutX="19.0" layoutY="50.0" prefHeight="25.0" prefWidth="186.0" promptText="Username" />
+      <TextField fx:id="usernameTextfield" layoutX="19.0" layoutY="38.0" prefHeight="37.0" prefWidth="186.0" promptText="Username" />
    </children>
 </AnchorPane>
