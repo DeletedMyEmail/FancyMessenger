@@ -24,5 +24,6 @@ Note that the default server address in [ClientBackend](src/main/java/client/Cli
 ## Roadmap
 
 1. Queue messages if a user is offline and send them if they get back online
+2. Send larger images
 2. GUI update
 3. Suggest new stuff
