@@ -108,7 +108,7 @@ public class HomeSceneController {
         lTextflow.getChildren().add(lSentOrReceived);
 
         if (pContent.startsWith("[image]")) {
-            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(13));
+            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(7));
             Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
 
             lTextflow.getChildren().add(new ImageView(lImg));
