@@ -27,7 +27,7 @@
       <ListView fx:id="contactsList" layoutX="9.0" layoutY="95.0" prefHeight="494.0" prefWidth="129.0" />
       <ScrollPane fx:id="messagesScrollpane" layoutX="160.0" layoutY="95.0" prefHeight="494.0" prefWidth="887.0">
          <content>
-            <VBox fx:id="message_box" prefHeight="198.0" prefWidth="197.0" spacing="20" />
+            <VBox fx:id="message_box" prefHeight="485.0" prefWidth="880.0" spacing="20" />
          </content>
       </ScrollPane>
       <Text fx:id="titleText" fill="WHITE" layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #7ac490;" text="KMes Messenger" wrappingWidth="287.0068359375">

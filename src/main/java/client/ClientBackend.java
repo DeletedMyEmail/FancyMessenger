@@ -17,8 +17,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
@@ -131,23 +129,25 @@ public class ClientBackend {
      * Adds a new message to the list of messages with a specific user.
      * If there is no such list in the HashMap in conjunction with this user, a new one will be added.
      *
-     * @param pUsername Name of the user who sent/received this message
+     * @param pUser Name of the user who sent/received this message
      * @param pMessage Message content
      * */
-    protected void addNewMessage(String pUsername, String pMessage)
+    protected void addNewMessage(String pUser, String pMessage)
     {
-        if (messages.get(pUsername) == null)
+        if (messages.get(pUser) == null)
         {
-            messages.put(pUsername, new ArrayList<>() {{
+            messages.put(pUser, new ArrayList<>() {{
                 add(pMessage);
             }});
-            SceneManager.getHomeScene().showNewContact(pUsername);
+            SceneManager.getHomeScene().showNewContact(pUser);
         }
         else
         {
-            messages.get(pUsername).add(pMessage);
+            messages.get(pUser).add(pMessage);
         }
-        SceneManager.getHomeScene().showNewMessage(pUsername, pMessage);
+
+        if (pMessage.startsWith("Received: ")) SceneManager.getHomeScene().showNewMessageIfChatActive(pUser, pMessage.substring(10), true);
+        else SceneManager.getHomeScene().showNewMessageIfChatActive(pUser, pMessage.substring(6), false);
     }
 
     /**

@@ -8,12 +8,13 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -41,16 +42,17 @@ public class HomeSceneController {
 
     private void showAllMessages(Text pText) {
         ObservableList<Node> messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
-        showAllMessages(pText, messageList);
+        showAllMessages(pText.getText(), messageList);
     }
 
-    private void showAllMessages(Text pText, ObservableList pMessageList)
+    private void showAllMessages(String pContact, ObservableList pMessageList)
     {
-        if (backend.getMessagesForUser(pText.getText()) != null)
+        if (backend.getMessagesForUser(pContact) != null)
         {
-            for (String msg : backend.getMessagesForUser(pText.getText()))
+            for (String msg : backend.getMessagesForUser(pContact))
             {
-                pMessageList.add(createMessageHBox(msg));
+                if (msg.startsWith("Received: ")) pMessageList.add(createMessageBox(msg.substring(10), true));
+                else pMessageList.add(createMessageBox(msg.substring(6), false));
             }
         }
     }
@@ -88,31 +90,40 @@ public class HomeSceneController {
         }
     }
 
-    private HBox createMessageHBox(String pContent)
+    private VBox createMessageBox(String pContent, boolean pReceiving)
     {
-        String cssLayout = "-fx-border-color: #6bc490";
-        HBox hbox = new HBox();
-        hbox.setMaxWidth(350.0);
-        if (pContent.startsWith("Sent: [image]")) {
+        VBox lVBox = new VBox();
+        TextFlow lTextflow = new TextFlow();
+        Text lSentOrReceived = new Text();
+
+        if (pReceiving) {
+            lVBox.setStyle("-fx-background-color: #c7c9c7;");
+            lSentOrReceived.setText("Received: ");
+        }
+        else {
+            lVBox.setStyle("-fx-background-color: #d6f4cd;");
+            lSentOrReceived.setText("Sent: ");
+        }
+        lSentOrReceived.setFont(Font.font("System", FontWeight.BOLD, 15));
+        lTextflow.getChildren().add(lSentOrReceived);
+
+        if (pContent.startsWith("[image]")) {
             byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(13));
             Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
 
-            hbox.getChildren().add(new ImageView(lImg));
-        }
-        else if (pContent.startsWith("Received: [image]")) {
-            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(17));
-            Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
-
-            hbox.getChildren().add(new ImageView(lImg));
+            lTextflow.getChildren().add(new ImageView(lImg));
         }
         else {
-            hbox.getChildren().add(new Text(pContent));
+            Text lText = new Text();
+            lText.setFont(Font.font("System", FontWeight.NORMAL, 14));
+            lText.setText(pContent);
+            lTextflow.getChildren().add(lText);
         }
-        hbox.setStyle(cssLayout);
-        return hbox;
+        lVBox.getChildren().add(lTextflow);
+        return lVBox;
     }
 
-    protected void showNewMessage(String pAuthor, String pMessage)
+    protected void showNewMessageIfChatActive(String pAuthor, String pMessage, boolean pReceived)
     {
         Platform.runLater(new Runnable()
         {
@@ -120,9 +131,10 @@ public class HomeSceneController {
             public void run()
             {
                 Text item = ((Text)contactsList.getSelectionModel().getSelectedItem());
+
                 if (item != null && item.getText().equals(pAuthor))
                 {
-                    ((VBox)messagesScrollpane.getContent()).getChildren().add(createMessageHBox(pMessage));
+                    ((VBox)messagesScrollpane.getContent()).getChildren().add(createMessageBox(pMessage, pReceived));
                 }
             }
         });
