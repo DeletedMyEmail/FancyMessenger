@@ -20,6 +20,8 @@ Execute the main method of [ServerTerminal](src/main/java/server/ServerTerminal.
 
 Note that the default server address in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **"localhost"** and the default port is **4242**.
 
+![Messenger Demo](/src/main/resources/videos/demo.mp4?raw=true)
+
 <!-- Roadmap -->
 ## Roadmap
 
