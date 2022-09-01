@@ -32,7 +32,7 @@ import java.util.List;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes Server
  *
- * @version v2.0.1 | last edit: 27.08.2022
+ * @version v2.0.2 | last edit: 31.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
