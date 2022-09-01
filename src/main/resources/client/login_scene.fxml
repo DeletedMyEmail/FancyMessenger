@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.LoginSceneController">
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.LoginSceneController">
     <children>
-        <HBox layoutX="-42.0" layoutY="-37.0" prefHeight="60.0" prefWidth="600.0" style="-fx-background-color: #6bc490;"
-              AnchorPane.bottomAnchor="340.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Login">
-                    <HBox.margin>
-                        <Insets left="20.0" top="20.0" />
-                    </HBox.margin>
-                    <font>
-                        <Font name="System Bold" size="18.0" />
-                    </font>
-                </Text>
-            </children>
-        </HBox>
-        <PasswordField layoutX="44.0" layoutY="175.0" fx:id="passwordField"/>
-        <TextField layoutX="44.0" layoutY="139.0" fx:id="usernameField" />
-        <Button layoutX="44.0" layoutY="224.0" mnemonicParsing="false" onAction="#onLoginButtonClick" text="Login" fx:id="loginButton"/>
-        <Button layoutX="133.0" layoutY="224.0" mnemonicParsing="false" onAction="#onRegisterButtonClick" text="Register" fx:id="registerButton" />
-        <Button alignment="CENTER" layoutX="500.0" layoutY="15.0" mnemonicParsing="false" onAction="#switchToMainScene" prefHeight="26.0" prefWidth="70.0" text="Home">
-            <font>
-                <Font name="System Bold" size="10.0" />
-            </font>
-        </Button>
+        <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="82.0" prefWidth="1080.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <PasswordField fx:id="passwordField" layoutX="455.0" layoutY="254.0" prefHeight="30.0" prefWidth="149.0" promptText="Password" />
+        <TextField fx:id="usernameField" layoutX="455.0" layoutY="207.0" prefHeight="30.0" prefWidth="149.0" promptText="Username" />
+        <Button fx:id="loginButton" layoutX="455.0" layoutY="313.0" mnemonicParsing="false" onAction="#onLoginButtonClick" prefHeight="25.0" prefWidth="60.0" text="Login" />
+        <Button fx:id="registerButton" layoutX="540.0" layoutY="313.0" mnemonicParsing="false" onAction="#onRegisterButtonClick" text="Register" />
+      <Button alignment="CENTER" layoutX="924.0" layoutY="26.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#switchToMainScene" prefHeight="30.0" prefWidth="120.0" text="Home">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Text fx:id="titleText" fill="WHITE" layoutX="40.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-border-style: solid; -fx-border-width: 0px 3px 0px 0px; -fx-border-color: #7ac490;" text="Login" wrappingWidth="287.0068359375">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Text>
     </children>
 </AnchorPane>

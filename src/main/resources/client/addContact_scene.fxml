@@ -7,14 +7,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane prefHeight="150.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.AddContactSceneController">
+<AnchorPane prefHeight="150.0" prefWidth="231.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.AddContactSceneController">
    <children>
-      <Button layoutX="74.0" layoutY="103.0" mnemonicParsing="false" style="-fx-background-color: #6bc490;" text="Add" onAction="#onAddButtonClick">
+      <Button layoutX="93.0" layoutY="101.0" mnemonicParsing="false" onAction="#onAddButtonClick" style="-fx-background-color: #6bc490;" text="Add">
          <font>
             <Font name="System Bold" size="11.0" />
          </font>
       </Button>
-      <TextField layoutX="26.0" layoutY="50.0" promptText="Username" fx:id="usernameTextfield" />
+      <TextField fx:id="usernameTextfield" layoutX="19.0" layoutY="50.0" prefHeight="25.0" prefWidth="186.0" promptText="Username" />
    </children>
 </AnchorPane>
