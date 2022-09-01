@@ -6,11 +6,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 
 /**
  * Controller for the GUI home scene
@@ -47,7 +52,6 @@ public class HomeSceneController {
             {
                 pMessageList.add(createMessageHBox(msg));
             }
-            System.out.println("New messages added");
         }
     }
 
@@ -89,7 +93,21 @@ public class HomeSceneController {
         String cssLayout = "-fx-border-color: #6bc490";
         HBox hbox = new HBox();
         hbox.setMaxWidth(350.0);
-        hbox.getChildren().add(new Text(pContent));
+        if (pContent.startsWith("Sent: [image]")) {
+            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(13));
+            Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
+
+            hbox.getChildren().add(new ImageView(lImg));
+        }
+        else if (pContent.startsWith("Received: [image]")) {
+            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(17));
+            Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
+
+            hbox.getChildren().add(new ImageView(lImg));
+        }
+        else {
+            hbox.getChildren().add(new Text(pContent));
+        }
         hbox.setStyle(cssLayout);
         return hbox;
     }
@@ -152,5 +170,17 @@ public class HomeSceneController {
     {
         clearCurrentMessages();
         clearContacts();
+    }
+
+    @FXML
+    public void onFileButtonClick(ActionEvent actionEvent) {
+        Text selectedContact = ((Text)contactsList.getSelectionModel().getSelectedItem());
+        if (selectedContact == null) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
+            return;
+        }
+
+        String lReceiver = selectedContact.getText();
+        backend.fileButtonClick(lReceiver);
     }
 }

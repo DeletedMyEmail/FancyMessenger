@@ -2,9 +2,8 @@ package client;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+
 import java.io.IOException;
 
 /**
@@ -33,9 +32,14 @@ public class LoginSceneController {
     }
 
     @FXML
-    public void onLoginButtonClick(ActionEvent actionEvent) throws IOException
+    public void onLoginButtonClick(ActionEvent actionEvent)
     {
-        backend.sendToServer("login;;"+usernameField.getText()+";;"+passwordField.getText());
+        try {
+            backend.sendToServer("login;;"+usernameField.getText()+";;"+passwordField.getText());
+        }
+        catch (IOException ioEx) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
+        }
     }
 
     public void switchToMainScene(ActionEvent actionEvent)
@@ -43,7 +47,12 @@ public class LoginSceneController {
         SceneManager.switchToHomeScene();
     }
 
-    public void onRegisterButtonClick(ActionEvent actionEvent) throws IOException {
-        backend.sendToServer("register;;"+usernameField.getText()+";;"+passwordField.getText());
+    public void onRegisterButtonClick(ActionEvent actionEvent) {
+        try {
+            backend.sendToServer("register;;"+usernameField.getText()+";;"+passwordField.getText());
+        }
+        catch (IOException ioEx) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
+        }
     }
 }

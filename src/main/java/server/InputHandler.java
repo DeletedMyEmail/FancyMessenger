@@ -124,6 +124,7 @@ class InputHandler extends Thread {
                 try
                 {
                     String lInput = socketManager.readFromSocket(i);
+
                     if (lCurrentSocket.isClosed() || !lCurrentSocket.isConnected())
                     {
                         socketManager.closeSocket(i);
@@ -135,24 +136,17 @@ class InputHandler extends Thread {
                         String[] lRequest = lInput.split(";;");
                         switch (lRequest[0])
                         {
-                            case "login":
-                                handleLoginRequest(i, lRequest[1], lRequest[2]);
-                                break;
-                            case "register":
-                                handleRegistrationRequest(i, lRequest[1], lRequest[2]);
-                                break;
-                            case "send":
-                                handleSendRequest(i, lRequest[1], lRequest[2]);
-                                break;
-                            case "logout":
-                                clientConnnectionsAndStreams.get(i).set(3,"");
-                                break;
-                            case "doesUserExist":
-                                String lUsername = lRequest[1];
-                                if (userExists(lUsername)) socketManager.writeToSocket(i, "userExists;;"+lUsername);
-                                else socketManager.writeToSocket(i, "error;;User does not exist: "+lUsername+";;Adding contact failed");
-                            default:
-                                break;
+                            case "login" -> handleLoginRequest(i, lRequest[1], lRequest[2]);
+                            case "register" -> handleRegistrationRequest(i, lRequest[1], lRequest[2]);
+                            case "send" -> handleSendRequest(i, lRequest[1], lRequest[2]);
+                            case "logout" -> clientConnnectionsAndStreams.get(i).set(3,"");
+                            case "doesUserExist" -> {
+                                    String lUsername = lRequest[1];
+                                    if (userExists(lUsername)) socketManager.writeToSocket(i, "userExists;;"+lUsername);
+                                    else socketManager.writeToSocket(i, "error;; ;;User \""+lUsername+"\" does not exist");
+                                }
+                            case "Unable to decrypt message" -> socketManager.writeToSocket(i, "error;; ;;Your message was not properly encrypted");
+                            default -> socketManager.writeToSocket(i, "error;; ;;Unknown input");
                         }
                     }
                 }
@@ -160,18 +154,19 @@ class InputHandler extends Thread {
                 catch (IndexOutOfBoundsException ioobEx)
                 {
                     try {
-                        socketManager.writeToSocket(i, "error;;Missing argument;;Error occurred");
+                        socketManager.writeToSocket(i, "error;; ;;Missing argument");
                     } catch (IOException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
                         e.printStackTrace();
                     }
                 }
-                catch (IOException ex)
+                catch (IOException ioEx)
                 {
                     clientConnnectionsAndStreams.remove(i);
-                    System.out.printf("[%d]Socket closed due to IOExcception\n", i+1);
+                    System.out.printf("[%d]Socket closed due to IOException\n", i+1);
                     i--;
                 }
                 catch (Exception ex) {
+                    System.out.println("Deadly exception");
                     ex.printStackTrace();
                     System.exit(1);
                 }

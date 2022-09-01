@@ -12,6 +12,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
@@ -59,18 +60,33 @@ class SocketManager extends Thread{
     }
 
     private void writeToSocket(DataOutputStream pOutStream, SecretKey pSocketsSecretKey, String pMessage) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        pOutStream.writeUTF(EncryptionUtils.encryptAES(pMessage, pSocketsSecretKey));
+        byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, pSocketsSecretKey);
+        byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
+        ByteBuffer lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage);
+        pOutStream.write(lConcatenated.array());
     }
 
-    protected String readFromSocket(int pIndex) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        DataInputStream lInStream = (DataInputStream)socketConnectionsAndStreams.get(pIndex).get(2);
-        SecretKey lSecretKey = (SecretKey)socketConnectionsAndStreams.get(pIndex).get(4);
-        return readFromSocket(lInStream, lSecretKey);
+    protected String readFromSocket(int pIndex) throws IOException
+    {
+            DataInputStream lInStream = (DataInputStream)socketConnectionsAndStreams.get(pIndex).get(2);
+            SecretKey lSecretKey = (SecretKey)socketConnectionsAndStreams.get(pIndex).get(4);
+            return readFromSocket(lInStream, lSecretKey);
     }
 
-    private String readFromSocket(DataInputStream pInStream, SecretKey pKey) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        String lEncryptedInput = pInStream.readUTF();
-        return EncryptionUtils.decryptAES(lEncryptedInput, pKey);
+    private String readFromSocket(DataInputStream pInStream, SecretKey pKey) throws IOException
+    {
+        try
+        {
+            int lSize = pInStream.readInt();
+            byte[] lEncryptedInput = new byte[lSize];
+            ;
+            pInStream.read(lEncryptedInput);
+            return EncryptionUtils.decryptAES(lEncryptedInput, pKey);
+        }
+        catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
+            ex.printStackTrace();
+            return "Unable to decrypt message";
+        }
     }
 
     /**
@@ -110,7 +126,7 @@ class SocketManager extends Thread{
                 lInput = new byte[128];
                 lNewInStream.read(lInput);
                 SecretKey lSocketsAESKey = EncryptionUtils.decodeAESKey(
-                        encryptionUtils.decryptRSA(lInput));
+                        encryptionUtils.decryptRSAToBytes(lInput));
 
                 socketConnectionsAndStreams.add(new ArrayList<>()
                 {{

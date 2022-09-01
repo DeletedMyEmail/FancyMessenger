@@ -29,14 +29,15 @@ public class SceneManager extends Application {
 
     private void setScenes() throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(SceneManager.class.getResource("settings_scene.fxml"));
-        settingsScene = new Scene(loader.load());
-        settingsController = loader.getController();
 
-        loader = new FXMLLoader();
         loader.setLocation(SceneManager.class.getResource("home_scene.fxml"));
         homeScene = new Scene(loader.load());
         homeController = loader.getController();
+
+        loader = new FXMLLoader();
+        loader.setLocation(SceneManager.class.getResource("settings_scene.fxml"));
+        settingsScene = new Scene(loader.load());
+        settingsController = loader.getController();
 
         loader = new FXMLLoader();
         loader.setLocation(SceneManager.class.getResource("login_scene.fxml"));
@@ -57,6 +58,11 @@ public class SceneManager extends Application {
     protected static HomeSceneController getHomeScene()
     {
         return homeController;
+    }
+
+    protected static Stage getStage()
+    {
+        return stage;
     }
 
     protected static void switchToSettingsScene()
@@ -168,6 +174,7 @@ public class SceneManager extends Application {
             stage = pStage;
             setScenes();
             stage.setScene(homeScene);
+            stage.setResizable(false);
             stage.getIcons().add(new Image(SceneManager.class.getResourceAsStream("/images/logo.png")));
             stage.show();
         }
