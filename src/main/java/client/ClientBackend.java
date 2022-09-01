@@ -21,10 +21,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Client backend for KMes Messenger<br/>
@@ -211,11 +208,13 @@ public class ClientBackend {
      * */
     protected void sendToServer(String pMessage) throws IOException
     {
-        try {
+        try
+        {
             byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, AESKey);
             byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
-            ByteBuffer lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage);
-            outStream.write(lConcatenated.array());
+            byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
+
+            outStream.write(lConcatenated, 0 , lConcatenated.length);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -224,7 +223,7 @@ public class ClientBackend {
     private String readFromServer() throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         int lSize = inStream.readInt();
         byte[] lEncryptedInput = new byte[lSize];
-        inStream.read(lEncryptedInput);
+        inStream.readFully(lEncryptedInput);
         return EncryptionUtils.decryptAES(lEncryptedInput, AESKey);
     }
 

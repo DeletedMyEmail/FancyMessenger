@@ -93,8 +93,11 @@ public class HomeSceneController {
     private VBox createMessageBox(String pContent, boolean pReceiving)
     {
         VBox lVBox = new VBox();
+        lVBox.setMaxWidth(800);
+        lVBox.setMaxHeight(400);
         TextFlow lTextflow = new TextFlow();
         Text lSentOrReceived = new Text();
+
 
         if (pReceiving) {
             lVBox.setStyle("-fx-background-color: #c7c9c7;");
@@ -110,8 +113,12 @@ public class HomeSceneController {
         if (pContent.startsWith("[image]")) {
             byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(7));
             Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
-
-            lTextflow.getChildren().add(new ImageView(lImg));
+            ImageView lImgView = new ImageView(lImg);
+            lImgView.setCache(true);
+            lImgView.setPreserveRatio(true);
+            lImgView.setFitHeight(400);
+            lImgView.setFitWidth(600);
+            lTextflow.getChildren().add(lImgView);
         }
         else {
             Text lText = new Text();

@@ -62,8 +62,8 @@ class SocketManager extends Thread{
     private void writeToSocket(DataOutputStream pOutStream, SecretKey pSocketsSecretKey, String pMessage) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, pSocketsSecretKey);
         byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
-        ByteBuffer lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage);
-        pOutStream.write(lConcatenated.array());
+        byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
+        pOutStream.write(lConcatenated, 0, lConcatenated.length);
     }
 
     protected String readFromSocket(int pIndex) throws IOException
@@ -78,9 +78,11 @@ class SocketManager extends Thread{
         try
         {
             int lSize = pInStream.readInt();
+            if (lSize <= 0) return "";
             byte[] lEncryptedInput = new byte[lSize];
-            ;
-            pInStream.read(lEncryptedInput);
+
+            pInStream.readFully(lEncryptedInput);
+
             return EncryptionUtils.decryptAES(lEncryptedInput, pKey);
         }
         catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
