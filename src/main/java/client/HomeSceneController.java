@@ -72,7 +72,7 @@ public class HomeSceneController {
             public void run()
             {
                 clearCurrentMessages();
-                showAllMessages((Text)t1);
+                if ((Text)t1 != null) showAllMessages((Text)t1);
             }
         }));
     }
@@ -93,8 +93,8 @@ public class HomeSceneController {
     private VBox createMessageBox(String pContent, boolean pReceiving)
     {
         VBox lVBox = new VBox();
-        lVBox.setMaxWidth(800);
-        lVBox.setMaxHeight(400);
+        lVBox.setMaxWidth(880);
+        lVBox.setMaxHeight(450);
         TextFlow lTextflow = new TextFlow();
         Text lSentOrReceived = new Text();
 

@@ -262,7 +262,7 @@ public class ClientBackend {
     public void fileButtonClick(String pReceiver) {
         FileChooser lChooser = new FileChooser();
         lChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg"));
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
         lChooser.setTitle("Choose an image");
         File lFile = lChooser.showOpenDialog(SceneManager.getStage());
 
