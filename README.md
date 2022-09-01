@@ -26,4 +26,5 @@ https://user-images.githubusercontent.com/88390464/187886356-53112c49-153f-4d0b-
 ## Roadmap
 
 1. Queue messages if a user is offline and send them if they get back online
-2. Suggest new stuff
+2. Save resized images
+3. Suggest new stuff
