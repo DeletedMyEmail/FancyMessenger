@@ -94,7 +94,7 @@ public class ClientBackend {
         {
             sendToServer("logout");
             messages.clear();
-            SceneManager.getHomeScene().clearShowMessagesAndContacts();
+            SceneManager.getHomeScene().clearMessagesAndContacts();
             currentUser = "";
         }
         catch (IOException ex)
@@ -143,8 +143,8 @@ public class ClientBackend {
             messages.get(pUser).add(pMessage);
         }
 
-        if (pMessage.startsWith("Received: ")) SceneManager.getHomeScene().showNewMessageIfChatActive(pUser, pMessage.substring(10), true);
-        else SceneManager.getHomeScene().showNewMessageIfChatActive(pUser, pMessage.substring(6), false);
+        if (pMessage.startsWith("Received: ")) SceneManager.getHomeScene().showNewMessage(pUser, pMessage.substring(10), true);
+        else SceneManager.getHomeScene().showNewMessage(pUser, pMessage.substring(6), false);
     }
 
     /**
