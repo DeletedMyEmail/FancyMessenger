@@ -1,10 +1,9 @@
 package client;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -43,22 +42,19 @@ public class HomeSceneController {
 
     HashMap<String, VBox> messageLists;
 
-    private void switchMessageList(String pContact)
-    {
-        ObservableList<Node> lChildren = ((VBox)messagesScrollpane.getContent()).getChildren();
-        if (lChildren.size() == 0) lChildren.add(messageLists.get(pContact));
-        else lChildren.set(0, messageLists.get(pContact));
+    private void switchMessageList(String pContact) {
+        messageLists.putIfAbsent(pContact, new VBox());
+        messagesScrollpane.setContent(messageLists.get(pContact));
     }
 
     @FXML
     public void initialize()
     {
         backend = SceneManager.getBackend();
-        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(new Runnable()
-        {
+        messageLists = new HashMap<>();
+        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 if (t1 != null) switchMessageList(((Text)t1).getText());
             }
         }));
@@ -67,27 +63,22 @@ public class HomeSceneController {
     @FXML
     protected void onAccountButtonClick()
     {
-        if (!backend.getUsername().equals(""))
-        {
-            SceneManager.switchToSettingsScene();
-        }
-        else
-        {
-            SceneManager.switchToLoginScene();
-        }
+        if (!backend.getUsername().equals("")) SceneManager.switchToSettingsScene();
+        else SceneManager.switchToLoginScene();
     }
 
     private VBox createMessageBox(String pContent, boolean pReceiving)
     {
         VBox lVBox = new VBox();
-        lVBox.setMaxWidth(880);
-        lVBox.setMaxHeight(450);
+        lVBox.setPrefWidth(860);
+        lVBox.setPadding(new Insets(3));
+        VBox.setMargin(lVBox, new Insets(0, 0, 15, 0));
         TextFlow lTextflow = new TextFlow();
         Text lSentOrReceived = new Text();
 
 
         if (pReceiving) {
-            lVBox.setStyle("-fx-background-color: #c7c9c7;");
+            lVBox.setStyle("-fx-background-color: #c7c9c7; -fx-margin-bottom: 10px;");
             lSentOrReceived.setText("Received: ");
         }
         else {
@@ -103,8 +94,12 @@ public class HomeSceneController {
             ImageView lImgView = new ImageView(lImg);
             lImgView.setCache(true);
             lImgView.setPreserveRatio(true);
-            lImgView.setFitHeight(400);
-            lImgView.setFitWidth(600);
+
+            if (lImg.getHeight() > 500 || lImg.getWidth() > 840) {
+                lImgView.setFitHeight(500);
+                lImgView.setFitWidth(840);
+            }
+
             lTextflow.getChildren().add(lImgView);
         }
         else {
@@ -118,16 +113,20 @@ public class HomeSceneController {
     }
 
     protected void showNewMessage(String pAuthor, String pMessage, boolean pReceived) {
-        messageLists.get(pAuthor).getChildren().add(createMessageBox(pMessage, pReceived));
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (messageLists.get(pAuthor) == null) messageLists.put(pAuthor, new VBox());
+                messageLists.get(pAuthor).getChildren().add(createMessageBox(pMessage, pReceived));
+            }
+        });
     }
 
     protected void showNewContact(String pUsername)
     {
-        Platform.runLater(new Runnable()
-        {
+        Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 contactsList.getItems().add(new Text(pUsername));
             }
         });
@@ -148,8 +147,7 @@ public class HomeSceneController {
     }
 
     @FXML
-    protected void onAddContactButtonClick(ActionEvent actionEvent)
-    {
+    protected void onAddContactButtonClick(ActionEvent actionEvent) {
         SceneManager.showAddContactWindow();
     }
 
