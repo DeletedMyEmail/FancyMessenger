@@ -1,10 +1,9 @@
 package client;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -17,6 +16,7 @@ import javafx.scene.text.TextFlow;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
 
 /**
  * Controller for the GUI home scene
@@ -40,39 +40,22 @@ public class HomeSceneController {
     @FXML
     public ScrollPane messagesScrollpane;
 
-    private void showAllMessages(Text pText) {
-        ObservableList<Node> messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
-        showAllMessages(pText.getText(), messageList);
-    }
+    HashMap<String, VBox> messageLists;
 
-    private void showAllMessages(String pContact, ObservableList pMessageList)
-    {
-        if (backend.getMessagesForUser(pContact) != null)
-        {
-            for (String msg : backend.getMessagesForUser(pContact))
-            {
-                if (msg.startsWith("Received: ")) pMessageList.add(createMessageBox(msg.substring(10), true));
-                else pMessageList.add(createMessageBox(msg.substring(6), false));
-            }
-        }
-    }
-
-    private void clearCurrentMessages() {
-        ObservableList messageList = ((VBox)messagesScrollpane.getContent()).getChildren();
-        messageList.clear();
+    private void switchMessageList(String pContact) {
+        messageLists.putIfAbsent(pContact, new VBox());
+        messagesScrollpane.setContent(messageLists.get(pContact));
     }
 
     @FXML
     public void initialize()
     {
         backend = SceneManager.getBackend();
-        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(new Runnable()
-        {
+        messageLists = new HashMap<>();
+        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
-                clearCurrentMessages();
-                if ((Text)t1 != null) showAllMessages((Text)t1);
+            public void run() {
+                if (t1 != null) switchMessageList(((Text)t1).getText());
             }
         }));
     }
@@ -80,27 +63,22 @@ public class HomeSceneController {
     @FXML
     protected void onAccountButtonClick()
     {
-        if (!backend.getUsername().equals(""))
-        {
-            SceneManager.switchToSettingsScene();
-        }
-        else
-        {
-            SceneManager.switchToLoginScene();
-        }
+        if (!backend.getUsername().equals("")) SceneManager.switchToSettingsScene();
+        else SceneManager.switchToLoginScene();
     }
 
     private VBox createMessageBox(String pContent, boolean pReceiving)
     {
         VBox lVBox = new VBox();
-        lVBox.setMaxWidth(880);
-        lVBox.setMaxHeight(450);
+        lVBox.setPrefWidth(860);
+        lVBox.setPadding(new Insets(3));
+        VBox.setMargin(lVBox, new Insets(0, 0, 15, 0));
         TextFlow lTextflow = new TextFlow();
         Text lSentOrReceived = new Text();
 
 
         if (pReceiving) {
-            lVBox.setStyle("-fx-background-color: #c7c9c7;");
+            lVBox.setStyle("-fx-background-color: #c7c9c7; -fx-margin-bottom: 10px;");
             lSentOrReceived.setText("Received: ");
         }
         else {
@@ -116,8 +94,12 @@ public class HomeSceneController {
             ImageView lImgView = new ImageView(lImg);
             lImgView.setCache(true);
             lImgView.setPreserveRatio(true);
-            lImgView.setFitHeight(400);
-            lImgView.setFitWidth(600);
+
+            if (lImg.getHeight() > 500 || lImg.getWidth() > 840) {
+                lImgView.setFitHeight(500);
+                lImgView.setFitWidth(840);
+            }
+
             lTextflow.getChildren().add(lImgView);
         }
         else {
@@ -130,30 +112,21 @@ public class HomeSceneController {
         return lVBox;
     }
 
-    protected void showNewMessageIfChatActive(String pAuthor, String pMessage, boolean pReceived)
-    {
-        Platform.runLater(new Runnable()
-        {
+    protected void showNewMessage(String pAuthor, String pMessage, boolean pReceived) {
+        Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
-                Text item = ((Text)contactsList.getSelectionModel().getSelectedItem());
-
-                if (item != null && item.getText().equals(pAuthor))
-                {
-                    ((VBox)messagesScrollpane.getContent()).getChildren().add(createMessageBox(pMessage, pReceived));
-                }
+            public void run() {
+                if (messageLists.get(pAuthor) == null) messageLists.put(pAuthor, new VBox());
+                messageLists.get(pAuthor).getChildren().add(createMessageBox(pMessage, pReceived));
             }
         });
     }
 
     protected void showNewContact(String pUsername)
     {
-        Platform.runLater(new Runnable()
-        {
+        Platform.runLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 contactsList.getItems().add(new Text(pUsername));
             }
         });
@@ -174,21 +147,15 @@ public class HomeSceneController {
     }
 
     @FXML
-    protected void onAddContactButtonClick(ActionEvent actionEvent)
-    {
+    protected void onAddContactButtonClick(ActionEvent actionEvent) {
         SceneManager.showAddContactWindow();
     }
 
-    private void clearContacts()
+    protected void clearMessagesAndContacts()
     {
+        messageLists.clear();
         contactsList.getSelectionModel().clearSelection();
         contactsList.getItems().clear();
-    }
-
-    protected void clearShowMessagesAndContacts()
-    {
-        clearCurrentMessages();
-        clearContacts();
     }
 
     @FXML
@@ -202,4 +169,5 @@ public class HomeSceneController {
         String lReceiver = selectedContact.getText();
         backend.fileButtonClick(lReceiver);
     }
+
 }
