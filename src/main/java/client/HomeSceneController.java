@@ -154,6 +154,7 @@ public class HomeSceneController {
     protected void clearMessagesAndContacts()
     {
         messageLists.clear();
+        messagesScrollpane.setContent(null);
         contactsList.getSelectionModel().clearSelection();
         contactsList.getItems().clear();
     }
