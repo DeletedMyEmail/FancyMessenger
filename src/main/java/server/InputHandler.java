@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * This class acts as a backend for the KMes Server and processes all inputs from user sockets.
  *
- * @version v2.0.2 | last edit: 31.08.2022
+ * @version v2.1.1 | last edit: 03.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {

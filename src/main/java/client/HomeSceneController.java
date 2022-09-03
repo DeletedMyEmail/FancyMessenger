@@ -14,7 +14,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.stage.FileChooser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,7 +23,7 @@ import java.util.HashMap;
 /**
  * Controller for the GUI home scene
  *
- * @version v2.1.0 | last edit: 03.09.2022
+ * @version v2.1.1 | last edit: 03.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class HomeSceneController {

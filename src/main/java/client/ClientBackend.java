@@ -26,13 +26,12 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import javax.imageio.ImageIO;
-import java.util.List;
 
 /**
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes Server
  *
- * @version v2.1.0 | last edit: 03.09.2022
+ * @version v2.1.1 | last edit: 03.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
