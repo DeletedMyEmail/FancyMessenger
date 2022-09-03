@@ -15,6 +15,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,12 +31,14 @@ class InputHandler extends Thread {
     private final SQLUtils sqlUtils;
 
     private final List<List<Object>> clientConnnectionsAndStreams;
+    private final HashMap<String, List<String>> queuedMessages;
 
     private boolean running;
 
-    protected InputHandler(SocketManager pSocketManager) throws IOException, SQLException {
+    protected InputHandler(SocketManager pSocketManager) throws SQLException {
         socketManager = pSocketManager;
         socketManager.start();
+        queuedMessages = new HashMap<>();
         clientConnnectionsAndStreams = socketManager.getSockets();
         sqlUtils = new SQLUtils("src/main/resources/kmes.db");
         running = true;
@@ -46,6 +50,11 @@ class InputHandler extends Thread {
 
 
     private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        if (!userExists(pReveiver)) {
+            socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
+            return;
+        }
+        String lAuthor = (String) clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3);
         for (List<Object> client : clientConnnectionsAndStreams)
         {
             if (client.get(3).equals(pReveiver))
@@ -53,7 +62,7 @@ class InputHandler extends Thread {
                 if (!clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3).equals(pReveiver))
                 {
                     socketManager.writeToSocket(clientConnnectionsAndStreams.indexOf(client), "message;;"+
-                            clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3)+";;"+pMessage);
+                            lAuthor+";;"+pMessage);
                 }
                 else
                 {
@@ -62,7 +71,20 @@ class InputHandler extends Thread {
                 return;
             }
         }
-        socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
+        queueMessage(lAuthor, pReveiver, pMessage);
+    }
+
+    private void queueMessage(String pAuthor, String pReveiver, String pMessage) {
+        queuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
+        queuedMessages.get(pReveiver).add(pAuthor+";;"+pMessage);
+    }
+
+    private void sendQueuedMessages(int pSocketIndex, String pUsername) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
+        List<String> lMessages = queuedMessages.get(pUsername);
+        if (lMessages == null) return;
+        for (int i = 0; i < lMessages.size(); i++) {
+            socketManager.writeToSocket(pSocketIndex, "message;;"+lMessages.get(i));
+        }
     }
 
     private void handleRegistrationRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, SQLException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
@@ -105,6 +127,7 @@ class InputHandler extends Thread {
         {
             clientConnnectionsAndStreams.get(pSocketIndex).set(3, pUsername);
             socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
+            sendQueuedMessages(pSocketIndex, pUsername);
         }
         else {
             socketManager.writeToSocket(pSocketIndex, "error;;Password or username incorrect;;Login failed");

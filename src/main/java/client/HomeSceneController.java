@@ -1,6 +1,7 @@
 package client;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -133,7 +134,11 @@ public class HomeSceneController {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                contactsList.getItems().add(new Text(pUsername));
+                ObservableList<Text> lContacts = contactsList.getItems();
+                for (Text contact : lContacts) {
+                    if (contact.getText().equals(pUsername)) return;
+                }
+                lContacts.add(new Text(pUsername));
             }
         });
     }
