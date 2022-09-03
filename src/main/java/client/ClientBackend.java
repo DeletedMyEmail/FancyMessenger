@@ -3,14 +3,18 @@ package client;
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
 import KLibrary.Utils.EncryptionUtils;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -22,6 +26,9 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
+import javax.imageio.ImageIO;
+import java.nio.file.Files;
+import java.util.List;
 
 /**
  * Client backend for KMes Messenger<br/>
@@ -259,7 +266,7 @@ public class ClientBackend {
         }
     }
 
-    public void fileButtonClick(String pReceiver) {
+    public void sendFileButtonClick(String pReceiver) {
         FileChooser lChooser = new FileChooser();
         lChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
@@ -277,6 +284,35 @@ public class ClientBackend {
         }
         catch (IOException ex) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can not convert this file");
+        }
+    }
+
+    public void saveFile(Image pImage) {
+        FileChooser lChooser = new FileChooser();
+        lChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+        File lFileToSaveTo = lChooser.showSaveDialog(SceneManager.getStage());
+        if (lFileToSaveTo == null) SceneManager.showAlert(Alert.AlertType.ERROR, "", "Please select a file");
+        else
+        {
+            try
+            {
+                lFileToSaveTo.createNewFile();
+                BufferedImage lBufferedImage = SwingFXUtils.fromFXImage(pImage, null);
+                BufferedImage imageRGB = new BufferedImage(lBufferedImage.getWidth(), lBufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                imageRGB.createGraphics().drawImage(lBufferedImage, 0, 0, null);
+
+                String lFileExtension = lFileToSaveTo.getName();
+                lFileExtension = lFileExtension.substring(lFileExtension.lastIndexOf('.')+1);
+
+                ImageIO.write(imageRGB, lFileExtension, lFileToSaveTo);
+            }
+            catch (IOException ioEx) {
+                SceneManager.showAlert(Alert.AlertType.ERROR, "", "Error occured while saving");
+            }
+            catch (SecurityException secEx) {
+                SceneManager.showAlert(Alert.AlertType.ERROR, "", "Access denied");
+            }
         }
     }
 }

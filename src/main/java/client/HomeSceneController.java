@@ -7,11 +7,13 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -100,6 +102,10 @@ public class HomeSceneController {
                 lImgView.setFitWidth(840);
             }
 
+            lImgView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                backend.saveFile(((ImageView)event.getSource()).getImage());
+            });
+
             lTextflow.getChildren().add(lImgView);
         }
         else {
@@ -168,7 +174,7 @@ public class HomeSceneController {
         }
 
         String lReceiver = selectedContact.getText();
-        backend.fileButtonClick(lReceiver);
+        backend.sendFileButtonClick(lReceiver);
     }
 
 }
