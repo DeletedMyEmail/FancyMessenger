@@ -22,6 +22,12 @@ Note that the default server address in [ClientBackend](src/main/java/client/Cli
 
 https://user-images.githubusercontent.com/88390464/187886356-53112c49-153f-4d0b-a728-bcfd74251b9c.mp4
 
+## Recent Changes
+1. Save images
+2  Send images
+3. GUI style
+4. AES 
+
 <!-- Roadmap -->
 ## Roadmap
 
