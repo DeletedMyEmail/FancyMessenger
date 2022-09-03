@@ -23,6 +23,8 @@ Note that the default server address in [ClientBackend](src/main/java/client/Cli
 https://user-images.githubusercontent.com/88390464/188278132-a2bf9e37-8476-4a2f-ad05-e22990ac3241.mp4
 
 ## Recent Changes
+
+1. Queue messages if a user is offline and send them if they get back online
 1. Save images
 2. Send images
 3. GUI style
@@ -31,5 +33,4 @@ https://user-images.githubusercontent.com/88390464/188278132-a2bf9e37-8476-4a2f-
 <!-- Roadmap -->
 ## Roadmap
 
-1. Queue messages if a user is offline and send them if they get back online
-2. Suggest new stuff
+1. Suggest new stuff
