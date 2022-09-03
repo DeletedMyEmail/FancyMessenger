@@ -24,7 +24,7 @@ https://user-images.githubusercontent.com/88390464/187886356-53112c49-153f-4d0b-
 
 ## Recent Changes
 1. Save images
-2  Send images
+2. Send images
 3. GUI style
 4. AES 
 
