@@ -43,7 +43,6 @@ public class ClientBackend {
     // Port of the KMes Server which accepts clients
     private static final int PORT = 4242;
 
-    private final HashMap<String, List<String>> messages;
     private final EncryptionUtils encryptionUtils;
 
     // connection to KMes Server
@@ -62,7 +61,6 @@ public class ClientBackend {
      * in conjunction with the receiver/sender
      * */
     public ClientBackend() {
-        messages = new HashMap<>();
         encryptionUtils = new EncryptionUtils();
         /*
         reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
@@ -74,15 +72,6 @@ public class ClientBackend {
         {
             //TODO
         }*/
-    }
-
-    /**
-     * @param pUsername Name of the user whose sent/received messages are to be returned
-     * @return Returns a list of strings including all sent messages with the specified user
-     * */
-    protected List<String> getMessagesForUser(String pUsername)
-    {
-        return messages.get(pUsername);
     }
 
     /**
@@ -98,7 +87,6 @@ public class ClientBackend {
         try
         {
             sendToServer("logout");
-            messages.clear();
             SceneManager.getHomeScene().clearMessagesAndContacts();
             currentUser = "";
         }
@@ -136,17 +124,7 @@ public class ClientBackend {
      * */
     protected void addNewMessage(String pUser, String pMessage)
     {
-        if (messages.get(pUser) == null)
-        {
-            messages.put(pUser, new ArrayList<>() {{
-                add(pMessage);
-            }});
-            SceneManager.getHomeScene().showNewContact(pUser);
-        }
-        else
-        {
-            messages.get(pUser).add(pMessage);
-        }
+        SceneManager.getHomeScene().showNewContact(pUser);
 
         if (pMessage.startsWith("Received: ")) SceneManager.getHomeScene().showNewMessage(pUser, pMessage.substring(10), true);
         else SceneManager.getHomeScene().showNewMessage(pUser, pMessage.substring(6), false);
@@ -182,7 +160,6 @@ public class ClientBackend {
                                 case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
                                 case "message" -> addNewMessage(lInput[1], "Received: " + lInput[2]);
                                 case "userExists" -> {
-                                    messages.computeIfAbsent(lInput[1], k -> new ArrayList<>());
                                     SceneManager.getHomeScene().showNewContact(lInput[1]);
                                     SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                             " new contact: " + lInput[1], "New contact", ButtonType.OK);
