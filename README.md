@@ -25,10 +25,10 @@ https://user-images.githubusercontent.com/88390464/188278132-a2bf9e37-8476-4a2f-
 ## Recent Changes
 
 1. Queue messages if a user is offline and send them if they get back online
-1. Save images
-2. Send images
-3. GUI style
-4. AES 
+2. Save images
+3. Send images
+4. GUI style
+5. AES 
 
 <!-- Roadmap -->
 ## Roadmap
