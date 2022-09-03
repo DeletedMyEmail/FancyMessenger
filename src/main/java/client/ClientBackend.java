@@ -13,7 +13,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -27,7 +26,6 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import javax.imageio.ImageIO;
-import java.nio.file.Files;
 import java.util.List;
 
 /**
