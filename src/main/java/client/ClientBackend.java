@@ -127,15 +127,19 @@ public class ClientBackend {
      * Adds a new message to the list of messages with a specific user.
      * If there is no such list in the HashMap in conjunction with this user, a new one will be added.
      *
-     * @param pUser Name of the user who sent/received this message
+     * @param pContactName Name of the user who sent/received this message
      * @param pMessage Message content
      * */
-    protected void addNewMessage(String pUser, String pMessage)
-    {
-        SceneManager.getHomeScene().showNewContact(pUser);
+    protected void addNewMessage(String pContactName, String pMessage, boolean pReceived) {
+        SceneManager.getHomeScene().showNewContact(pContactName);
+        SceneManager.getHomeScene().showNewMessage(pContactName, pMessage, pReceived);
 
-        if (pMessage.startsWith("Received: ")) SceneManager.getHomeScene().showNewMessage(pUser, pMessage.substring(10), true);
-        else SceneManager.getHomeScene().showNewMessage(pUser, pMessage.substring(6), false);
+        try {
+            sqlUtils.onExecute(
+                    "INSERT INTO Message (Content,)");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -158,7 +162,7 @@ public class ClientBackend {
 
                         establishEncryption();
 
-                        // Handles inputs as long as the connection exists
+                        // Handles inputs as long as connected to the KMes Server
                         while (isConnected())
                         {
                             String[] lInput = readFromServer().split(";;");
@@ -169,7 +173,7 @@ public class ClientBackend {
                                     loadHistory();
                                 }
                                 case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
-                                case "message" -> addNewMessage(lInput[1], "Received: " + lInput[2]);
+                                case "message" -> addNewMessage(lInput[1], lInput[2], true);
                                 case "userExists" -> {
                                     SceneManager.getHomeScene().showNewContact(lInput[1]);
                                     insertContact(lInput[1]);
@@ -182,7 +186,6 @@ public class ClientBackend {
                 }
                 catch (SocketTimeoutException | SocketException socketException)
                 {
-                    socketException.printStackTrace();
                     SceneManager.showAlert(Alert.AlertType.ERROR, "",
                             "Connection to the KMesServer couldn't be established",
                             event -> System.exit(0), ButtonType.OK);
@@ -277,7 +280,7 @@ public class ClientBackend {
             if (lMessage[lMessage.length-1] == ';') lMessage[lMessage.length-1] = ',';
 
             sendToServer("send;;"+pReceiver+";;"+String.valueOf(lMessage));
-            addNewMessage(pReceiver, "Sent: "+String.valueOf(lMessage));
+            addNewMessage(pReceiver, String.valueOf(lMessage), false);
         }
         catch (IOException ioEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
