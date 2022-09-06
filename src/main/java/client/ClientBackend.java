@@ -3,6 +3,7 @@ package client;
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
 import KLibrary.Utils.EncryptionUtils;
 
+import KLibrary.Utils.SQLUtils;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -24,6 +25,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import javax.imageio.ImageIO;
 
@@ -43,6 +46,7 @@ public class ClientBackend {
     private static final int PORT = 4242;
 
     private final EncryptionUtils encryptionUtils;
+    private SQLUtils sqlUtils;
 
     // connection to KMes Server
     private Socket server;
@@ -61,6 +65,11 @@ public class ClientBackend {
      * */
     public ClientBackend() {
         encryptionUtils = new EncryptionUtils();
+        try {
+            sqlUtils = new SQLUtils("src/main/resources/kmes_client.db");
+        } catch (SQLException sqlEx) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
+        }
         /*
         reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
         writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
@@ -155,11 +164,15 @@ public class ClientBackend {
                             String[] lInput = readFromServer().split(";;");
 
                             switch (lInput[0]) {
-                                case "loggedIn" -> updateCurrentUser(lInput[1]);
+                                case "loggedIn" -> {
+                                    updateCurrentUser(lInput[1]); 
+                                    loadHistory();
+                                }
                                 case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
                                 case "message" -> addNewMessage(lInput[1], "Received: " + lInput[2]);
                                 case "userExists" -> {
                                     SceneManager.getHomeScene().showNewContact(lInput[1]);
+                                    insertContact(lInput[1]);
                                     SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                             " new contact: " + lInput[1], "New contact", ButtonType.OK);
                                 }
@@ -180,6 +193,40 @@ public class ClientBackend {
             }
         }).start();
 
+    }
+
+    private void loadHistory()
+    {
+        try
+        {
+            ResultSet lResult = sqlUtils.onQuery("SELECT ContactName FROM Contact WHERE AccountName=?", currentUser);
+
+            while (lResult.next()) SceneManager.getHomeScene().showNewContact(lResult.getString("ContactName"));
+
+            lResult = sqlUtils.onQuery("SELECT Message.Content, Message.Extention, MessageToContact.SentOrReceived, Contact.ContactName " +
+                                                "FROM Message " +
+                                                "INNER JOIN MessageToContact " +
+                                                "ON MessageToContact.MessageID = Message.MessageID " +
+                                                "INNER JOIN Contact " +
+                                                "ON Contact.ContactID = MessageToContact.ContactID " +
+                                                "WHERE Contact.AccountName=?", currentUser);
+
+            while (lResult.next())
+                SceneManager.getHomeScene().showNewMessage(
+                        lResult.getString("ContactName"),
+                        lResult.getString("Content"),
+                        lResult.getString("SentOrReceived").equals("received")
+                );
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void insertContact(String pContactName) {
+        try {
+            sqlUtils.onExecute("INSERT INTO Contact VALUES(?,?)", pContactName, currentUser);
+        } catch (SQLException ignored) {}
     }
 
     /**
@@ -243,18 +290,20 @@ public class ClientBackend {
     public void sendFileButtonClick(String pReceiver) {
         FileChooser lChooser = new FileChooser();
         lChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
-        lChooser.setTitle("Choose an image");
+                new FileChooser.ExtensionFilter("Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.pdf", "*.txt")
+        );
+        lChooser.setTitle("Choose a file");
         File lFile = lChooser.showOpenDialog(SceneManager.getStage());
-
         if (lFile == null) return;
+
+        String lFileExtention = lFile.getName().substring(lFile.getName().lastIndexOf('.')+1);
 
         try {
             FileInputStream lFileStream = new FileInputStream(lFile);
             byte[] lImageBytes = new byte[(int) lFile.length()];
             lFileStream.read(lImageBytes);
             lFileStream.close();
-            sendMessageToOtherUser(pReceiver, "[image]"+Base64.getEncoder().encodeToString(lImageBytes));
+            sendMessageToOtherUser(pReceiver, "[file]["+lFileExtention+"]"+Base64.getEncoder().encodeToString(lImageBytes));
         }
         catch (IOException ex) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can not convert this file");

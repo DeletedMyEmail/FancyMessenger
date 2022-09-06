@@ -40,7 +40,7 @@ class InputHandler extends Thread {
         socketManager.start();
         queuedMessages = new HashMap<>();
         clientConnnectionsAndStreams = socketManager.getSockets();
-        sqlUtils = new SQLUtils("src/main/resources/kmes.db");
+        sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
         running = true;
     }
 
