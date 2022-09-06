@@ -90,21 +90,35 @@ public class HomeSceneController {
         lSentOrReceived.setFont(Font.font("System", FontWeight.BOLD, 15));
         lTextflow.getChildren().add(lSentOrReceived);
 
-        if (pContent.startsWith("[image]")) {
-            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(7));
-            Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
-            ImageView lImgView = new ImageView(lImg);
+        if (pContent.startsWith("[file]")) {
+            int lLastBracket = pContent.indexOf(']', 6);
+            String lFileExtention = pContent.substring(7,lLastBracket);
+            ImageView lImgView = new ImageView();
             lImgView.setCache(true);
             lImgView.setPreserveRatio(true);
 
-            if (lImg.getHeight() > 500 || lImg.getWidth() > 840) {
-                lImgView.setFitHeight(500);
-                lImgView.setFitWidth(840);
+            if (lFileExtention.equals("txt") || lFileExtention.equals("pdf")) {
+                Image lImg = new Image("src/main/resources/images/"+lFileExtention+".png");
+                lImgView.setImage(lImg);
             }
+            else if (lFileExtention.equals("png") || lFileExtention.equals("gif") || lFileExtention.equals("jpeg") || lFileExtention.equals("jpg"))
+            {
+                byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(lLastBracket+1));
+                Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
+                lImgView.setImage(lImg);
 
-            lImgView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                backend.saveFile(((ImageView)event.getSource()).getImage());
-            });
+                if (lImg.getHeight() > 500 || lImg.getWidth() > 840) {
+                    lImgView.setFitHeight(500);
+                    lImgView.setFitWidth(840);
+                }
+
+                lImgView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    backend.saveFile(((ImageView)event.getSource()).getImage());
+                });
+            }
+            else {
+                lImgView.setImage(new Image("src/main/resources/images/unknown_extention.png"));
+            }
 
             lTextflow.getChildren().add(lImgView);
         }
@@ -118,12 +132,12 @@ public class HomeSceneController {
         return lVBox;
     }
 
-    protected void showNewMessage(String pAuthor, String pMessage, boolean pReceived) {
+    protected void showNewMessage(String pUsername, String pMessage, boolean pReceived) {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if (messageLists.get(pAuthor) == null) messageLists.put(pAuthor, new VBox());
-                messageLists.get(pAuthor).getChildren().add(createMessageBox(pMessage, pReceived));
+                if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
+                messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pReceived));
             }
         });
     }

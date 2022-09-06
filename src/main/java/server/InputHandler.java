@@ -50,28 +50,32 @@ class InputHandler extends Thread {
 
 
     private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        if (!userExists(pReveiver)) {
-            socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
-            return;
-        }
         String lAuthor = (String) clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3);
-        for (List<Object> client : clientConnnectionsAndStreams)
+
+        if (lAuthor.equals(""))
+            socketManager.writeToSocket(pAuthorSocketIndex, "error;;You have to be logged in before sending messages;;Couldn't send message");
+        else if (!userExists(pReveiver))
+            socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
+        else
         {
-            if (client.get(3).equals(pReveiver))
+            for (List<Object> client : clientConnnectionsAndStreams)
             {
-                if (!clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3).equals(pReveiver))
+                if (client.get(3).equals(pReveiver))
                 {
-                    socketManager.writeToSocket(clientConnnectionsAndStreams.indexOf(client), "message;;"+
-                            lAuthor+";;"+pMessage);
+                    if (!lAuthor.equals(pReveiver))
+                    {
+                        socketManager.writeToSocket(clientConnnectionsAndStreams.indexOf(client), "message;;"+
+                                lAuthor+";;"+pMessage);
+                    }
+                    else
+                    {
+                        socketManager.writeToSocket(pAuthorSocketIndex, "error;;You can't message yourself;;Couldn't send message");
+                    }
+                    return;
                 }
-                else
-                {
-                    socketManager.writeToSocket(pAuthorSocketIndex, "error;;You can't message yourself;;Couldn't send message");
-                }
-                return;
             }
+            queueMessage(lAuthor, pReveiver, pMessage);
         }
-        queueMessage(lAuthor, pReveiver, pMessage);
     }
 
     private void queueMessage(String pAuthor, String pReveiver, String pMessage) {
