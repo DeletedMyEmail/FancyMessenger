@@ -279,9 +279,6 @@ public class ClientBackend {
             sendToServer("send;;"+pReceiver+";;"+String.valueOf(lMessage));
             addNewMessage(pReceiver, "Sent: "+String.valueOf(lMessage));
         }
-        catch (UTFDataFormatException sizeEx) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Input is too large", ButtonType.OK);
-        }
         catch (IOException ioEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
         }
