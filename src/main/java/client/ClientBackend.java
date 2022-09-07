@@ -39,7 +39,7 @@ import javax.imageio.ImageIO;
  * */
 public class ClientBackend {
 
-    // Hostname/IP from KMes Server
+    // KMes Server Hostname/IP
     private static final String HOST = "localhost";
 
     // Port of the KMes Server which accepts clients
@@ -54,9 +54,6 @@ public class ClientBackend {
     private DataOutputStream outStream;
     private SecretKey AESKey;
 
-    // private BufferedReader reader;
-    // private BufferedWriter writer;
-
     private String currentUser = "";
 
     /**
@@ -70,16 +67,6 @@ public class ClientBackend {
         } catch (SQLException sqlEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
         }
-        /*
-        reader = new BufferedReader(new FileReader("src/main/contacts.txt"));
-        writer = new BufferedWriter(new FileWriter("src/main/contacts.txt"));
-
-        contacts = new ArrayList<>();
-        String in;
-        while((in = reader.readLine()) != null)
-        {
-            //TODO
-        }*/
     }
 
     /**
@@ -212,9 +199,10 @@ public class ClientBackend {
     {
         try
         {
-            ResultSet lResult = sqlUtils.onQuery("SELECT ContactName FROM Contact WHERE AccountName=?", currentUser);
+            ResultSet lResult = sqlUtils.onQuery("SELECT ContactName FROM Contact WHERE AccountName='"+currentUser+"'");
 
-            while (lResult.next()) SceneManager.getHomeScene().showNewContact(lResult.getString("ContactName"));
+            while (lResult.next())
+                SceneManager.getHomeScene().showNewContact(lResult.getString("ContactName"));
 
             lResult = sqlUtils.onQuery("SELECT Message.Content, Message.Extention, MessageToContact.SentOrReceived, Contact.ContactName " +
                                                 "FROM Message " +
@@ -222,24 +210,24 @@ public class ClientBackend {
                                                 "ON MessageToContact.MessageID = Message.MessageID " +
                                                 "INNER JOIN Contact " +
                                                 "ON Contact.ContactID = MessageToContact.ContactID " +
-                                                "WHERE Contact.AccountName=?", currentUser);
+                                                "WHERE Contact.AccountName='"+currentUser+"'");
 
             while (lResult.next())
                 SceneManager.getHomeScene().showNewMessage(
                         lResult.getString("ContactName"),
                         lResult.getString("Content"),
                         Extention.valueOf(lResult.getString("Extention").toUpperCase()),
-                        lResult.getString("SentOrReceived").equals("received")
+                        lResult.getBoolean("SentOrReceived")
                 );
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void insertContact(String pContactName) {
         try {
-            sqlUtils.onExecute("INSERT INTO Contact VALUES(?,?)", pContactName, currentUser);
+            sqlUtils.onExecute("INSERT INTO Contact (ContactName, AccountName) VALUES(?,?)", pContactName, currentUser);
         } catch (SQLException ignored) {}
     }
 

@@ -86,8 +86,9 @@ class InputHandler extends Thread {
     private void sendQueuedMessages(int pSocketIndex, String pUsername) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
         List<String> lMessages = queuedMessages.get(pUsername);
         if (lMessages == null) return;
-        for (int i = 0; i < lMessages.size(); i++) {
-            socketManager.writeToSocket(pSocketIndex, "message;;"+lMessages.get(i));
+        while (lMessages.size() != 0) {
+            socketManager.writeToSocket(pSocketIndex, "message;;" + lMessages.get(0));
+            lMessages.remove(0);
         }
     }
 
@@ -102,6 +103,7 @@ class InputHandler extends Thread {
                     String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
                     sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
                     socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
+                    sendQueuedMessages(pSocketIndex, pUsername);
                 }
                 catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
                     socketManager.writeToSocket(pSocketIndex, "error;;Couldn't encrypt your password;;Error occurred during registration process");

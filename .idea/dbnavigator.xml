@@ -32,7 +32,7 @@
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
     <connection id="101bc1f1-ddbe-409e-8d35-4caecd0aec56">
-      <console name="ClientDB" type="STANDARD" schema="main" session="Main"><![CDATA[SELECT * FROM Contact]]></console>
+      <console name="ClientDB" type="STANDARD" schema="main" session="Main"><![CDATA[DELETE FROM "Contact""]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
@@ -164,7 +164,7 @@
           <description value="" />
           <database-type value="SQLITE" />
           <config-type value="BASIC" />
-          <database-version value="3.39" />
+          <database-version value="3.34" />
           <driver-source value="BUILTIN" />
           <driver-library value="" />
           <driver value="" />
@@ -173,7 +173,7 @@
           <port value="" />
           <database value="" />
           <files>
-            <file path="C:\Users\derdi\Documents\Dev\KMesRework\src\main\resources\kmes_client.db" schema="main" />
+            <file path="E:\Github\KMesRework\src\main\resources\kmes_client.db" schema="main" />
           </files>
           <type value="NONE" />
           <user value="" />

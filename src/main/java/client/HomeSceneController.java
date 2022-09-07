@@ -103,13 +103,15 @@ public class HomeSceneController {
             lImgView.setCache(true);
             lImgView.setPreserveRatio(true);
 
-            if (pFileExtention == Extention.TXT || pFileExtention == Extention.PDF) {
+            if (pFileExtention == Extention.TXT || pFileExtention == Extention.PDF)
+            {
                 Image lImg = new Image("src/main/resources/images/"+pFileExtention+".png");
                 lImgView.setImage(lImg);
             }
             else if (pFileExtention == Extention.UNKNOWN)
                 lImgView.setImage(new Image("src/main/resources/images/unknown_extention.png"));
-            else {
+            else
+            {
                 byte[] lImageBytes = Base64.getDecoder().decode(pContent);
                 Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
                 lImgView.setImage(lImg);
@@ -135,6 +137,7 @@ public class HomeSceneController {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                System.out.println(pUsername);
                 if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
                 messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
             }
@@ -143,15 +146,12 @@ public class HomeSceneController {
 
     protected void showNewContact(String pUsername)
     {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                ObservableList<Text> lContacts = contactsList.getItems();
-                for (Text contact : lContacts) {
-                    if (contact.getText().equals(pUsername)) return;
-                }
-                lContacts.add(new Text(pUsername));
+        Platform.runLater(() -> {
+            ObservableList<Text> lContacts = contactsList.getItems();
+            for (Text contact : lContacts) {
+                if (contact.getText().equals(pUsername)) return;
             }
+            lContacts.add(new Text(pUsername));
         });
     }
 
