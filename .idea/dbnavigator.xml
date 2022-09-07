@@ -32,7 +32,7 @@
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
     <connection id="101bc1f1-ddbe-409e-8d35-4caecd0aec56">
-      <console name="ClientDB" type="STANDARD" schema="main" session="Main" />
+      <console name="ClientDB" type="STANDARD" schema="main" session="Main"><![CDATA[SELECT * FROM Contact]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
@@ -180,7 +180,7 @@
           <deprecated-pwd value="" />
         </database>
         <properties>
-          <auto-commit value="false" />
+          <auto-commit value="true" />
         </properties>
         <ssh-settings>
           <active value="false" />

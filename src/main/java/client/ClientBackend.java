@@ -128,15 +128,30 @@ public class ClientBackend {
      * If there is no such list in the HashMap in conjunction with this user, a new one will be added.
      *
      * @param pContactName Name of the user who sent/received this message
-     * @param pMessage Message content
+     * @param pContent Message content
      * */
-    protected void addNewMessage(String pContactName, String pMessage, boolean pReceived) {
+    protected void addNewMessage(String pContactName, String pContent, boolean pReceived) {
+        String lMessage = pContent;
+        Extention lFileExtention = Extention.NONE;
+        if (pContent.startsWith("[file]")) {
+            int lLastBracket = pContent.indexOf(']', 6);
+            lFileExtention = Extention.valueOf(pContent.substring(7,lLastBracket).toUpperCase());
+            lMessage = lMessage.substring(lLastBracket+1);
+        }
+
         SceneManager.getHomeScene().showNewContact(pContactName);
-        SceneManager.getHomeScene().showNewMessage(pContactName, pMessage, pReceived);
+        SceneManager.getHomeScene().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
 
         try {
             sqlUtils.onExecute(
-                    "INSERT INTO Message (Content,)");
+                    "INSERT INTO Message (Content,Extention) VALUES(?,?);",
+                    lMessage, lFileExtention.name());
+            sqlUtils.onExecute(
+                    "INSERT INTO MessageToContact VALUES( " +
+                            "(SELECT ContactID FROM Contact WHERE ContactName= ? AND AccountName= ? ), " +
+                            "(SELECT max(MessageID) FROM Message), ?);",
+                    pContactName, currentUser, pReceived
+            );
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -146,53 +161,48 @@ public class ClientBackend {
      * Creates a new Thread which listens for server inputs and handles them
      * */
     protected void listenForServerInput () {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    while (true) // do not criticize obvious stupidity
+        new Thread(() -> {
+            try {
+                while (true) // do not criticize obvious stupidity
+                {
+                    // Connects to the KMes Server and iniitializes attributes for communication
+                    server = new Socket();
+                    server.connect(new InetSocketAddress(HOST, PORT), 4000);
+                    outStream = new DataOutputStream(server.getOutputStream());
+                    inStream = new DataInputStream(server.getInputStream());
+
+                    establishEncryption();
+
+                    // Handles inputs as long as connected to the KMes Server
+                    while (isConnected())
                     {
-                        // Connects to the KMes Server and iniitializes attributes for communication
-                        server = new Socket();
-                        server.connect(new InetSocketAddress(HOST, PORT), 4000);
-                        outStream = new DataOutputStream(server.getOutputStream());
-                        inStream = new DataInputStream(server.getInputStream());
+                        String[] lInput = readFromServer().split(";;");
 
-                        establishEncryption();
-
-                        // Handles inputs as long as connected to the KMes Server
-                        while (isConnected())
-                        {
-                            String[] lInput = readFromServer().split(";;");
-
-                            switch (lInput[0]) {
-                                case "loggedIn" -> {
-                                    updateCurrentUser(lInput[1]); 
-                                    loadHistory();
-                                }
-                                case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
-                                case "message" -> addNewMessage(lInput[1], lInput[2], true);
-                                case "userExists" -> {
-                                    SceneManager.getHomeScene().showNewContact(lInput[1]);
-                                    insertContact(lInput[1]);
-                                    SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
-                                            " new contact: " + lInput[1], "New contact", ButtonType.OK);
-                                }
+                        switch (lInput[0]) {
+                            case "loggedIn" -> {
+                                updateCurrentUser(lInput[1]);
+                                loadHistory();
+                            }
+                            case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
+                            case "message" -> addNewMessage(lInput[1], lInput[2], true);
+                            case "userExists" -> {
+                                SceneManager.getHomeScene().showNewContact(lInput[1]);
+                                insertContact(lInput[1]);
+                                SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
+                                        " new contact: " + lInput[1], "New contact", ButtonType.OK);
                             }
                         }
                     }
                 }
-                catch (SocketTimeoutException | SocketException socketException)
-                {
-                    SceneManager.showAlert(Alert.AlertType.ERROR, "",
-                            "Connection to the KMesServer couldn't be established",
-                            event -> System.exit(0), ButtonType.OK);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
+            }
+            catch (SocketTimeoutException | SocketException socketException)
+            {
+                SceneManager.showAlert(Alert.AlertType.ERROR, "",
+                        "Connection to the KMesServer couldn't be established",
+                        event -> System.exit(0), ButtonType.OK);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
 
@@ -218,6 +228,7 @@ public class ClientBackend {
                 SceneManager.getHomeScene().showNewMessage(
                         lResult.getString("ContactName"),
                         lResult.getString("Content"),
+                        Extention.valueOf(lResult.getString("Extention").toUpperCase()),
                         lResult.getString("SentOrReceived").equals("received")
                 );
 

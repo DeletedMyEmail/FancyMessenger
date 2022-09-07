@@ -69,7 +69,7 @@ public class HomeSceneController {
         else SceneManager.switchToLoginScene();
     }
 
-    private VBox createMessageBox(String pContent, boolean pReceiving)
+    private VBox createMessageBox(String pContent, Extention pFileExtention, boolean pReceiving)
     {
         VBox lVBox = new VBox();
         lVBox.setPrefWidth(860);
@@ -90,20 +90,27 @@ public class HomeSceneController {
         lSentOrReceived.setFont(Font.font("System", FontWeight.BOLD, 15));
         lTextflow.getChildren().add(lSentOrReceived);
 
-        if (pContent.startsWith("[file]")) {
-            int lLastBracket = pContent.indexOf(']', 6);
-            String lFileExtention = pContent.substring(7,lLastBracket);
+        if (pFileExtention == Extention.NONE)
+        {
+            Text lText = new Text();
+            lText.setFont(Font.font("System", FontWeight.NORMAL, 14));
+            lText.setText(pContent);
+            lTextflow.getChildren().add(lText);
+        }
+        else
+        {
             ImageView lImgView = new ImageView();
             lImgView.setCache(true);
             lImgView.setPreserveRatio(true);
 
-            if (lFileExtention.equals("txt") || lFileExtention.equals("pdf")) {
-                Image lImg = new Image("src/main/resources/images/"+lFileExtention+".png");
+            if (pFileExtention == Extention.TXT || pFileExtention == Extention.PDF) {
+                Image lImg = new Image("src/main/resources/images/"+pFileExtention+".png");
                 lImgView.setImage(lImg);
             }
-            else if (lFileExtention.equals("png") || lFileExtention.equals("gif") || lFileExtention.equals("jpeg") || lFileExtention.equals("jpg"))
-            {
-                byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(lLastBracket+1));
+            else if (pFileExtention == Extention.UNKNOWN)
+                lImgView.setImage(new Image("src/main/resources/images/unknown_extention.png"));
+            else {
+                byte[] lImageBytes = Base64.getDecoder().decode(pContent);
                 Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
                 lImgView.setImage(lImg);
 
@@ -116,28 +123,20 @@ public class HomeSceneController {
                     backend.saveFile(((ImageView)event.getSource()).getImage());
                 });
             }
-            else {
-                lImgView.setImage(new Image("src/main/resources/images/unknown_extention.png"));
-            }
 
             lTextflow.getChildren().add(lImgView);
         }
-        else {
-            Text lText = new Text();
-            lText.setFont(Font.font("System", FontWeight.NORMAL, 14));
-            lText.setText(pContent);
-            lTextflow.getChildren().add(lText);
-        }
+
         lVBox.getChildren().add(lTextflow);
         return lVBox;
     }
 
-    protected void showNewMessage(String pUsername, String pMessage, boolean pReceived) {
+    protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
-                messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pReceived));
+                messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
             }
         });
     }
