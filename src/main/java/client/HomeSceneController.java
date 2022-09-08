@@ -191,7 +191,7 @@ public class HomeSceneController {
         }
 
         String lReceiver = selectedContact.getText();
-        backend.sendFileButtonClick(lReceiver);
+        backend.sendFile(lReceiver);
     }
 
 }

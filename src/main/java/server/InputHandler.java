@@ -52,7 +52,7 @@ class InputHandler extends Thread {
     private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         String lAuthor = (String) clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3);
 
-        if (lAuthor.equals(""))
+        if ( lAuthor.equals(""))
             socketManager.writeToSocket(pAuthorSocketIndex, "error;;You have to be logged in before sending messages;;Couldn't send message");
         else if (!userExists(pReveiver))
             socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");

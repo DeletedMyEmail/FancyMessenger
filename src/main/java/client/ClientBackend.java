@@ -34,7 +34,7 @@ import javax.imageio.ImageIO;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes Server
  *
- * @version v2.1.1 | last edit: 03.09.2022
+ * @version v2.1.1 | last edit: 08.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -48,7 +48,7 @@ public class ClientBackend {
     private final EncryptionUtils encryptionUtils;
     private SQLUtils sqlUtils;
 
-    // connection to KMes Server
+    // Connection to KMes Server
     private Socket server;
     private DataInputStream inStream;
     private DataOutputStream outStream;
@@ -57,8 +57,10 @@ public class ClientBackend {
     private String currentUser = "";
 
     /**
-     * Creates a ClientBackend instance, iniitializes attributes and transfers old saved messages into a HashMap
-     * in conjunction with the receiver/sender
+     * Creates an instance of this class, iniitializes utility classes and establishes a database connection
+     *
+     * @see EncryptionUtils
+     * @see SQLUtils
      * */
     public ClientBackend() {
         encryptionUtils = new EncryptionUtils();
@@ -70,7 +72,7 @@ public class ClientBackend {
     }
 
     /**
-     * @return Returns the username from the current user or an empty string if not logged in.
+     * @return Returns the username of the current user or an empty string if not logged in.
      * */
     protected String getUsername() { return currentUser; }
 
@@ -112,7 +114,7 @@ public class ClientBackend {
 
     /**
      * Adds a new message to the list of messages with a specific user.
-     * If there is no such list in the HashMap in conjunction with this user, a new one will be added.
+     * If there is no such list in the HashMap in conjunction with this user, a new one will be added and displayed.
      *
      * @param pContactName Name of the user who sent/received this message
      * @param pContent Message content
@@ -145,7 +147,13 @@ public class ClientBackend {
     }
 
     /**
-     * Creates a new Thread which listens for server inputs and handles them
+     * Creates a new thread which connects the KMes Server on port {@value PORT}
+     * with the address {@value HOST} listens for server inputs and handles them.
+     * Method ends if the thread is closed
+     *
+     * @see java.net.ServerSocket
+     * @see Socket
+     * @see Thread
      * */
     protected void listenForServerInput () {
         new Thread(() -> {
@@ -195,6 +203,11 @@ public class ClientBackend {
 
     }
 
+    /**
+     * Loads all contacts and messages in the database in conjunction with the current user
+     *
+     * @see SQLUtils
+     * */
     private void loadHistory()
     {
         try
@@ -232,9 +245,12 @@ public class ClientBackend {
     }
 
     /**
-     * Sends a string to the KMes Server
+     * Sends an encrypted message (AES) to the KMes Server
      *
      * @param pMessage Message to be sent
+     *
+     * @see #establishEncryption()
+     * @see EncryptionUtils
      * */
     protected void sendToServer(String pMessage) throws IOException
     {
@@ -250,6 +266,15 @@ public class ClientBackend {
         }
     }
 
+
+    /**
+     * Reads and decryptes a message (AES) to the KMes Server
+     *
+     * @return  Decrypted message as string sent from the KMes Server
+     *
+     * @see #establishEncryption()
+     * @see EncryptionUtils
+     * */
     private String readFromServer() throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         int lSize = inStream.readInt();
         byte[] lEncryptedInput = new byte[lSize];
@@ -257,6 +282,10 @@ public class ClientBackend {
         return EncryptionUtils.decryptAES(lEncryptedInput, AESKey);
     }
 
+    /**
+     * Sends public RSA key to the server and receives the server's public RSA key.
+     * Uses private key to decrypt the new AES key which has been encrypted with the client's public key.
+     * */
     private void establishEncryption() throws IOException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         // RSA
         outStream.write(encryptionUtils.getPublicKey().getEncoded());
@@ -270,6 +299,15 @@ public class ClientBackend {
         outStream.write(lEncryptedAESKey);
     }
 
+    /**
+     * Displays the message in {@link HomeSceneController} encryptes a message and requests to send it to the user pReceiver
+     *
+     * @param pReceiver     User who'll receive the message
+     * @param pMessage      Unencrypted message which will be sent
+     *
+     * @see #sendToServer(String)
+     * @see #addNewMessage(String, String, boolean)
+     * */
     public void sendMessageToOtherUser(String pReceiver, String pMessage)
     {
         try
@@ -286,7 +324,16 @@ public class ClientBackend {
         }
     }
 
-    public void sendFileButtonClick(String pReceiver) {
+    /**
+     * Opens a {@link FileChooser} dialog,
+     * displays the selected file in {@link HomeSceneController}, converts it to encrypted bytes and requests to send it to the user pReceiver
+     *
+     * @param pReceiver     User who'll receive the message
+     *
+     * @see #sendToServer(String)
+     * @see #addNewMessage(String, String, boolean)
+     * */
+    public void sendFile(String pReceiver) {
         FileChooser lChooser = new FileChooser();
         lChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.pdf", "*.txt")
