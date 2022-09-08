@@ -23,7 +23,7 @@ import java.util.HashMap;
 /**
  * Controller for the GUI home scene
  *
- * @version v2.1.1 | last edit: 03.09.2022
+ * @version v2.2.1 | last edit: 08.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class HomeSceneController {
@@ -69,7 +69,7 @@ public class HomeSceneController {
         else SceneManager.switchToLoginScene();
     }
 
-    private VBox createMessageBox(String pContent, boolean pReceiving)
+    private VBox createMessageBox(String pContent, Extention pFileExtention, boolean pReceiving)
     {
         VBox lVBox = new VBox();
         lVBox.setPrefWidth(860);
@@ -90,55 +90,64 @@ public class HomeSceneController {
         lSentOrReceived.setFont(Font.font("System", FontWeight.BOLD, 15));
         lTextflow.getChildren().add(lSentOrReceived);
 
-        if (pContent.startsWith("[image]")) {
-            byte[] lImageBytes = Base64.getDecoder().decode(pContent.substring(7));
-            Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
-            ImageView lImgView = new ImageView(lImg);
-            lImgView.setCache(true);
-            lImgView.setPreserveRatio(true);
-
-            if (lImg.getHeight() > 500 || lImg.getWidth() > 840) {
-                lImgView.setFitHeight(500);
-                lImgView.setFitWidth(840);
-            }
-
-            lImgView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                backend.saveFile(((ImageView)event.getSource()).getImage());
-            });
-
-            lTextflow.getChildren().add(lImgView);
-        }
-        else {
+        if (pFileExtention == Extention.NONE)
+        {
             Text lText = new Text();
             lText.setFont(Font.font("System", FontWeight.NORMAL, 14));
             lText.setText(pContent);
             lTextflow.getChildren().add(lText);
         }
+        else
+        {
+            ImageView lImgView = new ImageView();
+            lImgView.setCache(true);
+            lImgView.setPreserveRatio(true);
+
+            if (pFileExtention == Extention.TXT || pFileExtention == Extention.PDF)
+            {
+                Image lImg = new Image("src/main/resources/images/"+pFileExtention+".png");
+                lImgView.setImage(lImg);
+            }
+            else if (pFileExtention == Extention.UNKNOWN)
+                lImgView.setImage(new Image("src/main/resources/images/unknown_extention.png"));
+            else
+            {
+                byte[] lImageBytes = Base64.getDecoder().decode(pContent);
+                Image lImg = new Image(new ByteArrayInputStream(lImageBytes));
+                lImgView.setImage(lImg);
+
+                if (lImg.getHeight() > 500 || lImg.getWidth() > 840) {
+                    lImgView.setFitHeight(500);
+                    lImgView.setFitWidth(840);
+                }
+
+                lImgView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    backend.saveFile(((ImageView)event.getSource()).getImage());
+                });
+            }
+
+            lTextflow.getChildren().add(lImgView);
+        }
+
         lVBox.getChildren().add(lTextflow);
         return lVBox;
     }
 
-    protected void showNewMessage(String pAuthor, String pMessage, boolean pReceived) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if (messageLists.get(pAuthor) == null) messageLists.put(pAuthor, new VBox());
-                messageLists.get(pAuthor).getChildren().add(createMessageBox(pMessage, pReceived));
-            }
+    protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
+        Platform.runLater(() -> {
+            if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
+            messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
         });
     }
 
     protected void showNewContact(String pUsername)
     {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                ObservableList<Text> lContacts = contactsList.getItems();
-                for (Text contact : lContacts) {
-                    if (contact.getText().equals(pUsername)) return;
-                }
-                lContacts.add(new Text(pUsername));
+        Platform.runLater(() -> {
+            ObservableList<Text> lContacts = contactsList.getItems();
+            for (Text contact : lContacts) {
+                if (contact.getText().equals(pUsername)) return;
             }
+            lContacts.add(new Text(pUsername));
         });
     }
 
@@ -178,7 +187,7 @@ public class HomeSceneController {
         }
 
         String lReceiver = selectedContact.getText();
-        backend.sendFileButtonClick(lReceiver);
+        backend.sendFile(lReceiver);
     }
 
 }
