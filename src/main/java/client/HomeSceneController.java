@@ -105,11 +105,15 @@ public class HomeSceneController {
 
             if (pFileExtention == Extention.TXT || pFileExtention == Extention.PDF)
             {
-                Image lImg = new Image("src/main/resources/images/"+pFileExtention+".png");
+                System.out.println(pFileExtention.name().toLowerCase());
+                Image lImg = new Image(HomeSceneController.class.getResourceAsStream(
+                        "/images/"+pFileExtention.name().toLowerCase()+".png"));
                 lImgView.setImage(lImg);
+                lImgView.setFitHeight(50);
+                lImgView.setFitWidth(50);
             }
             else if (pFileExtention == Extention.UNKNOWN)
-                lImgView.setImage(new Image("src/main/resources/images/unknown_extention.png"));
+                lImgView.setImage(new Image(HomeSceneController.class.getResourceAsStream("/images/unknown.png")));
             else
             {
                 byte[] lImageBytes = Base64.getDecoder().decode(pContent);
