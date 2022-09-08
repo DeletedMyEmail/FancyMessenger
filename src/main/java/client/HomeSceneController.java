@@ -23,7 +23,7 @@ import java.util.HashMap;
 /**
  * Controller for the GUI home scene
  *
- * @version v2.1.1 | last edit: 03.09.2022
+ * @version v2.2.1 | last edit: 08.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class HomeSceneController {
@@ -134,13 +134,9 @@ public class HomeSceneController {
     }
 
     protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println(pUsername);
-                if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
-                messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
-            }
+        Platform.runLater(() -> {
+            if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
+            messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
         });
     }
 

@@ -31,8 +31,8 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 /**
- * Client backend for KMes Messenger<br/>
- * Handles input from the KMes Server
+ * This class acts as a client backend for the KMes Messenger. <br/>
+ * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
  * @version v2.2.1 | last edit: 08.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
@@ -128,6 +128,7 @@ public class ClientBackend {
             lMessage = lMessage.substring(lLastBracket+1);
         }
 
+        addContact(pContactName);
         SceneManager.getHomeScene().showNewContact(pContactName);
         SceneManager.getHomeScene().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
 
@@ -181,8 +182,7 @@ public class ClientBackend {
                             case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
                             case "message" -> addNewMessage(lInput[1], lInput[2], true);
                             case "userExists" -> {
-                                SceneManager.getHomeScene().showNewContact(lInput[1]);
-                                insertContact(lInput[1]);
+                                addContact(lInput[1]);
                                 SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                         " new contact: " + lInput[1], "New contact", ButtonType.OK);
                             }
@@ -238,10 +238,15 @@ public class ClientBackend {
         }
     }
 
-    private void insertContact(String pContactName) {
+    private void addContact(String pContactName) {
         try {
-            sqlUtils.onExecute("INSERT INTO Contact (ContactName, AccountName) VALUES(?,?)", pContactName, currentUser);
-        } catch (SQLException ignored) {}
+            if (!sqlUtils.onQuery("SELECT * FROM Contact WHERE ContactName=? AND AccountName=?", pContactName, currentUser).next()) {
+                sqlUtils.onExecute("INSERT INTO Contact (ContactName, AccountName) VALUES(?,?)", pContactName, currentUser);
+            }
+            SceneManager.getHomeScene().showNewContact(pContactName);
+        } catch (SQLException sqlEx) {
+            SceneManager.showAlert(Alert.AlertType.ERROR, "Couldn't add contact", "Database error", ButtonType.OK);
+        }
     }
 
     /**
