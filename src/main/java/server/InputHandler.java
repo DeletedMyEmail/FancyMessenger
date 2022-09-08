@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * This class acts as a backend for the KMes Server and processes all inputs from user sockets.
  *
- * @version v2.1.1 | last edit: 03.09.2022
+ * @version v2.2.1 | last edit: 08.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
@@ -31,10 +31,25 @@ class InputHandler extends Thread {
     private final SQLUtils sqlUtils;
 
     private final List<List<Object>> clientConnnectionsAndStreams;
+
+    /*
+    * Messages which couldn't be sent to users while they were offline. <br>
+    * If a user logs in, those messages are sent.
+    *  */
     private final HashMap<String, List<String>> queuedMessages;
 
     private boolean running;
 
+
+    /**
+     * Creates an instance of this class, iniitializes attributes,
+     * establishes a database connection and starts accepting sockets.
+     *
+     * @param pSocketManager    Thread and instance of {@link SocketManager} which starts accepting sockets
+     *
+     * @see EncryptionUtils
+     * @see SQLUtils
+     * */
     protected InputHandler(SocketManager pSocketManager) throws SQLException {
         socketManager = pSocketManager;
         socketManager.start();
@@ -44,11 +59,31 @@ class InputHandler extends Thread {
         running = true;
     }
 
+    /**
+     * Creates a new {@link SocketManager} and passes it to the constructor {@link #InputHandler(SocketManager)}
+     * which creates an instance of this class, iniitializes attributes,
+     * establishes a database connection and starts accepting sockets.
+     *
+     * @see EncryptionUtils
+     * @see SQLUtils
+     * */
     protected InputHandler() throws IOException, SQLException {
         this(new SocketManager());
     }
 
 
+    /**
+     * Validates a send request and sends the encrypted (AES) message to another via
+     * {@link SocketManager#writeToSocket(int, String)} user. <br>
+     * If the author is not logged in or the receiver does not exist, an error message is sent back.
+     *
+     * @param pAuthorSocketIndex    Index of the author client in {@link #clientConnnectionsAndStreams}
+     * @param pReveiver             Username of the receiver
+     * @param pMessage              Message to send
+     *
+     * @see #clientConnnectionsAndStreams
+     * @see EncryptionUtils
+     * */
     private void handleSendRequest(int pAuthorSocketIndex, String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         String lAuthor = (String) clientConnnectionsAndStreams.get(pAuthorSocketIndex).get(3);
 
@@ -78,6 +113,14 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     *
+     * @param pAuthor
+     * @param pReveiver
+     * @param pMessage
+     *
+     * @see #queuedMessages
+     * */
     private void queueMessage(String pAuthor, String pReveiver, String pMessage) {
         queuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
         queuedMessages.get(pReveiver).add(pAuthor+";;"+pMessage);

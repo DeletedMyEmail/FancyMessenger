@@ -34,7 +34,7 @@ import javax.imageio.ImageIO;
  * Client backend for KMes Messenger<br/>
  * Handles input from the KMes Server
  *
- * @version v2.1.1 | last edit: 08.09.2022
+ * @version v2.2.1 | last edit: 08.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -356,6 +356,14 @@ public class ClientBackend {
         }
     }
 
+    /**
+     * Opens a {@link FileChooser} save dialog and saves the image converted to the file extention the selected file has.
+     *
+     * @param pImage     The image to save
+     *
+     * @see #sendToServer(String)
+     * @see #addNewMessage(String, String, boolean)
+     * */
     public void saveFile(Image pImage) {
         FileChooser lChooser = new FileChooser();
         lChooser.getExtensionFilters().addAll(
