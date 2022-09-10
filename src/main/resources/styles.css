@@ -1,3 +1,7 @@
+* {
+    -fx-focus-color: #6bc490;
+}
+
 .btn {
     -fx-background-color: #6bc490;
     -fx-background-radius: 20px;
@@ -9,4 +13,18 @@
     -fx-border-radius: 20px;
     -fx-border-style: solid;
     -fx-border-width: 2px;
+}
+
+.list-cell > * {
+    -fx-text-fill: #6bc490;
+    -fx-font-weight: bolder;
+    -fx-font-size: 13px;
+}
+
+.list-cell:selected > * {
+    -fx-text-fill: #f2e3e6;
+}
+
+.list-cell:focused:selected {
+    -fx-background-color: #6bc490;
 }

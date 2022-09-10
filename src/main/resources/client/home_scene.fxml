@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.HomeSceneController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1080.0" stylesheets="@../styles.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.HomeSceneController">
    <children>
       <HBox prefHeight="100.0" prefWidth="1080.0" style="-fx-background-color: #6bc490;" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <TextField fx:id="messageTextField" layoutX="160.0" layoutY="594.0" prefHeight="40.0" prefWidth="787.0" />
@@ -24,7 +24,7 @@
          </font>
       </Button>
       <Pane layoutX="145.0" layoutY="80.0" prefHeight="570.0" prefWidth="5.0" style="-fx-border-color: #6bc490; -fx-border-width: 0px 3px 0px 0px;" />
-      <ListView fx:id="contactsList" layoutX="9.0" layoutY="95.0" prefHeight="494.0" prefWidth="129.0" />
+      <ListView fx:id="contactsList" layoutX="9.0" layoutY="95.0" prefHeight="494.0" prefWidth="129.0" stylesheets="@../styles.css" />
       <ScrollPane fx:id="messagesScrollpane" layoutX="160.0" layoutY="95.0" prefHeight="494.0" prefWidth="887.0">
          <content>
             <VBox fx:id="message_box" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="485.0" prefWidth="880.0" spacing="20" />
