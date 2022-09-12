@@ -16,6 +16,7 @@
 }
 
 .list-cell > * {
+    -fx-padding: 0 0 0 4px;
     -fx-text-fill: #6bc490;
     -fx-font-weight: bolder;
     -fx-font-size: 13px;

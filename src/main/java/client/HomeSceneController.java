@@ -62,7 +62,10 @@ public class HomeSceneController {
         backend = SceneManager.getBackend();
         messageLists = new HashMap<>();
         contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(() -> {
-            if (t1 != null) switchMessageList((t1).getText());
+            if (t1 != null) {
+                switchMessageList((t1).getText());
+                t1.setStyle("");
+            }
         }));
     }
 
@@ -141,17 +144,21 @@ public class HomeSceneController {
         return lVBox;
     }
 
+    public void showNotification(String pContactName) {
+        Label lContactLabel = getContactLabel(pContactName);
+        Label lSelectedContact = contactsList.getSelectionModel().getSelectedItem();
+
+        if (lContactLabel != null && (lSelectedContact == null || !lSelectedContact.equals(lContactLabel)))
+            lContactLabel.setStyle(
+                    "-fx-border-style: hidden hidden hidden solid; -fx-border-color: red; -fx-border-width: 1px;"
+            );
+    }
+
     protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
         Platform.runLater(() -> {
             if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
             messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
 
-            Label lMessageAuthorOrReceiver = getContactLabel(pUsername);
-            Label lSelectedContact = contactsList.getSelectionModel().getSelectedItem();
-
-            if (lMessageAuthorOrReceiver != null && (lSelectedContact == null || !lSelectedContact.equals(lMessageAuthorOrReceiver)))
-                lMessageAuthorOrReceiver.setStyle(
-                        "");
         });
     }
 
@@ -172,7 +179,7 @@ public class HomeSceneController {
     }
 
     @FXML
-    protected void onSendButtonClick(ActionEvent actionEvent) throws IOException
+    protected void onSendButtonClick(ActionEvent actionEvent)
     {
         Label selectedContact = contactsList.getSelectionModel().getSelectedItem();
         if (selectedContact == null) {
@@ -209,5 +216,4 @@ public class HomeSceneController {
         String lReceiver = selectedContact.getText();
         backend.sendFile(lReceiver);
     }
-
 }
