@@ -150,7 +150,7 @@ public class HomeSceneController {
 
         if (lContactLabel != null && (lSelectedContact == null || !lSelectedContact.equals(lContactLabel)))
             lContactLabel.setStyle(
-                    "-fx-border-style: hidden hidden hidden solid; -fx-border-color: red; -fx-border-width: 1px;"
+                    "-fx-border-style: hidden hidden hidden solid; -fx-border-color: #6bc490; -fx-border-width: 1.5px;"
             );
     }
 
