@@ -20,7 +20,7 @@ Execute the main method of [ServerTerminal](src/main/java/server/ServerTerminal.
 
 Note that the default server address in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **"localhost"** and the default port is **4242**.
 
-https://user-images.githubusercontent.com/88390464/188278132-a2bf9e37-8476-4a2f-ad05-e22990ac3241.mp4
+https://user-images.githubusercontent.com/88390464/189905622-2bff0615-a9ca-40bd-abb1-c13f890c0eba.mp4
 
 ## Recent Changes
 
