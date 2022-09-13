@@ -30,7 +30,7 @@ import java.util.HashMap;
 /**
  * Controller for the GUI home scene
  *
- * @version v2.2.1 | last edit: 08.09.2022
+ * @version v2.2.2 | last edit: 13.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class HomeSceneController {
