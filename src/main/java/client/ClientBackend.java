@@ -128,9 +128,10 @@ public class ClientBackend {
             lMessage = lMessage.substring(lLastBracket+1);
         }
 
-        addContact(pContactName);
+        insertContact(pContactName);
         SceneManager.getHomeScene().showNewContact(pContactName);
         SceneManager.getHomeScene().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
+        SceneManager.getHomeScene().showNotification(pContactName);
 
         try {
             sqlUtils.onExecute(
@@ -182,7 +183,7 @@ public class ClientBackend {
                             case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
                             case "message" -> addNewMessage(lInput[1], lInput[2], true);
                             case "userExists" -> {
-                                addContact(lInput[1]);
+                                insertContact(lInput[1]);
                                 SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                         " new contact: " + lInput[1], "New contact", ButtonType.OK);
                             }
@@ -238,7 +239,7 @@ public class ClientBackend {
         }
     }
 
-    private void addContact(String pContactName) {
+    private void insertContact(String pContactName) {
         try {
             if (!sqlUtils.onQuery("SELECT * FROM Contact WHERE ContactName=? AND AccountName=?", pContactName, currentUser).next()) {
                 sqlUtils.onExecute("INSERT INTO Contact (ContactName, AccountName) VALUES(?,?)", pContactName, currentUser);

@@ -6,15 +6,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Base64;
@@ -37,7 +44,7 @@ public class HomeSceneController {
     public TextField messageTextField;
 
     @FXML
-    public ListView contactsList;
+    public ListView<Label> contactsList;
 
     @FXML
     public ScrollPane messagesScrollpane;
@@ -54,10 +61,10 @@ public class HomeSceneController {
     {
         backend = SceneManager.getBackend();
         messageLists = new HashMap<>();
-        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if (t1 != null) switchMessageList(((Text)t1).getText());
+        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(() -> {
+            if (t1 != null) {
+                switchMessageList((t1).getText());
+                t1.setStyle("");
             }
         }));
     }
@@ -137,28 +144,44 @@ public class HomeSceneController {
         return lVBox;
     }
 
+    public void showNotification(String pContactName) {
+        Label lContactLabel = getContactLabel(pContactName);
+        Label lSelectedContact = contactsList.getSelectionModel().getSelectedItem();
+
+        if (lContactLabel != null && (lSelectedContact == null || !lSelectedContact.equals(lContactLabel)))
+            lContactLabel.setStyle(
+                    "-fx-border-style: hidden hidden hidden solid; -fx-border-color: #6bc490; -fx-border-width: 1.5px;"
+            );
+    }
+
     protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
         Platform.runLater(() -> {
             if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
             messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
+
         });
+    }
+
+    private Label getContactLabel(String pUsername)
+    {
+        ObservableList<Label> lContacts = contactsList.getItems();
+        for (Label contact : lContacts) {
+            if (contact.getText().equals(pUsername)) return contact;
+        }
+        return null;
     }
 
     protected void showNewContact(String pUsername)
     {
         Platform.runLater(() -> {
-            ObservableList<Text> lContacts = contactsList.getItems();
-            for (Text contact : lContacts) {
-                if (contact.getText().equals(pUsername)) return;
-            }
-            lContacts.add(new Text(pUsername));
+            if (getContactLabel(pUsername) == null) contactsList.getItems().add(new Label(pUsername));
         });
     }
 
     @FXML
-    protected void onSendButtonClick(ActionEvent actionEvent) throws IOException
+    protected void onSendButtonClick(ActionEvent actionEvent)
     {
-        Text selectedContact = ((Text)contactsList.getSelectionModel().getSelectedItem());
+        Label selectedContact = contactsList.getSelectionModel().getSelectedItem();
         if (selectedContact == null) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
             return;
@@ -184,7 +207,7 @@ public class HomeSceneController {
 
     @FXML
     public void onFileButtonClick(ActionEvent actionEvent) {
-        Text selectedContact = ((Text)contactsList.getSelectionModel().getSelectedItem());
+        Label selectedContact = contactsList.getSelectionModel().getSelectedItem();
         if (selectedContact == null) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
             return;
@@ -193,5 +216,4 @@ public class HomeSceneController {
         String lReceiver = selectedContact.getText();
         backend.sendFile(lReceiver);
     }
-
 }
