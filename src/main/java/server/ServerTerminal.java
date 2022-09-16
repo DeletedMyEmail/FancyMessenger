@@ -18,17 +18,6 @@ public class ServerTerminal {
     private boolean active;
 
     public ServerTerminal() {
-        try {
-            socketManager = new SocketAcceptor();
-            inputHandler = new InputHandler(socketManager);
-            inputHandler.start();
-        } catch (Exception ex) {
-            System.out.println("Error occured while initializing: "+ex);
-            System.exit(0);
-        }
-
-        reader = new BufferedReader(new InputStreamReader(System.in));
-        active = true;
     }
 
     public void run() {

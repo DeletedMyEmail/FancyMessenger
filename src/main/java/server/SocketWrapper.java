@@ -16,7 +16,7 @@ import java.security.PrivateKey;
 /**
  * Thread accepting new clients connecting to the KMes messenger
  *
- * @version v2.0.2 | last edit: 31.08.2022
+ * @version v3.0.0 | last edit: 16.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketWrapper {
@@ -25,7 +25,6 @@ class SocketWrapper {
     private DataInputStream reader;
     private DataOutputStream writer;
 
-    private final EncryptionUtils encryptionUtils;
     private SecretKey AESKey;
 
     private boolean running;
@@ -36,30 +35,16 @@ class SocketWrapper {
         reader = new DataInputStream(client.getInputStream());
         writer = new DataOutputStream(client.getOutputStream());
 
-        encryptionUtils = new EncryptionUtils();
         AESKey = pAESKey;
     }
 
     public SocketWrapper(Socket pSocket) throws IOException {
-        this(pSocket, EncryptionUtils.generateSymmetricKey());
-    }
-
-    protected void close() {
-        try
-        {
-            reader.close();
-            writer.close();
-            client.close();
-        }
-        catch (IOException ignored)
-        {
-            reader = null;
-            writer = null;
-            client = null;
-        }
+        this(pSocket, null);
     }
 
     protected void writeAES(String pMessage) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, IOException {
+        if (AESKey == null) return;
+
         byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, AESKey);
         byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
         byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
@@ -74,17 +59,20 @@ class SocketWrapper {
         writer.write(pMessage);
     }
 
-    public String readUTF() throws IOException {
-        return reader.readUTF();
-    }
+    public byte[] readAllBytes() throws IOException {
+        int lSize = reader.readInt();
+        if (lSize <= 0) return new byte[0];
 
-    public String readAllBytes() throws IOException {
+        byte[] lInput = new byte[lSize];
+        reader.readFully(lInput);
 
-        return reader.readFully();
+        return lInput;
     }
 
     public String readAES() throws IOException
     {
+        if (AESKey == null) return "";
+
         try
         {
             int lSize = reader.readInt();
@@ -101,4 +89,31 @@ class SocketWrapper {
         }
     }
 
+
+    protected void close() {
+        try
+        {
+            reader.close();
+            writer.close();
+            client.close();
+        }
+        catch (IOException ignored)
+        {
+            reader = null;
+            writer = null;
+            client = null;
+        }
+    }
+
+    protected void setAESKey(SecretKey pKey) { AESKey = pKey; }
+
+    protected boolean isClosed() { return client == null || client.isClosed();}
+
+    protected SecretKey getAESKey() {return AESKey;}
+
+    protected Socket getSocket() {return client;}
+
+    protected DataOutputStream getOutStream() {return writer;}
+
+    protected DataInputStream getInStream() {return reader;}
 }

@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,73 +29,68 @@ class InputHandler extends Thread {
 
     private final SQLUtils sqlUtils;
     private final SocketWrapper client;
+    private final HashMap<String, SocketWrapper> otherClients;
 
     private String currentUser;
+    private boolean running;
 
     /**
      *
+     * @param pAllConnectedClients
      *
-     * @param pClient    {@link SocketWrapper}
+     * @param pClient               {@link SocketWrapper}
      *
      * @see EncryptionUtils
      * @see SQLUtils
      * */
-    protected InputHandler(SocketWrapper pClient) throws SQLException {
-        sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
-        client = pClient;
+    protected InputHandler(SocketWrapper pClient, HashMap<String, SocketWrapper> pAllConnectedClients) throws SQLException {
+        this.otherClients = pAllConnectedClients;
+        this.sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
+        this.client = pClient;
     }
 
-    private void handleSendRequest(String pReveiver, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        if (currentUser.equals(""))
-            socketManager.writeToSocket(pAuthorSocketIndex, "error;;You have to be logged in before sending messages;;Couldn't send message");
-        else if (!userExists(pReveiver))
-            socketManager.writeToSocket(pAuthorSocketIndex, "error;;User not found;;Couldn't send message");
+    private SocketWrapper getWrapper(String pUsername) { return null; }
+
+    private void handleSendRequest(String pReveiver, String pMessage) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
+        if (!userExists(pReveiver))
+            client.writeAES("error;;User does not exist;;Couldn't send message");
+        else if (pReveiver.equals(currentUser))
+            client.writeAES("error;;You can't text yourself;;Couldn't send message");
+        else if (currentUser.equals(""))
+            client.writeAES("error;;You have to be logged in before sending messages;;Couldn't send message");
         else
         {
-            for (List<Object> client : clientConnnectionsAndStreams)
+            SocketWrapper lReceiverWrapper = getWrapper(pReveiver);
+            if (lReceiverWrapper == null) queueMessage(pReveiver, pMessage);
+            else
             {
-                if (client.get(3).equals(pReveiver))
-                {
-                    if (!lAuthor.equals(pReveiver))
-                    {
-                        socketManager.writeToSocket(clientConnnectionsAndStreams.indexOf(client), "message;;"+
-                                lAuthor+";;"+pMessage);
-                    }
-                    else
-                    {
-                        socketManager.writeToSocket(pAuthorSocketIndex, "error;;You can't message yourself;;Couldn't send message");
-                    }
-                    return;
-                }
+                lReceiverWrapper.writeAES("message;;"+
+                        currentUser+";;"+pMessage);
             }
-            queueMessage(lAuthor, pReveiver, pMessage);
         }
     }
 
-    /**
-     *
-     * @param pAuthor
-     * @param pReveiver
-     * @param pMessage
-     *
-     * @see #queuedMessages
-     * */
-    private void queueMessage(String pAuthor, String pReveiver, String pMessage) {
-        queuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
-        queuedMessages.get(pReveiver).add(pAuthor+";;"+pMessage);
+    private void queueMessage(String pReveiver, String pMessage)
+    {
+        HashMap<String, List<String>> lQueuedMessages = SocketAcceptor.getQueuedMessages();
+        lQueuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
+        lQueuedMessages.get(pReveiver).add(currentUser+";;"+pMessage);
     }
 
-    private void sendQueuedMessages(int pSocketIndex, String pUsername) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
-        List<String> lMessages = queuedMessages.get(pUsername);
+    private void sendQueuedMessages() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
+        List<String> lMessages = SocketAcceptor.getQueuedMessages().get(currentUser);
         if (lMessages == null) return;
         while (lMessages.size() != 0) {
-            socketManager.writeToSocket(pSocketIndex, "message;;" + lMessages.get(0));
+            client.writeAES(lMessages.get(0));
             lMessages.remove(0);
         }
     }
 
-    private void handleRegistrationRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, SQLException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        if (clientConnnectionsAndStreams.get(pSocketIndex).get(3).equals(""))
+    private void handleRegistrationRequest(String pUsername, String pPassword) throws IOException, SQLException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        if (!currentUser.equals("")) {
+            client.writeAES("error;;Log out before registration;;Registration failed");
+        }
+        else
         {
             if (!userExists(pUsername))
             {
@@ -103,41 +99,37 @@ class InputHandler extends Thread {
                     byte[] lSalt = EncryptionUtils.generateSalt();
                     String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
                     sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
-                    socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
-                    sendQueuedMessages(pSocketIndex, pUsername);
+                    client.writeAES("loggedIn;;"+pUsername);
+                    sendQueuedMessages();
                 }
                 catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-                    socketManager.writeToSocket(pSocketIndex, "error;;Couldn't encrypt your password;;Error occurred during registration process");
+                    client.writeAES("error;;Couldn't encrypt your password;;Error occurred during registration process");
                 }
             }
             else
             {
-                socketManager.writeToSocket(pSocketIndex, "error;;This username is already taken, please choose another one;;Registration failed");
+                client.writeAES("error;;This username is already taken, please choose another one;;Registration failed");
             }
-        }
-        else
-        {
-            socketManager.writeToSocket(pSocketIndex, "error;;Log out before registration;;Registration failed");
         }
     }
 
-    private void handleLoginRequest(int pSocketIndex, String pUsername, String pPassword) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+    private void handleLoginRequest(String pUsername, String pPassword) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         byte[] lSalt;
         try {
             lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
         } catch (SQLException sqlEx) {
-            socketManager.writeToSocket(pSocketIndex, "error;;User not found;;Login failed");
+            client.writeAES("error;;User not found;;Login failed");
             return;
         }
 
         if (verifyLogin(pUsername, pPassword, lSalt))
         {
-            clientConnnectionsAndStreams.get(pSocketIndex).set(3, pUsername);
-            socketManager.writeToSocket(pSocketIndex, "loggedIn;;"+pUsername);
-            sendQueuedMessages(pSocketIndex, pUsername);
+            currentUser = pUsername;
+            client.writeAES("loggedIn;;"+pUsername);
+            sendQueuedMessages();
         }
         else {
-            socketManager.writeToSocket(pSocketIndex, "error;;Password or username incorrect;;Login failed");
+            client.writeAES("error;;Password or username incorrect;;Login failed");
         }
     }
 
@@ -146,61 +138,51 @@ class InputHandler extends Thread {
      *
      * */
     public void run() {
+        running = true;
         while (running)
         {
-            for (int i = 0; i < clientConnnectionsAndStreams.toArray().length; i++)
-            {
-                Socket lCurrentSocket = ((Socket) clientConnnectionsAndStreams.get(i).get(0));
-                try
-                {
-                    String lInput = socketManager.readFromSocket(i);
+            if (client.isClosed()) {
+                running = false;
+                break;
+            }
 
-                    if (lCurrentSocket.isClosed() || !lCurrentSocket.isConnected())
-                    {
-                        socketManager.closeSocket(i);
-                        System.out.printf("[%d]Socket closed\n", i+1);
-                        i--;
-                    }
-                    else
-                    {
-                        String[] lRequest = lInput.split(";;");
-                        switch (lRequest[0])
-                        {
-                            case "login" -> handleLoginRequest(i, lRequest[1], lRequest[2]);
-                            case "register" -> handleRegistrationRequest(i, lRequest[1], lRequest[2]);
-                            case "send" -> handleSendRequest(i, lRequest[1], lRequest[2]);
-                            case "logout" -> clientConnnectionsAndStreams.get(i).set(3,"");
-                            case "doesUserExist" -> {
-                                    String lUsername = lRequest[1];
-                                    if (userExists(lUsername)) socketManager.writeToSocket(i, "userExists;;"+lUsername);
-                                    else socketManager.writeToSocket(i, "error;; ;;User \""+lUsername+"\" does not exist");
-                                }
-                            case "Unable to decrypt message" -> socketManager.writeToSocket(i, "error;; ;;Your message was not properly encrypted");
-                            default -> socketManager.writeToSocket(i, "error;; ;;Unknown input");
+            try
+            {
+                String lInput = client.readAES();
+
+                String[] lRequest = lInput.split(";;");
+                switch (lRequest[0])
+                {
+                    case "login" -> handleLoginRequest(lRequest[1], lRequest[2]);
+                    case "register" -> handleRegistrationRequest(lRequest[1], lRequest[2]);
+                    case "send" -> handleSendRequest(lRequest[1], lRequest[2]);
+                    case "logout" -> currentUser = "";
+                    case "doesUserExist" -> {
+                            String lUsername = lRequest[1];
+                            if (userExists(lUsername)) client.writeAES("userExists;;"+lUsername);
+                            else client.writeAES("error;; ;;User \""+lUsername+"\" does not exist");
                         }
-                    }
+                    case "Unable to decrypt message" -> client.writeAES( "error;; ;;Your message was not properly encrypted");
+                    default -> client.writeAES("error;; ;;Unknown input");
                 }
-                catch (SocketTimeoutException ignored) {}
-                catch (IndexOutOfBoundsException ioobEx)
-                {
-                    try {
-                        socketManager.writeToSocket(i, "error;; ;;Missing argument");
-                    } catch (IOException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
-                        e.printStackTrace();
-                    }
-                }
-                catch (IOException ioEx)
-                {
-                    clientConnnectionsAndStreams.remove(i);
-                    System.out.printf("[%d]Socket closed due to IOException\n", i+1);
-                    i--;
-                }
-                catch (Exception ex) {
-                    System.out.println("Deadly exception");
-                    ex.printStackTrace();
-                    System.exit(1);
+
+            }
+            catch (SocketTimeoutException ignored) {}
+            catch (IndexOutOfBoundsException ioobEx)
+            {
+                try {
+                    client.writeAES("error;; ;;Missing argument");
+                } catch (IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
+                    e.printStackTrace();
                 }
             }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                client.close();
+                running = false;
+                break;
+            }
+
         }
     }
 
@@ -236,7 +218,4 @@ class InputHandler extends Thread {
     }
 
     public void stopListeningForInput() {running = false;}
-
-    public SocketAcceptor getSocketManager() { return socketManager;}
-
 }
