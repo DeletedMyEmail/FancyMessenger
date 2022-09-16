@@ -12,14 +12,14 @@ import java.io.*;
 public class ServerTerminal {
 
     private BufferedReader reader;
-    private SocketManager socketManager;
+    private SocketAcceptor socketManager;
     private InputHandler inputHandler;
 
     private boolean active;
 
     public ServerTerminal() {
         try {
-            socketManager = new SocketManager();
+            socketManager = new SocketAcceptor();
             inputHandler = new InputHandler(socketManager);
             inputHandler.start();
         } catch (Exception ex) {

@@ -18,7 +18,6 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -28,67 +27,26 @@ import java.util.List;
  * @version v2.0.2 | last edit: 31.08.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
-class SocketManager extends Thread{
+class SocketAcceptor extends Thread{
 
     private static final int PORT = 4242;
 
-    private final List<List<Object>> socketConnectionsAndStreams;
+    private final List<SocketWrapper> clients;
     private final EncryptionUtils encryptionUtils;
     private final ServerSocket serverSocket;
 
     private boolean running;
 
-    protected SocketManager() throws IOException
+    protected SocketAcceptor() throws IOException
     {
-        socketConnectionsAndStreams = new ArrayList<>();
+        clients = new ArrayList<>();
         serverSocket = new ServerSocket(PORT);
         encryptionUtils = new EncryptionUtils();
     }
 
-    protected List<List<Object>> getSockets() { return socketConnectionsAndStreams; };
-
     protected void closeSocket(int pIndex) throws IOException {
-        ((Socket) socketConnectionsAndStreams.get(pIndex).get(0)).close();
-        socketConnectionsAndStreams.remove(pIndex);
-    }
-
-    protected void writeToSocket(int pIndex, String pMessage) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        writeToSocket(
-                (DataOutputStream)socketConnectionsAndStreams.get(pIndex).get(1),
-                (SecretKey) socketConnectionsAndStreams.get(pIndex).get(4),
-                pMessage);
-    }
-
-    private void writeToSocket(DataOutputStream pOutStream, SecretKey pSocketsSecretKey, String pMessage) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, pSocketsSecretKey);
-        byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
-        byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
-        pOutStream.write(lConcatenated, 0, lConcatenated.length);
-    }
-
-    protected String readFromSocket(int pIndex) throws IOException
-    {
-            DataInputStream lInStream = (DataInputStream)socketConnectionsAndStreams.get(pIndex).get(2);
-            SecretKey lSecretKey = (SecretKey)socketConnectionsAndStreams.get(pIndex).get(4);
-            return readFromSocket(lInStream, lSecretKey);
-    }
-
-    private String readFromSocket(DataInputStream pInStream, SecretKey pKey) throws IOException
-    {
-        try
-        {
-            int lSize = pInStream.readInt();
-            if (lSize <= 0) return "";
-            byte[] lEncryptedInput = new byte[lSize];
-
-            pInStream.readFully(lEncryptedInput);
-
-            return EncryptionUtils.decryptAES(lEncryptedInput, pKey);
-        }
-        catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
-            ex.printStackTrace();
-            return "Unable to decrypt message";
-        }
+        clients.get(pIndex).close();
+        clients.remove(pIndex);
     }
 
     /**
@@ -102,11 +60,7 @@ class SocketManager extends Thread{
             try
             {
                 // Init new socket and streams
-
-                Socket lNewSocket = serverSocket.accept();
-                DataOutputStream lNewOutStream = new DataOutputStream(lNewSocket.getOutputStream());
-                DataInputStream lNewInStream = new DataInputStream(lNewSocket.getInputStream());
-                lNewSocket.setSoTimeout(300);
+                SocketWrapper lNewSocket = new SocketWrapper(serverSocket.accept());
 
                 byte[] lInput = new byte[294];
                 lNewInStream.read(lInput);

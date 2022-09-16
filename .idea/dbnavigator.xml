@@ -32,7 +32,7 @@
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
     <connection id="101bc1f1-ddbe-409e-8d35-4caecd0aec56">
-      <console name="ClientDB" type="STANDARD" schema="main" session="Main"><![CDATA[DELETE FROM "MessageToContact"]]></console>
+      <console name="ClientDB" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
