@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 
+import java.io.IOException;
+
 /**
  * Controller for the GUI settings scene
  *
@@ -33,10 +35,8 @@ public class SettingsSceneController {
         SceneManager.switchToHomeScene();
     }
 
-    public void logOut(ActionEvent actionEvent)
-    {
-        backend.logOut();
-        SceneManager.switchToLoginScene();
+    public void logOut(ActionEvent actionEvent) throws IOException {
+        backend.requestLogout();
     }
 }
 

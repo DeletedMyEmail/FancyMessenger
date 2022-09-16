@@ -76,21 +76,8 @@ public class ClientBackend {
      * */
     protected String getUsername() { return currentUser; }
 
-    /**
-     * Logs out the current user.<br/>
-     * Both server and client will no longer associate a specific user with this socket.
-     * */
-    protected void logOut() {
-        try
-        {
-            sendToServer("logout");
-            SceneManager.getHomeScene().clearMessagesAndContacts();
-            currentUser = "";
-        }
-        catch (IOException ex)
-        {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMesServer", ButtonType.OK);
-        }
+    public void requestLogout() throws IOException {
+        sendToServer("logout");
     }
 
     /**
@@ -179,6 +166,11 @@ public class ClientBackend {
                             case "loggedIn" -> {
                                 updateCurrentUser(lInput[1]);
                                 loadHistory();
+                            }
+                            case "loggedOut" -> {
+                                currentUser = "";
+                                SceneManager.getHomeScene().clearMessagesAndContacts();
+                                SceneManager.switchToLoginScene();
                             }
                             case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
                             case "message" -> addNewMessage(lInput[1], lInput[2], true);
