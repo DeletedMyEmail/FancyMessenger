@@ -6,9 +6,7 @@ import KLibrary.Utils.SQLUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.*;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -29,7 +27,8 @@ class InputHandler extends Thread {
 
     private final SQLUtils sqlUtils;
     private final SocketWrapper client;
-    private final HashMap<String, SocketWrapper> otherClients;
+    private final HashMap<String, SocketWrapper> allConnectedClients;
+    private final HashMap<String, List<String>> queuedMessages;
 
     private String currentUser;
     private boolean running;
@@ -43,15 +42,17 @@ class InputHandler extends Thread {
      * @see EncryptionUtils
      * @see SQLUtils
      * */
-    protected InputHandler(SocketWrapper pClient, HashMap<String, SocketWrapper> pAllConnectedClients) throws SQLException {
-        this.otherClients = pAllConnectedClients;
+    protected InputHandler(SocketWrapper pClient, HashMap<String, SocketWrapper> pAllConnectedClients, HashMap<String, List<String>> pQueuedMessages) throws SQLException {
+        this.allConnectedClients = pAllConnectedClients;
+        this.queuedMessages = pQueuedMessages;
         this.sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
         this.client = pClient;
     }
 
-    private SocketWrapper getWrapper(String pUsername) { return null; }
+    private SocketWrapper getWrapper(String pUsername) { return allConnectedClients.get(pUsername); }
 
     private void handleSendRequest(String pReveiver, String pMessage) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
+        System.err.println(pReveiver);
         if (!userExists(pReveiver))
             client.writeAES("error;;User does not exist;;Couldn't send message");
         else if (pReveiver.equals(currentUser))
@@ -72,17 +73,30 @@ class InputHandler extends Thread {
 
     private void queueMessage(String pReveiver, String pMessage)
     {
-        HashMap<String, List<String>> lQueuedMessages = SocketAcceptor.getQueuedMessages();
-        lQueuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
-        lQueuedMessages.get(pReveiver).add(currentUser+";;"+pMessage);
+        queuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
+        queuedMessages.get(pReveiver).add(currentUser+";;"+pMessage);
+        System.out.println(queuedMessages.get(pReveiver).size());
     }
 
     private void sendQueuedMessages() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
-        List<String> lMessages = SocketAcceptor.getQueuedMessages().get(currentUser);
+        List<String> lMessages = queuedMessages.get(currentUser);
         if (lMessages == null) return;
         while (lMessages.size() != 0) {
-            client.writeAES(lMessages.get(0));
+            System.out.println(lMessages.size());
+            client.writeAES("message;;"+lMessages.get(0));
             lMessages.remove(0);
+        }
+    }
+
+    private void changeBindingWithCurrentUser()
+    {
+        SocketWrapper lCurrentBindedWrapperToThisUsername = allConnectedClients.get(currentUser);
+        if (lCurrentBindedWrapperToThisUsername != null) {
+            try {
+                lCurrentBindedWrapperToThisUsername.writeAES("loggedOut");
+            }
+            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {}
+            allConnectedClients.put(currentUser, client);
         }
     }
 
@@ -100,6 +114,7 @@ class InputHandler extends Thread {
                     String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
                     sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
                     client.writeAES("loggedIn;;"+pUsername);
+                    changeBindingWithCurrentUser();
                     sendQueuedMessages();
                 }
                 catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
@@ -113,7 +128,7 @@ class InputHandler extends Thread {
         }
     }
 
-    private void handleLoginRequest(String pUsername, String pPassword) throws IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+    private void handleLoginRequest(String pUsername, String pPassword) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         byte[] lSalt;
         try {
             lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
@@ -126,6 +141,7 @@ class InputHandler extends Thread {
         {
             currentUser = pUsername;
             client.writeAES("loggedIn;;"+pUsername);
+            changeBindingWithCurrentUser();
             sendQueuedMessages();
         }
         else {
@@ -156,12 +172,17 @@ class InputHandler extends Thread {
                     case "login" -> handleLoginRequest(lRequest[1], lRequest[2]);
                     case "register" -> handleRegistrationRequest(lRequest[1], lRequest[2]);
                     case "send" -> handleSendRequest(lRequest[1], lRequest[2]);
-                    case "logout" -> currentUser = "";
-                    case "doesUserExist" -> {
-                            String lUsername = lRequest[1];
-                            if (userExists(lUsername)) client.writeAES("userExists;;"+lUsername);
-                            else client.writeAES("error;; ;;User \""+lUsername+"\" does not exist");
-                        }
+                    case "logout" ->
+                            {
+                                currentUser = "";
+                                client.writeAES("loggedOut");
+                            }
+                    case "doesUserExist" ->
+                            {
+                                String lUsername = lRequest[1];
+                                if (userExists(lUsername)) client.writeAES("userExists;;"+lUsername);
+                                else client.writeAES("error;; ;;User \""+lUsername+"\" does not exist");
+                            }
                     case "Unable to decrypt message" -> client.writeAES( "error;; ;;Your message was not properly encrypted");
                     default -> client.writeAES("error;; ;;Unknown input");
                 }

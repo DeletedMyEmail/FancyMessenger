@@ -8,6 +8,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -27,15 +28,16 @@ class SocketWrapper {
 
     private SecretKey AESKey;
 
-    private boolean running;
-
     public SocketWrapper(Socket pSocket, SecretKey pAESKey) throws IOException
     {
         client = pSocket;
-        reader = new DataInputStream(client.getInputStream());
-        writer = new DataOutputStream(client.getOutputStream());
-
         AESKey = pAESKey;
+
+        try {
+            reader = new DataInputStream(client.getInputStream());
+            writer = new DataOutputStream(client.getOutputStream());
+        }
+        catch(SocketException socketException) {close();}
     }
 
     public SocketWrapper(Socket pSocket) throws IOException {
@@ -45,28 +47,42 @@ class SocketWrapper {
     protected void writeAES(String pMessage) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, IOException {
         if (AESKey == null) return;
 
-        byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, AESKey);
-        byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
-        byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
-        writer.write(lConcatenated, 0, lConcatenated.length);
+        try
+        {
+            byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, AESKey);
+            byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
+            byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
+            writer.write(lConcatenated, 0, lConcatenated.length);
+        }
+        catch(SocketException socketException) {close();}
     }
 
     protected void writeUnencrypted(String pMessage) throws IOException {
-        writer.writeUTF(pMessage);
+        try {
+            writer.writeUTF(pMessage);
+        }
+        catch(SocketException socketException) {close();}
     }
 
     protected void writeUnencrypted(byte[] pMessage) throws IOException {
-        writer.write(pMessage);
+        try {
+            writer.write(pMessage);
+        }
+        catch(SocketException socketException) {close();}
     }
 
     public byte[] readAllBytes() throws IOException {
-        int lSize = reader.readInt();
-        if (lSize <= 0) return new byte[0];
+        try
+        {
+            int lSize = reader.readInt();
+            if (lSize <= 0) return new byte[0];
 
-        byte[] lInput = new byte[lSize];
-        reader.readFully(lInput);
+            byte[] lInput = new byte[lSize];
+            reader.readFully(lInput);
 
-        return lInput;
+            return lInput;
+        }
+        catch(SocketException socketException) {close(); return new byte[0];}
     }
 
     public String readAES() throws IOException
@@ -87,6 +103,7 @@ class SocketWrapper {
             ex.printStackTrace();
             return "Unable to decrypt message";
         }
+        catch(SocketException socketException) {close(); return "";}
     }
 
 

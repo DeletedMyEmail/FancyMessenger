@@ -12,17 +12,29 @@ import java.io.*;
 public class ServerTerminal {
 
     private BufferedReader reader;
-    private SocketAcceptor socketManager;
+    private SocketAcceptor socketAcceptor;
     private InputHandler inputHandler;
 
     private boolean active;
 
     public ServerTerminal() {
+        reader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            socketAcceptor = new SocketAcceptor();
+            socketAcceptor.start();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error occurred while starting to accept clients");
+            System.exit(1);
+        }
     }
 
     public void run() {
         printHelp();
 
+        active = true;
         while (active) {
             try {
                 String input = reader.readLine().toLowerCase();
@@ -32,16 +44,16 @@ public class ServerTerminal {
                     case "esc" -> {
                         active = false;
                         inputHandler.stopListeningForInput();
-                        socketManager.close();
+                        socketAcceptor.close();
                         System.out.println("Server stopped");
                         System.exit(0);
                     }
                     case "connections" -> {
-                        int lSize = socketManager.amountOfConnections();
+                        int lSize = socketAcceptor.amountOfConnections();
                         System.out.println("Current amount of connection: " + lSize);
                     }
                     case "stopaccepting" -> {
-                        socketManager.stopAcceptingSockets();
+                        socketAcceptor.stopAcceptingSockets();
                         System.out.println("The established connections are still alive but new sockets won't be able to connect anymore");
                     }
                     default -> System.out.println("Command not found\nTry dcs help");

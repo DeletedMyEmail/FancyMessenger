@@ -27,8 +27,8 @@ class SocketAcceptor extends Thread {
 
     private static final int PORT = 4242;
 
-    private static HashMap<String, SocketWrapper> clients;
-    private static HashMap<String, List<String>> queuedMessages;
+    private final HashMap<String, SocketWrapper> clients;
+    private final HashMap<String, List<String>> queuedMessages;
     private final ServerSocket serverSocket;
 
     private final EncryptionUtils encryptionUtils;
@@ -44,7 +44,7 @@ class SocketAcceptor extends Thread {
     }
 
     protected void closeSocket(String pUsername) {
-        clients.get(pUsername).close();
+        if (clients.get(pUsername) != null) clients.get(pUsername).close();
         clients.remove(pUsername);
     }
 
@@ -86,8 +86,8 @@ class SocketAcceptor extends Thread {
 
                 try
                 {
-                    new InputHandler(lNewSocket, clients).start();
-                    System.out.printf("[%d] Client socket accepted\n", clients.size());
+                    new InputHandler(lNewSocket, clients, queuedMessages).start();
+                    System.out.println("Client socket accepted");
                 }
                 catch (Exception ex) {ex.printStackTrace();}
 
@@ -100,10 +100,6 @@ class SocketAcceptor extends Thread {
 
     protected void stopAcceptingSockets() { running = false; }
 
-    protected void addUser(String pUsername, SocketWrapper pSocketWrapper) {
-        clients.put(pUsername, pSocketWrapper);
-    }
-
     protected void close()
     {
         running = false;
@@ -112,8 +108,4 @@ class SocketAcceptor extends Thread {
     }
 
     protected int amountOfConnections() { return clients.size(); }
-
-    protected static HashMap<String, List<String>> getQueuedMessages() {return queuedMessages;}
-
-    protected HashMap<String, SocketWrapper> getClients() {return clients;}
 }
