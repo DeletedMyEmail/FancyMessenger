@@ -6,7 +6,7 @@
 
     <groupId>org.kmes</groupId>
     <artifactId>KMesRework</artifactId>
-    <version>2.2.2</version>
+    <version>3.0.0</version>
     <name>KMesRework</name>
 
     <properties>

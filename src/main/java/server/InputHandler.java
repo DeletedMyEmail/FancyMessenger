@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * This class acts as a backend for the KMes Server and processes all inputs from user sockets.
  *
- * @version v2.2.1 | last edit: 08.09.2022
+ * @version v3.0.0 | last edit: 16.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class InputHandler extends Thread {
@@ -96,8 +96,8 @@ class InputHandler extends Thread {
                 lCurrentBindedWrapperToThisUsername.writeAES("loggedOut");
             }
             catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {}
-            allConnectedClients.put(currentUser, client);
         }
+        allConnectedClients.put(currentUser, client);
     }
 
     private void handleRegistrationRequest(String pUsername, String pPassword) throws IOException, SQLException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {

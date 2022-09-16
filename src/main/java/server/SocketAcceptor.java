@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Thread accepting new clients connecting to the KMes messenger
  *
- * @version v2.0.2 | last edit: 31.08.2022
+ * @version v3.0.0 | last edit: 16.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
@@ -60,6 +60,10 @@ class SocketAcceptor extends Thread {
             {
                 // Init new socket and streams
                 SocketWrapper lNewSocket = new SocketWrapper(serverSocket.accept());
+                if (!running) {
+                    lNewSocket.close();
+                    break;
+                }
 
                 byte[] lInput = new byte[294];
                 lNewSocket.getInStream().read(lInput);

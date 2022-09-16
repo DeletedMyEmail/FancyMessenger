@@ -6,16 +6,13 @@ import java.io.*;
 /**
  * KMes Server cmd terminal
  *
- * @version v2.0.0 | last edit: 26.08.2022
+ * @version v3.0.0 | last edit: 16.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ServerTerminal {
 
     private BufferedReader reader;
     private SocketAcceptor socketAcceptor;
-    private InputHandler inputHandler;
-
-    private boolean active;
 
     public ServerTerminal() {
         reader = new BufferedReader(new InputStreamReader(System.in));
@@ -34,19 +31,17 @@ public class ServerTerminal {
     public void run() {
         printHelp();
 
-        active = true;
-        while (active) {
+        boolean running = true;
+        while (running) {
             try {
                 String input = reader.readLine().toLowerCase();
 
                 switch (input.strip()) {
                     case "help" -> printHelp();
                     case "esc" -> {
-                        active = false;
-                        inputHandler.stopListeningForInput();
+                        running = false;
                         socketAcceptor.close();
                         System.out.println("Server stopped");
-                        System.exit(0);
                     }
                     case "connections" -> {
                         int lSize = socketAcceptor.amountOfConnections();
@@ -69,7 +64,7 @@ public class ServerTerminal {
                         
                         You can manage the server via the following commands:
                                         
-                            - stopaccepting => Keep established connections but accept only one new socket
+                            - stopaccepting => Keep established connections but don't accept new sockets
                             - connections => Return the amount of connected clients
                             - help => Print this list of commands
                             - esc => Exit the application
