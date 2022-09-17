@@ -24,8 +24,6 @@ import java.util.List;
  * */
 class SocketAcceptor extends Thread {
 
-    private static final int PORT = 443;
-
     private final HashMap<String, SocketWrapper> clients;
     private final HashMap<String, List<String>> queuedMessages;
     private final ServerSocket serverSocket;
@@ -34,11 +32,11 @@ class SocketAcceptor extends Thread {
 
     private boolean running;
 
-    protected SocketAcceptor() throws IOException
+    protected SocketAcceptor(int pPort) throws IOException
     {
         clients = new HashMap<>();
         queuedMessages = new HashMap<>();
-        serverSocket = new ServerSocket(PORT);
+        serverSocket = new ServerSocket(pPort);
         encryptionUtils = new EncryptionUtils();
     }
 
