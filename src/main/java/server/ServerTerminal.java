@@ -42,6 +42,7 @@ public class ServerTerminal {
                         running = false;
                         socketAcceptor.close();
                         System.out.println("Server stopped");
+                        System.exit(0);
                     }
                     case "connections" -> {
                         int lSize = socketAcceptor.amountOfConnections();

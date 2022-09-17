@@ -1,0 +1,35 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="KMesReworkClient_v3.0.0:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/KMesReworkClient_v3_0_0_jar</output-path>
+    <root id="archive" name="KMesRework.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/java/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="KMesRework" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/18.0.2/javafx-controls-18.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/KLibrary_v1.1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/18.0.2/javafx-fxml-18.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-swing/18.0.2/javafx-swing-18.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/18.0.2/javafx-base-18.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/18.0.2/javafx-base-18.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/18.0.2/javafx-graphics-18.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/18.0.2/javafx-fxml-18.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/xerial/sqlite-jdbc/3.39.2.1/sqlite-jdbc-3.39.2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-swing/18.0.2/javafx-swing-18.0.2-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/18.0.2/javafx-controls-18.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/18.0.2/javafx-graphics-18.0.2-win.jar" path-in-jar="/" />
+      <element id="library" level="project" name="KLibrary" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:win:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:win:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:win:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:win:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:18.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:win:18.0.2" />
+      <element id="library" level="project" name="Maven: org.xerial:sqlite-jdbc:3.39.2.1" />
+    </root>
+  </artifact>
+</component>
