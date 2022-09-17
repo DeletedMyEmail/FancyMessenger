@@ -45,7 +45,7 @@ class InputHandler extends Thread {
     protected InputHandler(SocketWrapper pClient, HashMap<String, SocketWrapper> pAllConnectedClients, HashMap<String, List<String>> pQueuedMessages) throws SQLException {
         this.allConnectedClients = pAllConnectedClients;
         this.queuedMessages = pQueuedMessages;
-        this.sqlUtils = new SQLUtils("kmes_server.db");
+        this.sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
         this.client = pClient;
     }
 
