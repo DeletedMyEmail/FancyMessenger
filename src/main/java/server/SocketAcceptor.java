@@ -25,7 +25,7 @@ import java.util.List;
  * */
 class SocketAcceptor extends Thread {
 
-    private static final int PORT = 4242;
+    private static final int PORT = 443;
 
     private final HashMap<String, SocketWrapper> clients;
     private final HashMap<String, List<String>> queuedMessages;
