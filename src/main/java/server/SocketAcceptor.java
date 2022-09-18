@@ -12,14 +12,15 @@ import java.net.ServerSocket;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
 
 /**
- * Thread accepting new clients connecting to the KMes messenger
+ * Thread accepting new clients connecting to the KMes Server
  *
- * @version v3.0.0 | last edit: 16.09.2022
+ * @version v3.0.0 | last edit: 18.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
@@ -40,14 +41,10 @@ class SocketAcceptor extends Thread {
         encryptionUtils = new EncryptionUtils();
     }
 
-    protected void closeSocket(String pUsername) {
-        if (clients.get(pUsername) != null) clients.get(pUsername).close();
-        clients.remove(pUsername);
-    }
-
     /**
-     * Accepts new sockets and establishes secure RSA encryption via key transfer
+     * Accepts new sockets and establishes encryption via RSA + AES key transfer
      * */
+    @Override
     public void run()
     {
         running = true;
@@ -85,18 +82,19 @@ class SocketAcceptor extends Thread {
 
                 lNewSocket.getSocket().setSoTimeout(0);
 
-                try
-                {
-                    new InputHandler(lNewSocket, clients, queuedMessages).start();
-                    System.out.println("Client socket accepted");
-                }
-                catch (Exception ex) {ex.printStackTrace();}
+                new InputHandler(lNewSocket, clients, queuedMessages).start();
+                System.out.println("Client socket accepted");
 
             }
-            catch (IOException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            catch (IOException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | SQLException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    protected void closeSocket(String pUsername) {
+        if (clients.get(pUsername) != null) clients.get(pUsername).close();
+        clients.remove(pUsername);
     }
 
     protected void stopAcceptingSockets() { running = false; }
@@ -107,6 +105,8 @@ class SocketAcceptor extends Thread {
         clients.forEach((username, socketWrapper) -> socketWrapper.close());
         clients.clear();
     }
+
+    protected int getPort() {return serverSocket.getLocalPort();}
 
     protected int amountOfConnections() { return clients.size(); }
 }

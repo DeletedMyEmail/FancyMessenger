@@ -40,7 +40,7 @@ import javax.imageio.ImageIO;
 public class ClientBackend {
 
     // KMes Server Hostname/IP
-    private static final String HOST = "212.227.188.240";
+    private static final String HOST = "localhost";
 
     // Port of the KMes Server which accepts clients
     private static final int PORT = 443;

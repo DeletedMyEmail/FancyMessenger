@@ -106,7 +106,6 @@ class SocketWrapper {
         catch(SocketException socketException) {close(); return "";}
     }
 
-
     protected void close() {
         try
         {

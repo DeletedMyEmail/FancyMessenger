@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * this class processes the requests of a client socket in a new thread
  *
- * @version v3.0.0 | last edit: 16.09.2022
+ * @version v3.0.0 | last edit: 18.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  *
  * @see SocketWrapper
@@ -115,6 +115,10 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * @param pReveiver Name of the user to be messaged
+     * @param pMessage  Message to be sent
+     * */
     private void handleSendRequest(String pReveiver, String pMessage) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         System.err.println(pReveiver);
         if (!userExists(pReveiver))
@@ -135,6 +139,12 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * Notifies the user if the entered username or password is invalid, otherwise creates a new user in the database
+     *
+     * @param pUsername Username of the user to be registered
+     * @param pPassword User's new password
+     * */
     private void handleRegistrationRequest(String pUsername, String pPassword) throws IOException, SQLException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         if (!currentUser.equals("")) {
             client.writeAES("error;;Log out before registration;;Registration failed");
@@ -163,6 +173,12 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * Notifies the user if the entered username or password is invalid, otherwise links this socket to the entered username
+     *
+     * @param pUsername Username
+     * @param pPassword User's password
+     * */
     private void handleLoginRequest(String pUsername, String pPassword) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         byte[] lSalt;
         try {
@@ -184,13 +200,21 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * Queues a message which will be sent if the user gets back online
+     *
+     * @param pReveiver Name of the user to be messaged
+     * @param pMessage  Message to be sent
+     * */
     private void queueMessage(String pReveiver, String pMessage)
     {
         queuedMessages.putIfAbsent(pReveiver, new ArrayList<>());
         queuedMessages.get(pReveiver).add(currentUser+";;"+pMessage);
-        System.out.println(queuedMessages.get(pReveiver).size());
     }
 
+    /**
+     * Looks for queued messages linked to the user currently connected with this socket and sends them
+     * */
     private void sendQueuedMessages() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
         List<String> lMessages = queuedMessages.get(currentUser);
         if (lMessages == null) return;
@@ -201,6 +225,30 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * Validates login credentials
+     *
+     * @param pUsername Username
+     * @param pPassword Unhashed password - will be hashed with the corresponding salt from the database
+     * */
+    private boolean verifyLogin(String pUsername, String pPassword)
+    {
+        byte[] lSalt;
+        try {
+            lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
+        }
+        catch (SQLException sqlEx) { return false;}
+
+        return verifyLogin(pUsername, pPassword, lSalt);
+    }
+
+    /**
+     * Validates login credentials
+     *
+     * @param pUsername Username
+     * @param pPassword Unhashed password
+     * @param pSalt     User's salt used to hash the password
+     * */
     private boolean verifyLogin(String pUsername, String pPassword, byte[] pSalt)
     {
         try
@@ -219,6 +267,10 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * Validates the existence of a database entry for a specific user
+     * @param pUsername Name of the user
+     * */
     private boolean userExists(String pUsername)
     {
         try {
@@ -231,6 +283,9 @@ class InputHandler extends Thread {
         }
     }
 
+    /**
+     * Links this socket to the current user and logs out old connections
+     * */
     private void changeBindingWithCurrentUser()
     {
         SocketWrapper lCurrentBindedWrapperToThisUsername = allConnectedClients.get(currentUser);
@@ -243,7 +298,8 @@ class InputHandler extends Thread {
         allConnectedClients.put(currentUser, client);
     }
 
+    /**
+     * @return {@link SocketWrapper} for a specific user
+     * */
     private SocketWrapper getWrapper(String pUsername) { return allConnectedClients.get(pUsername); }
-
-    public void stopListeningForInput() {running = false;}
 }
