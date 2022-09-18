@@ -12,12 +12,11 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.PrivateKey;
 
 /**
- * Thread accepting new clients connecting to the KMes messenger
+ * This class wraps a {@link Socket} and provides read, write, etc. methods
  *
- * @version v3.0.0 | last edit: 16.09.2022
+ * @version v3.0.0 | last edit: 18.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketWrapper {
@@ -28,6 +27,10 @@ class SocketWrapper {
 
     private SecretKey AESKey;
 
+    /**
+     * @param pSocket Socket to wrap
+     * @param pAESKey {@link SecretKey} used to encrypt messages via AES
+     * */
     public SocketWrapper(Socket pSocket, SecretKey pAESKey) throws IOException
     {
         client = pSocket;
