@@ -18,20 +18,13 @@ The following things were important to me:
 
 Execute the main method of [ServerTerminal](src/main/java/server/ServerTerminal.java) to start the server and the one of [Main](src/main/java/client/Main.java) to create a client instance.
 
-Note that the default server address in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **"localhost"** and the default port is **4242**.
+Note that the default server address in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **localhost** and the default port is **443**.
 
 https://user-images.githubusercontent.com/88390464/189905622-2bff0615-a9ca-40bd-abb1-c13f890c0eba.mp4
 
 ## Recent Changes
 
-1. Message history and contact list
-2. Queue messages if a user is offline and send them if they get back online
-3. Save images
-4. Send images
-5. GUI style
-6. AES 
-
-<!-- Roadmap -->
-## Roadmap
-
-1. Suggest new stuff
+- Changed server structure to improve performance
+- Deleted debug methods
+- Added comments
+- Specify a port on server start
