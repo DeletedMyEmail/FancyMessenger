@@ -112,7 +112,6 @@ public class HomeSceneController {
 
             if (pFileExtention == Extention.TXT || pFileExtention == Extention.PDF)
             {
-                System.out.println(pFileExtention.name().toLowerCase());
                 Image lImg = new Image(HomeSceneController.class.getResourceAsStream(
                         "/images/"+pFileExtention.name().toLowerCase()+".png"));
                 lImgView.setImage(lImg);
@@ -199,10 +198,12 @@ public class HomeSceneController {
 
     protected void clearMessagesAndContacts()
     {
-        messageLists.clear();
-        messagesScrollpane.setContent(null);
-        contactsList.getSelectionModel().clearSelection();
-        contactsList.getItems().clear();
+        Platform.runLater(() -> {
+            messageLists.clear();
+            messagesScrollpane.setContent(null);
+            contactsList.getSelectionModel().clearSelection();
+            contactsList.getItems().clear();
+        });
     }
 
     @FXML

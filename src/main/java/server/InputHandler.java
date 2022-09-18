@@ -120,7 +120,6 @@ class InputHandler extends Thread {
      * @param pMessage  Message to be sent
      * */
     private void handleSendRequest(String pReveiver, String pMessage) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
-        System.err.println(pReveiver);
         if (!userExists(pReveiver))
             client.writeAES("error;;User does not exist;;Couldn't send message");
         else if (pReveiver.equals(currentUser))
@@ -293,7 +292,7 @@ class InputHandler extends Thread {
             try {
                 lCurrentBindedWrapperToThisUsername.writeAES("loggedOut");
             }
-            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {}
+            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {ignored.printStackTrace();}
         }
         allConnectedClients.put(currentUser, client);
     }
@@ -302,4 +301,6 @@ class InputHandler extends Thread {
      * @return {@link SocketWrapper} for a specific user
      * */
     private SocketWrapper getWrapper(String pUsername) { return allConnectedClients.get(pUsername); }
+
+    public void stopListening() {running=false;}
 }

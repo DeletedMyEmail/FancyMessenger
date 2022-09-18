@@ -43,7 +43,7 @@ public class ClientBackend {
     private static final String HOST = "localhost";
 
     // Port of the KMes Server which accepts clients
-    private static final int PORT = 443;
+    private static final int PORT = 4242;
 
     private final EncryptionUtils encryptionUtils;
     private SQLUtils sqlUtils;
