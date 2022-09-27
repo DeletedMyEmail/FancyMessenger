@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * this class processes the requests of a client socket in a new thread
  *
- * @version stabel-1.0.0 | last edit: 18.09.2022
+ * @version stabel-1.0.1 | last edit: 27.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  *
  * @see SocketWrapper
