@@ -49,6 +49,7 @@ class InputHandler extends Thread {
         this.queuedMessages = pQueuedMessages;
         this.sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
         this.client = pClient;
+        this.currentUser = "";
     }
 
     /**
