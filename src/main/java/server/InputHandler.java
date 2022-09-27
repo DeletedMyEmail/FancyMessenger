@@ -191,8 +191,8 @@ class InputHandler extends Thread {
         if (verifyLogin(pUsername, pPassword, lSalt))
         {
             currentUser = pUsername;
-            client.writeAES("loggedIn;;"+pUsername);
             changeBindingWithCurrentUser();
+            client.writeAES("loggedIn;;"+pUsername);
             sendQueuedMessages();
         }
         else {
