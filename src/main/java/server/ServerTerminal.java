@@ -7,15 +7,16 @@ import java.sql.SQLException;
 /**
  * KMes Server cmd terminal
  *
- * @version stabel-1.0.0 | last edit: 16.09.2022
+ * @version stabel-1.0.1 | last edit: 27.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ServerTerminal {
 
-    private int port;
+    private SocketAcceptor socketAcceptor;
 
     private BufferedReader reader;
-    private SocketAcceptor socketAcceptor;
+
+    private int port;
 
     public ServerTerminal() {
         reader = new BufferedReader(new InputStreamReader(System.in));

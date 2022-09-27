@@ -108,6 +108,7 @@ class InputHandler extends Thread {
             }
             catch (Exception ex) {
                 ex.printStackTrace();
+                allConnectedClients.remove(currentUser);
                 client.close();
                 running = false;
                 break;
