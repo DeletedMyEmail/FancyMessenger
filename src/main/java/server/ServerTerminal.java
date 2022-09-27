@@ -1,6 +1,7 @@
 package server;
 
 import java.io.*;
+import java.sql.SQLException;
 
 
 /**
@@ -34,7 +35,7 @@ public class ServerTerminal {
             socketAcceptor = new SocketAcceptor(port);
             socketAcceptor.start();
         }
-        catch (IOException e) {
+        catch (IOException | SQLException e) {
             e.printStackTrace();
             System.out.println("Error occurred while initializing server");
             System.exit(1);

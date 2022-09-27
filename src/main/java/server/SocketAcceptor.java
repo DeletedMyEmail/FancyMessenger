@@ -2,6 +2,7 @@ package server;
 
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
 import KLibrary.Utils.EncryptionUtils;
+import KLibrary.Utils.SQLUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -31,14 +32,15 @@ class SocketAcceptor extends Thread {
 
     private final EncryptionUtils encryptionUtils;
 
+    private final SQLUtils sqlUtils;
     private boolean running;
 
-    protected SocketAcceptor(int pPort) throws IOException
-    {
+    protected SocketAcceptor(int pPort) throws IOException, SQLException {
         clients = new HashMap<>();
         queuedMessages = new HashMap<>();
         serverSocket = new ServerSocket(pPort);
         encryptionUtils = new EncryptionUtils();
+        sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
     }
 
     /**
@@ -82,7 +84,7 @@ class SocketAcceptor extends Thread {
 
                 lNewSocket.getSocket().setSoTimeout(0);
 
-                new InputHandler(lNewSocket, clients, queuedMessages).start();
+                new InputHandler(lNewSocket, clients, queuedMessages, sqlUtils).start();
                 System.out.println("Client socket accepted");
 
             }
