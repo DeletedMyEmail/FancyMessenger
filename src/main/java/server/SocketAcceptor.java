@@ -26,6 +26,8 @@ import java.util.List;
  * */
 class SocketAcceptor extends Thread {
 
+    public static final int PORT = 4242;
+
     private final HashMap<String, SocketWrapper> clients;
     private final HashMap<String, List<String>> queuedMessages;
     private final ServerSocket serverSocket;
@@ -35,10 +37,10 @@ class SocketAcceptor extends Thread {
     private final SQLUtils sqlUtils;
     private boolean running;
 
-    protected SocketAcceptor(int pPort) throws IOException, SQLException {
+    protected SocketAcceptor() throws IOException, SQLException {
         clients = new HashMap<>();
         queuedMessages = new HashMap<>();
-        serverSocket = new ServerSocket(pPort);
+        serverSocket = new ServerSocket(PORT);
         encryptionUtils = new EncryptionUtils();
         sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
     }
@@ -108,7 +110,7 @@ class SocketAcceptor extends Thread {
         clients.clear();
     }
 
-    protected int getPort() {return serverSocket.getLocalPort();}
-
-    protected int amountOfConnections() { return clients.size(); }
+    public static void main(String[] args) throws SQLException, IOException {
+        new SocketAcceptor().run();
+    }
 }

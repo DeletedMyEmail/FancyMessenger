@@ -84,6 +84,7 @@ class InputHandler extends Thread {
                     case "logout" ->
                             {
                                 currentUser = "";
+                                allConnectedClients.remove(currentUser);
                                 client.writeAES("loggedOut");
                             }
                     case "doesUserExist" ->
@@ -106,8 +107,8 @@ class InputHandler extends Thread {
                     e.printStackTrace();
                 }
             }
-            catch (Exception ex) {
-                ex.printStackTrace();
+            catch (Exception ex)
+            {
                 allConnectedClients.remove(currentUser);
                 client.close();
                 running = false;
