@@ -34,13 +34,13 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version v3.0.0 | last edit: 16.09.2022
+ * @version stabel-1.0.0 | last edit: 27.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
 
     // KMes Server Hostname/IP
-    private static final String HOST = "localhost";
+    private static final String SERVER_IP = "134.122.74.216";
 
     // Port of the KMes Server which accepts clients
     private static final int PORT = 4242;
@@ -137,7 +137,7 @@ public class ClientBackend {
 
     /**
      * Creates a new thread which connects the KMes Server on port {@value PORT}
-     * with the address {@value HOST} listens for server inputs and handles them.
+     * with the address {@value SERVER_IP} listens for server inputs and handles them.
      * Method ends if the thread is closed
      *
      * @see java.net.ServerSocket
@@ -151,7 +151,7 @@ public class ClientBackend {
                 {
                     // Connects to the KMes Server and iniitializes attributes for communication
                     server = new Socket();
-                    server.connect(new InetSocketAddress(HOST, PORT), 4000);
+                    server.connect(new InetSocketAddress(SERVER_IP, PORT), 4000);
                     outStream = new DataOutputStream(server.getOutputStream());
                     inStream = new DataInputStream(server.getInputStream());
 

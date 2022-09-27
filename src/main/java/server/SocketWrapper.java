@@ -16,7 +16,7 @@ import java.security.InvalidKeyException;
 /**
  * This class wraps a {@link Socket} and provides read, write, etc. methods
  *
- * @version v3.0.0 | last edit: 18.09.2022
+ * @version stabel-1.0.0 | last edit: 18.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketWrapper {

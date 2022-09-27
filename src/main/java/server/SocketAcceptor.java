@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Thread accepting new clients connecting to the KMes Server
  *
- * @version v3.0.0 | last edit: 18.09.2022
+ * @version stabel-1.0.0 | last edit: 18.09.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
