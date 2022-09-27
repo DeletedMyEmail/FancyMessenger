@@ -158,8 +158,8 @@ class InputHandler extends Thread {
                     byte[] lSalt = EncryptionUtils.generateSalt();
                     String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
                     sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
-                    client.writeAES("loggedIn;;"+pUsername);
                     changeBindingWithCurrentUser();
+                    client.writeAES("loggedIn;;"+pUsername);
                     sendQueuedMessages();
                 }
                 catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {

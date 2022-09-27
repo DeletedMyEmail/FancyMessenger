@@ -21,7 +21,7 @@
     <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:win:18.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-swing:18.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-swing:win:18.0.2" level="project" />
-    <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.39.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.39.3.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.9.0" level="project" />
