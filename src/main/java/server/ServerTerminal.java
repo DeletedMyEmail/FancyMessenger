@@ -66,7 +66,7 @@ public class ServerTerminal {
                         System.out.println("The established connections are still alive but new sockets won't be able to connect anymore");
                     }
                     case "getport" -> System.out.println(port);
-                    default -> System.out.println("Command not found\nTry dcs help");
+                    default -> System.out.println("Command not found\nTry help");
                 }
             } catch (IOException e) {
                 System.out.println("Error occured:\n" + e.getMessage());
