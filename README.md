@@ -16,9 +16,13 @@ The following things were important to me:
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Execute the main method of [SocketAcceptor](src/main/java/server/SocketAcceptor.java) to start the server (default port 4242) and the one of [Main](src/main/java/client/Main.java) to create a client instance.
+Download and run the [server jar](out/artifacts/KMesReworkServer_stable_1_0_2_jar/KMesServer_stable-1.0.2.jar) if port 4242 is suitable for your server.
+Otherwise, compile the [SocketAcceptor](src/main/java/server/SocketAcceptor.java) yourself.
 
-Note that the default server ip in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **134.122.74.216** and the default port is **4242**.
+Running a client is equaly simple. If you want to use the default server just run the [client jar](out/artifacts/KMesReworkClient_stable_1_0_2_jar/KMesClient_stable-1.0.2.jar).
+If you want to use a differen self-hosted server define port and ip in [ClientBackend](src/main/java/client/ClientBackend.java).
+
+**Note:** the default server ip in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **134.122.74.216** and the default port is **4242**.
 
 https://user-images.githubusercontent.com/88390464/189905622-2bff0615-a9ca-40bd-abb1-c13f890c0eba.mp4
 

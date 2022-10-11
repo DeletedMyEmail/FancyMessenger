@@ -34,7 +34,7 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version stabel-1.0.1 | last edit: 27.09.2022
+ * @version stabel-1.0.2 | last edit: 11.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -42,7 +42,7 @@ public class ClientBackend {
     // KMes Server Hostname/IP
     private static final String SERVER_IP = "134.122.74.216";
 
-    // Port of the KMes Server which accepts clients
+    // Port of the KMes Server listening for clients
     private static final int PORT = 4242;
 
     private final EncryptionUtils encryptionUtils;
@@ -66,26 +66,10 @@ public class ClientBackend {
         encryptionUtils = new EncryptionUtils();
         try {
             sqlUtils = new SQLUtils("src/main/resources/kmes_client.db");
+            createTables();
         } catch (SQLException sqlEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
         }
-    }
-
-    /**
-     * @return Returns the username of the current user or an empty string if not logged in.
-     * */
-    protected String getUsername() { return currentUser; }
-
-    public void requestLogout() throws IOException {
-        sendToServer("logout");
-    }
-
-    /**
-     * @return Returns the connection status to the KMes Server
-     * */
-    protected boolean isConnected()
-    {
-        return server != null && !server.isClosed();
     }
 
     /**
@@ -390,4 +374,54 @@ public class ClientBackend {
             }
         }
     }
+
+    private void createTables() throws SQLException
+    {
+        sqlUtils.onExecute("""
+                    create table if not exists Contact
+                    (
+                        ContactName TEXT not null,
+                        AccountName TEXT not null,
+                        ContactID   INTEGER
+                            primary key
+                    );
+                """);
+        sqlUtils.onExecute("""
+                    create table if not exists Message
+                    (
+                        MessageID INTEGER not null
+                            primary key,
+                        Extention TEXT,
+                        Content   BLOB    not null
+                    );
+                """);
+        sqlUtils.onExecute("""
+                    create table if not exists MessageToContact
+                    (
+                        ContactID      INTEGER
+                            references Contact,
+                        MessageID      INTEGER
+                            references Message,
+                        SentOrReceived TEXT,
+                        primary key (ContactID, MessageID)
+                    );
+                """);
+    };
+
+    public void requestLogout() throws IOException {
+        sendToServer("logout");
+    }
+
+    /**
+     * @return Returns the connection status to the KMes Server
+     * */
+    protected boolean isConnected()
+    {
+        return server != null && !server.isClosed();
+    }
+
+    /**
+     * @return Returns the username of the current user or an empty string if not logged in.
+     * */
+    protected String getUsername() { return currentUser; }
 }

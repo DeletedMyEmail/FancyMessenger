@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Thread accepting new clients connecting to the KMes Server
  *
- * @version stabel-1.0.1 | last edit: 27.09.2022
+ * @version stabel-1.0.2 | last edit: 11.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
@@ -43,6 +43,14 @@ class SocketAcceptor extends Thread {
         serverSocket = new ServerSocket(PORT);
         encryptionUtils = new EncryptionUtils();
         sqlUtils = new SQLUtils("src/main/resources/kmes_server.db");
+        sqlUtils.onExecute("""
+                CREATE TABLE IF NOT EXISTS User
+                (
+                    username TEXT primary key,
+                    hashedPassword TEXT,
+                    salt BLOB
+                );
+                """);
     }
 
     /**
@@ -52,6 +60,7 @@ class SocketAcceptor extends Thread {
     public void run()
     {
         running = true;
+        System.out.println("Server is now listening for clients on port "+PORT);
         while (running)
         {
             try
@@ -111,6 +120,6 @@ class SocketAcceptor extends Thread {
     }
 
     public static void main(String[] args) throws SQLException, IOException {
-        new SocketAcceptor().run();
+        new SocketAcceptor().start();
     }
 }
