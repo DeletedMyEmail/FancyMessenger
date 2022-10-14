@@ -6,21 +6,25 @@ import KLibrary.Utils.SQLUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.SocketTimeoutException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * this class processes the requests of a client socket in a new thread
  *
- * @version stabel-1.0.1 | last edit: 27.09.2022
+ * @version stabel-1.0.3 | last edit: 14.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  *
  * @see SocketWrapper
@@ -28,8 +32,9 @@ import java.util.List;
 class InputHandler extends Thread {
 
     private final SQLUtils sqlUtils;
+    private final EncryptionUtils encryptionUtils;
     private final SocketWrapper client;
-    private final HashMap<String, SocketWrapper> allConnectedClients;
+    private final HashMap<String, InputHandler> allConnectedClients;
     private final HashMap<String, List<String>> queuedMessages;
 
     private String currentUser;
@@ -44,12 +49,26 @@ class InputHandler extends Thread {
      *
      * @see SocketAcceptor
      * */
-    public InputHandler(SocketWrapper pClient, HashMap<String, SocketWrapper> pAllConnectedClients, HashMap<String, List<String>> pQueuedMessages, SQLUtils pSqlUtiils) throws SQLException {
+    public InputHandler(SocketWrapper pClient, HashMap<String, InputHandler> pAllConnectedClients, HashMap<String, List<String>> pQueuedMessages, SQLUtils pSQLUtiils, EncryptionUtils pEncryptionUtils) throws SQLException {
         this.allConnectedClients = pAllConnectedClients;
         this.queuedMessages = pQueuedMessages;
-        this.sqlUtils = pSqlUtiils;
+        this.sqlUtils = pSQLUtiils;
+        this.encryptionUtils = pEncryptionUtils;
         this.client = pClient;
         this.currentUser = "";
+
+        try
+        {
+            if (!keyHandshake()) {
+                client.close();
+                running = false;
+            }
+            else
+                running = true;
+        }
+        catch (IOException e) {
+            running = false;
+        }
     }
 
     /**
@@ -62,8 +81,8 @@ class InputHandler extends Thread {
      *  requests
      * */
     @Override
-    public void run() {
-        running = true;
+    public void run()
+    {
         while (running)
         {
             if (client.isClosed()) {
@@ -73,20 +92,13 @@ class InputHandler extends Thread {
 
             try
             {
-                String lInput = client.readAES();
-
-                String[] lRequest = lInput.split(";;");
+                String[] lRequest = client.readAES().split(";;");
                 switch (lRequest[0])
                 {
                     case "login" -> handleLoginRequest(lRequest[1], lRequest[2]);
                     case "register" -> handleRegistrationRequest(lRequest[1], lRequest[2]);
                     case "send" -> handleSendRequest(lRequest[1], lRequest[2]);
-                    case "logout" ->
-                            {
-                                currentUser = "";
-                                allConnectedClients.remove(currentUser);
-                                client.writeAES("loggedOut");
-                            }
+                    case "logout" -> logout();
                     case "doesUserExist" ->
                             {
                                 String lUsername = lRequest[1];
@@ -131,13 +143,12 @@ class InputHandler extends Thread {
             client.writeAES("error;;You have to be logged in before sending messages;;Couldn't send message");
         else
         {
-            SocketWrapper lReceiverWrapper = getWrapper(pReveiver);
-            if (lReceiverWrapper == null) queueMessage(pReveiver, pMessage);
+            InputHandler lReceiverWrapper = allConnectedClients.get(pReveiver);
+            if (lReceiverWrapper == null)
+                queueMessage(pReveiver, pMessage);
             else
-            {
-                lReceiverWrapper.writeAES("message;;"+
-                        currentUser+";;"+pMessage);
-            }
+                lReceiverWrapper.getClient().writeAES("message;;" +
+                        currentUser + ";;" + pMessage);
         }
     }
 
@@ -160,6 +171,8 @@ class InputHandler extends Thread {
                     byte[] lSalt = EncryptionUtils.generateSalt();
                     String lHashedPassword = EncryptionUtils.getHash(pPassword, lSalt);
                     sqlUtils.onExecute("INSERT INTO User VALUES(?, ?, ?)", pUsername, lHashedPassword, lSalt);
+
+                    currentUser = pUsername;
                     changeBindingWithCurrentUser();
                     client.writeAES("loggedIn;;"+pUsername);
                     sendQueuedMessages();
@@ -220,8 +233,8 @@ class InputHandler extends Thread {
     private void sendQueuedMessages() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, IOException, BadPaddingException, InvalidKeyException {
         List<String> lMessages = queuedMessages.get(currentUser);
         if (lMessages == null) return;
-        while (lMessages.size() != 0) {
-            System.out.println(lMessages.size());
+        while (lMessages.size() != 0)
+        {
             client.writeAES("message;;"+lMessages.get(0));
             lMessages.remove(0);
         }
@@ -261,7 +274,6 @@ class InputHandler extends Thread {
                 return EncryptionUtils.validate(pPassword, lResultSet.getString("hashedPassword"), pSalt);
             }
             return false;
-
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -290,20 +302,60 @@ class InputHandler extends Thread {
      * */
     private void changeBindingWithCurrentUser()
     {
-        SocketWrapper lCurrentBindedWrapperToThisUsername = allConnectedClients.get(currentUser);
-        if (lCurrentBindedWrapperToThisUsername != null) {
+        InputHandler lCurrentBindedWrapperToThisUsername = allConnectedClients.get(currentUser);
+        if (lCurrentBindedWrapperToThisUsername != null)
+        {
             try {
-                lCurrentBindedWrapperToThisUsername.writeAES("loggedOut");
+                lCurrentBindedWrapperToThisUsername.logout();
             }
-            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {ignored.printStackTrace();}
+            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {}
         }
-        allConnectedClients.put(currentUser, client);
+        allConnectedClients.put(currentUser, this);
     }
 
-    /**
-     * @return {@link SocketWrapper} for a specific user
-     * */
-    private SocketWrapper getWrapper(String pUsername) { return allConnectedClients.get(pUsername); }
+    private boolean keyHandshake() throws IOException
+    {
+        try
+        {
+            byte[] lInput = new byte[294];
+            client.getInStream().read(lInput);
+
+            // Key handshake
+
+            PublicKey lForeignPubKey = EncryptionUtils.decodeRSAKey(lInput);
+            if (lForeignPubKey == null) {
+                return false;
+            }
+
+            byte[] lEncodedOwnKey = encryptionUtils.getPublicKey().getEncoded();
+            client.writeUnencrypted(lEncodedOwnKey);
+
+            lInput = new byte[128];
+            client.getInStream().read(lInput);
+            SecretKey lSocketsAESKey = EncryptionUtils.decodeAESKey(
+                    encryptionUtils.decryptRSAToBytes(lInput));
+
+            client.setAESKey(lSocketsAESKey);
+
+            return true;
+        }
+        catch (NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException |
+               InvalidKeySpecException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public void logout() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException
+    {
+        allConnectedClients.remove(currentUser);
+        currentUser = "";
+        client.writeAES("loggedOut");
+    }
+
+    public SocketWrapper getClient() {return client;}
+
+    public String getUser() {return currentUser;}
 
     public void stopListening() {running=false;}
 }

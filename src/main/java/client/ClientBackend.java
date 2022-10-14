@@ -34,13 +34,13 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version stabel-1.0.2 | last edit: 11.10.2022
+ * @version stabel-1.0.3 | last edit: 14.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
 
     // KMes Server Hostname/IP
-    private static final String SERVER_IP = "134.122.74.216";
+    private static final String SERVER_IP = "localhost";
 
     // Port of the KMes Server listening for clients
     private static final int PORT = 4242;
@@ -62,7 +62,8 @@ public class ClientBackend {
      * @see EncryptionUtils
      * @see SQLUtils
      * */
-    public ClientBackend() {
+    public ClientBackend()
+    {
         encryptionUtils = new EncryptionUtils();
         try {
             sqlUtils = new SQLUtils("src/main/resources/kmes_client.db");
@@ -77,7 +78,8 @@ public class ClientBackend {
      *
      * @param pUsername Username of the new logged-in user
      * */
-    private void updateCurrentUser(String pUsername) {
+    private void updateCurrentUser(String pUsername)
+    {
         currentUser = pUsername;
         SceneManager.getSettingsScene().changeUsernameText(currentUser);
         SceneManager.switchToSettingsScene();
@@ -109,8 +111,8 @@ public class ClientBackend {
                     "INSERT INTO Message (Content,Extention) VALUES(?,?);",
                     lMessage, lFileExtention.name());
             sqlUtils.onExecute(
-                    "INSERT INTO MessageToContact VALUES( " +
-                            "(SELECT ContactID FROM Contact WHERE ContactName= ? AND AccountName= ? ), " +
+                    "INSERT INTO MessageToContact VALUES(" +
+                            "(SELECT ContactID FROM Contact WHERE ContactName = ? AND AccountName = ? )," +
                             "(SELECT max(MessageID) FROM Message), ?);",
                     pContactName, currentUser, pReceived
             );
@@ -145,7 +147,6 @@ public class ClientBackend {
                     while (isConnected())
                     {
                         String[] lInput = readFromServer().split(";;");
-
                         switch (lInput[0]) {
                             case "loggedIn" -> {
                                 updateCurrentUser(lInput[1]);
@@ -268,10 +269,12 @@ public class ClientBackend {
      * Sends public RSA key to the server and receives the server's public RSA key.
      * Uses private key to decrypt the new AES key which has been encrypted with the client's public key.
      * */
-    private void establishEncryption() throws IOException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    private void establishEncryption() throws IOException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException
+    {
         // RSA
         outStream.write(encryptionUtils.getPublicKey().getEncoded());
         byte[] lKeyBytes = new byte[294];
+
         inStream.read(lKeyBytes);
         PublicKey lServerRSAKey = EncryptionUtils.decodeRSAKey(lKeyBytes);
 

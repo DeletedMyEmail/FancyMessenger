@@ -4,15 +4,8 @@ package server;
 import KLibrary.Utils.EncryptionUtils;
 import KLibrary.Utils.SQLUtils;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.security.InvalidKeyException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +21,7 @@ class SocketAcceptor extends Thread {
 
     public static final int PORT = 4242;
 
-    private final HashMap<String, SocketWrapper> clients;
+    private final HashMap<String, InputHandler> clients;
     private final HashMap<String, List<String>> queuedMessages;
     private final ServerSocket serverSocket;
 
@@ -72,52 +65,17 @@ class SocketAcceptor extends Thread {
                     break;
                 }
 
-                byte[] lInput = new byte[294];
-                lNewSocket.getInStream().read(lInput);
-
-                // Key handshake
-
-                PublicKey lForeignPubKey = EncryptionUtils.decodeRSAKey(lInput);
-                if (lForeignPubKey == null)  {
-                    lNewSocket.close();
-                    continue;
-                }
-
-                byte[] lEncodedOwnKey = encryptionUtils.getPublicKey().getEncoded();
-                lNewSocket.writeUnencrypted(lEncodedOwnKey);
-
-                lInput = new byte[128];
-                lNewSocket.getInStream().read(lInput);
-                SecretKey lSocketsAESKey = EncryptionUtils.decodeAESKey(
-                        encryptionUtils.decryptRSAToBytes(lInput));
-
-                lNewSocket.setAESKey(lSocketsAESKey);
-
-                lNewSocket.getSocket().setSoTimeout(0);
-
-                new InputHandler(lNewSocket, clients, queuedMessages, sqlUtils).start();
+                new InputHandler(lNewSocket, clients, queuedMessages, sqlUtils, encryptionUtils).start();
                 System.out.println("Client socket accepted");
 
             }
-            catch (IOException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | SQLException e) {
+            catch (IOException | SQLException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    protected void closeSocket(String pUsername) {
-        if (clients.get(pUsername) != null) clients.get(pUsername).close();
-        clients.remove(pUsername);
-    }
-
     protected void stopAcceptingSockets() { running = false; }
-
-    protected void close()
-    {
-        running = false;
-        clients.forEach((username, socketWrapper) -> socketWrapper.close());
-        clients.clear();
-    }
 
     public static void main(String[] args) throws SQLException, IOException {
         new SocketAcceptor().start();
