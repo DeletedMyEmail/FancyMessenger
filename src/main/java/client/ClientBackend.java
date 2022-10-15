@@ -34,13 +34,13 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version stabel-1.0.3 | last edit: 14.10.2022
+ * @version stabel-1.0.3 | last edit: 15.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
 
     // KMes Server Hostname/IP
-    private static final String SERVER_IP = "localhost";
+    private static final String SERVER_IP = "134.122.74.216";
 
     // Port of the KMes Server listening for clients
     private static final int PORT = 4242;
