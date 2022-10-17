@@ -55,7 +55,14 @@ class InputHandler extends Thread {
         this.sqlUtils = pSQLUtiils;
         this.encryptionUtils = pEncryptionUtils;
         this.client = pClient;
-        this.currentUser = "";
+
+        ResultSet lRs = sqlUtils.onQuery("SELECT username FROM Session WHERE ip = ?", pClient.getSocket().getInetAddress().getAddress());
+        lRs.next();
+        if (!lRs.isClosed())
+            this.currentUser = lRs.getString("username");
+        else
+            this.currentUser = "";
+
 
         try
         {
@@ -308,7 +315,8 @@ class InputHandler extends Thread {
             try {
                 lCurrentBindedWrapperToThisUsername.logout();
             }
-            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {}
+            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException |
+                   InvalidKeyException | SQLException ignored) {}
         }
         allConnectedClients.put(currentUser, this);
     }
@@ -346,11 +354,23 @@ class InputHandler extends Thread {
         }
     }
 
-    public void logout() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException
-    {
+    public void logout() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException, SQLException {
         allConnectedClients.remove(currentUser);
         currentUser = "";
+        sqlUtils.onExecute("DELETE FROM Session WHERE ip = ?", client.getSocket().getInetAddress().getAddress());
         client.writeAES("loggedOut");
+    }
+
+    private void addSession() throws SQLException
+    {
+        if (currentUser.isEmpty()) return;
+
+        ResultSet lRs = sqlUtils.onQuery("SELECT username FROM Session WHERE ip = ?", client.getSocket().getInetAddress().getAddress());
+        lRs.next();
+        if (lRs.isClosed())
+            sqlUtils.onExecute("INSERT INTO Session VALUES (?,?)", client.getSocket().getInetAddress().getAddress(), currentUser);
+        else
+            sqlUtils.onExecute("UPDATE Session SET username = ? WHERE ip = ?", currentUser, client.getSocket().getInetAddress().getAddress());
     }
 
     public SocketWrapper getClient() {return client;}

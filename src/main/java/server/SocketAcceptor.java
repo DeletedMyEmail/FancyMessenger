@@ -44,6 +44,14 @@ class SocketAcceptor extends Thread {
                     salt BLOB
                 );
                 """);
+        sqlUtils.onExecute("""
+                CREATE TABLE "Session" (
+                	"username"	TEXT,
+                	"ip" BLOB,
+                	FOREIGN KEY("username") REFERENCES "User"("username"),
+                	PRIMARY KEY("ip")
+                );
+                """);
     }
 
     /**
