@@ -66,7 +66,7 @@ public class ClientBackend {
     {
         encryptionUtils = new EncryptionUtils();
         try {
-            sqlUtils = new SQLUtils("src/main/resources/kmes_client.db");
+            sqlUtils = new SQLUtils("kmes_client.db");
             createTables();
         } catch (SQLException sqlEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
