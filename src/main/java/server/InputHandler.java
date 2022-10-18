@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * this class processes the requests of a client socket in a new thread
  *
- * @version stabel-1.0.3 | last edit: 14.10.2022
+ * @version stabel-1.0.4 | last edit: 18.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  *
  * @see SocketWrapper
@@ -36,6 +36,8 @@ class InputHandler extends Thread {
     private final SocketWrapper client;
     private final HashMap<String, InputHandler> allConnectedClients;
     private final HashMap<String, List<String>> queuedMessages;
+
+    private final byte[] clientsIp;
 
     private String currentUser;
     private boolean running;
@@ -55,19 +57,32 @@ class InputHandler extends Thread {
         this.sqlUtils = pSQLUtiils;
         this.encryptionUtils = pEncryptionUtils;
         this.client = pClient;
-        this.currentUser = "";
+        this.clientsIp = client.getSocket().getInetAddress().getAddress();
 
         try
         {
-            if (!keyHandshake()) {
+            if (keyHandshake()) {
+                running = true;
+                ResultSet lRs = sqlUtils.onQuery("SELECT username FROM Session WHERE ip = ?", clientsIp);
+                if (!lRs.isClosed()) {
+                    lRs.next();
+                    this.currentUser = lRs.getString("username");
+                    client.writeAES("loggedIn;;"+currentUser);
+                }
+                else
+                    this.currentUser = "";
+
+            }
+            else
+            {
                 client.close();
                 running = false;
             }
-            else
-                running = true;
         }
-        catch (IOException e) {
+        catch (IOException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException |
+               InvalidKeyException e) {
             running = false;
+            System.out.println("Client socket disconnected");
         }
     }
 
@@ -124,7 +139,8 @@ class InputHandler extends Thread {
                 allConnectedClients.remove(currentUser);
                 client.close();
                 running = false;
-                break;
+                ex.printStackTrace();
+                System.out.println("Client socket disconnected");
             }
 
         }
@@ -174,6 +190,7 @@ class InputHandler extends Thread {
 
                     currentUser = pUsername;
                     changeBindingWithCurrentUser();
+                    addSession();
                     client.writeAES("loggedIn;;"+pUsername);
                     sendQueuedMessages();
                 }
@@ -194,19 +211,20 @@ class InputHandler extends Thread {
      * @param pUsername Username
      * @param pPassword User's password
      * */
-    private void handleLoginRequest(String pUsername, String pPassword) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-        byte[] lSalt;
-        try {
-            lSalt = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername).getBytes(1);
-        } catch (SQLException sqlEx) {
+    private void handleLoginRequest(String pUsername, String pPassword) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, SQLException {
+        ResultSet lRs = sqlUtils.onQuery("SELECT salt FROM User WHERE username=?", pUsername);
+        if (lRs.isClosed()) {
             client.writeAES("error;;User not found;;Login failed");
             return;
         }
+        lRs.next();
+        byte[] lSalt = lRs.getBytes("salt");
 
         if (verifyLogin(pUsername, pPassword, lSalt))
         {
             currentUser = pUsername;
             changeBindingWithCurrentUser();
+            addSession();
             client.writeAES("loggedIn;;"+pUsername);
             sendQueuedMessages();
         }
@@ -308,7 +326,8 @@ class InputHandler extends Thread {
             try {
                 lCurrentBindedWrapperToThisUsername.logout();
             }
-            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException ignored) {}
+            catch (InvalidAlgorithmParameterException | IOException | IllegalBlockSizeException | BadPaddingException |
+                   InvalidKeyException | SQLException ignored) {}
         }
         allConnectedClients.put(currentUser, this);
     }
@@ -346,11 +365,23 @@ class InputHandler extends Thread {
         }
     }
 
-    public void logout() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException
-    {
+    public void logout() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException, SQLException {
         allConnectedClients.remove(currentUser);
         currentUser = "";
+        sqlUtils.onExecute("DELETE FROM Session WHERE ip = ?", clientsIp);
         client.writeAES("loggedOut");
+    }
+
+    private void addSession() throws SQLException
+    {
+        if (currentUser.isEmpty()) return;
+
+        ResultSet lRs = sqlUtils.onQuery("SELECT username FROM Session WHERE ip = ?", clientsIp);
+        lRs.next();
+        if (lRs.isClosed())
+            sqlUtils.onExecute("INSERT INTO Session VALUES (?,?)", clientsIp, currentUser);
+        else
+            sqlUtils.onExecute("UPDATE Session SET username = ? WHERE ip = ?", currentUser, clientsIp);
     }
 
     public SocketWrapper getClient() {return client;}

@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Class which contains and handles everything in conjunction with stages and scene switches for the GUI
  *
- * @version v2.0.2 | last edit: 31.08.2022
+ * @version stabel-1.0.4 | last edit: 18.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class SceneManager extends Application {
@@ -169,14 +169,14 @@ public class SceneManager extends Application {
         try
         {
             backend = new ClientBackend();
-            backend.listenForServerInput();
-
             stage = pStage;
             setScenes();
             stage.setScene(homeScene);
             stage.setResizable(false);
             stage.getIcons().add(new Image(SceneManager.class.getResourceAsStream("/images/logo.png")));
             stage.show();
+
+            backend.listenForServerInput();
         }
         catch (Exception ex) { ex.printStackTrace();}
     }
