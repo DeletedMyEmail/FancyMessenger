@@ -1,4 +1,4 @@
-# KMesRework
+# KMesRework 
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -16,19 +16,12 @@ The following things were important to me:
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Download and run the [server jar](out/artifacts/KMesReworkServer_stable_1_0_3_jar/KMesReworkServer_stable-1.0.3.jar) if port 4242 is suitable for your server.
+Download and run the [server jar](out/artifacts/KMesReworkClient_stable_1_0_4_jar/KMesReworkClient_stable-1.0.4.jar) if port 4242 is suitable for your server.
 Otherwise, compile the [SocketAcceptor](src/main/java/server/SocketAcceptor.java) yourself.
 
-Running a client is equaly simple. If you want to use the default server just run the [client jar](out/artifacts/KMesReworkClient_stable_1_0_3_jar/KMesReworkClient_stable-1.0.3.jar).
+Running a client is equaly simple. If you want to use the default server just run the [client jar](out/artifacts/KMesReworkServer_stable_1_0_4_jar/KMesReworkServer_stable-1.0.4.jar).
 If you want to use a differen self-hosted server define port and ip in [ClientBackend](src/main/java/client/ClientBackend.java).
 
 **Note:** the default server ip in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **134.122.74.216** and the default port is **4242**.
 
 https://user-images.githubusercontent.com/88390464/189905622-2bff0615-a9ca-40bd-abb1-c13f890c0eba.mp4
-
-## Recent Changes
-
-- Changed server structure to improve performance
-- Deleted debug methods
-- Added comments
-- Specify a port on server start
