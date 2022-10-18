@@ -40,7 +40,7 @@ import javax.imageio.ImageIO;
 public class ClientBackend {
 
     // KMes Server Hostname/IP
-    private static final String SERVER_IP = "134.122.74.216";
+    private static final String SERVER_IP = "localhost";
 
     // Port of the KMes Server listening for clients
     private static final int PORT = 4242;
@@ -80,9 +80,10 @@ public class ClientBackend {
      * */
     private void updateCurrentUser(String pUsername)
     {
+        SceneManager.getSettingsScene().changeUsernameText(pUsername);
+        if (!currentUser.isEmpty())
+            SceneManager.switchToSettingsScene();
         currentUser = pUsername;
-        SceneManager.getSettingsScene().changeUsernameText(currentUser);
-        SceneManager.switchToSettingsScene();
     }
 
     /**

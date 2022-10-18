@@ -45,9 +45,9 @@ class SocketAcceptor extends Thread {
                 );
                 """);
         sqlUtils.onExecute("""
-                CREATE TABLE "Session" (
-                	"username"	TEXT,
-                	"ip" BLOB,
+                CREATE TABLE IF NOT EXISTS Session (
+                	ip BLOB,
+                	username TEXT,
                 	FOREIGN KEY("username") REFERENCES "User"("username"),
                 	PRIMARY KEY("ip")
                 );

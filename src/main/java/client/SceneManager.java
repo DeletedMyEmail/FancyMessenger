@@ -169,14 +169,14 @@ public class SceneManager extends Application {
         try
         {
             backend = new ClientBackend();
-            backend.listenForServerInput();
-
             stage = pStage;
             setScenes();
             stage.setScene(homeScene);
             stage.setResizable(false);
             stage.getIcons().add(new Image(SceneManager.class.getResourceAsStream("/images/logo.png")));
             stage.show();
+
+            backend.listenForServerInput();
         }
         catch (Exception ex) { ex.printStackTrace();}
     }
