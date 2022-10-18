@@ -140,10 +140,9 @@ public class ClientBackend {
      * */
     private void updateCurrentUser(String pUsername)
     {
-        SceneManager.getSettingsScene().changeUsernameText(pUsername);
-        if (!currentUser.isEmpty())
-            SceneManager.switchToSettingsScene();
         currentUser = pUsername;
+        SceneManager.getSettingsScene().changeUsernameText(currentUser);
+        SceneManager.switchToSettingsScene();
     }
 
     /**
