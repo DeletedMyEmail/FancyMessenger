@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * this class processes the requests of a client socket in a new thread
  *
- * @version stabel-1.0.3 | last edit: 14.10.2022
+ * @version stabel-1.0.4 | last edit: 18.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  *
  * @see SocketWrapper
