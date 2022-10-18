@@ -35,7 +35,7 @@ class SocketAcceptor extends Thread {
         queuedMessages = new HashMap<>();
         serverSocket = new ServerSocket(PORT);
         encryptionUtils = new EncryptionUtils();
-        sqlUtils = new SQLUtils("kmes_server.db");
+        sqlUtils = new SQLUtils("src/main/resources/client/kmes_server.db");
         sqlUtils.onExecute("""
                 CREATE TABLE IF NOT EXISTS User
                 (

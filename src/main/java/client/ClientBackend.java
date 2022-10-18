@@ -40,7 +40,7 @@ import javax.imageio.ImageIO;
 public class ClientBackend {
 
     // KMes Server Hostname/IP
-    private static final String SERVER_IP = "localhost";
+    private static final String SERVER_IP = "134.122.74.216";
 
     // Port of the KMes Server listening for clients
     private static final int PORT = 4242;
@@ -66,59 +66,10 @@ public class ClientBackend {
     {
         encryptionUtils = new EncryptionUtils();
         try {
-            sqlUtils = new SQLUtils("kmes_client.db");
+            sqlUtils = new SQLUtils("src/main/resources/client/kmes_client.db");
             createTables();
         } catch (SQLException sqlEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
-        }
-    }
-
-    /**
-     * Updates the current user, the GUI and loads the account settings scene
-     *
-     * @param pUsername Username of the new logged-in user
-     * */
-    private void updateCurrentUser(String pUsername)
-    {
-        SceneManager.getSettingsScene().changeUsernameText(pUsername);
-        if (!currentUser.isEmpty())
-            SceneManager.switchToSettingsScene();
-        currentUser = pUsername;
-    }
-
-    /**
-     * Adds a new message to the list of messages with a specific user.
-     * If there is no such list in the HashMap in conjunction with this user, a new one will be added and displayed.
-     *
-     * @param pContactName Name of the user who sent/received this message
-     * @param pContent Message content
-     * */
-    protected void addNewMessage(String pContactName, String pContent, boolean pReceived) {
-        String lMessage = pContent;
-        Extention lFileExtention = Extention.NONE;
-        if (pContent.startsWith("[file]")) {
-            int lLastBracket = pContent.indexOf(']', 6);
-            lFileExtention = Extention.valueOf(pContent.substring(7,lLastBracket).toUpperCase());
-            lMessage = lMessage.substring(lLastBracket+1);
-        }
-
-        insertContact(pContactName);
-        SceneManager.getHomeScene().showNewContact(pContactName);
-        SceneManager.getHomeScene().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
-        SceneManager.getHomeScene().showNotification(pContactName);
-
-        try {
-            sqlUtils.onExecute(
-                    "INSERT INTO Message (Content,Extention) VALUES(?,?);",
-                    lMessage, lFileExtention.name());
-            sqlUtils.onExecute(
-                    "INSERT INTO MessageToContact VALUES(" +
-                            "(SELECT ContactID FROM Contact WHERE ContactName = ? AND AccountName = ? )," +
-                            "(SELECT max(MessageID) FROM Message), ?);",
-                    pContactName, currentUser, pReceived
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -180,6 +131,55 @@ public class ClientBackend {
             }
         }).start();
 
+    }
+
+    /**
+     * Updates the current user, the GUI and loads the account settings scene
+     *
+     * @param pUsername Username of the new logged-in user
+     * */
+    private void updateCurrentUser(String pUsername)
+    {
+        SceneManager.getSettingsScene().changeUsernameText(pUsername);
+        if (!currentUser.isEmpty())
+            SceneManager.switchToSettingsScene();
+        currentUser = pUsername;
+    }
+
+    /**
+     * Adds a new message to the list of messages with a specific user.
+     * If there is no such list in the HashMap in conjunction with this user, a new one will be added and displayed.
+     *
+     * @param pContactName Name of the user who sent/received this message
+     * @param pContent Message content
+     * */
+    protected void addNewMessage(String pContactName, String pContent, boolean pReceived) {
+        String lMessage = pContent;
+        Extention lFileExtention = Extention.NONE;
+        if (pContent.startsWith("[file]")) {
+            int lLastBracket = pContent.indexOf(']', 6);
+            lFileExtention = Extention.valueOf(pContent.substring(7,lLastBracket).toUpperCase());
+            lMessage = lMessage.substring(lLastBracket+1);
+        }
+
+        insertContact(pContactName);
+        SceneManager.getHomeScene().showNewContact(pContactName);
+        SceneManager.getHomeScene().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
+        SceneManager.getHomeScene().showNotification(pContactName);
+
+        try {
+            sqlUtils.onExecute(
+                    "INSERT INTO Message (Content,Extention) VALUES(?,?);",
+                    lMessage, lFileExtention.name());
+            sqlUtils.onExecute(
+                    "INSERT INTO MessageToContact VALUES(" +
+                            "(SELECT ContactID FROM Contact WHERE ContactName = ? AND AccountName = ? )," +
+                            "(SELECT max(MessageID) FROM Message), ?);",
+                    pContactName, currentUser, pReceived
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
