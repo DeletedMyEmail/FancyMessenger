@@ -34,7 +34,7 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version stabel-1.0.4 | last edit: 18.10.2022
+ * @version stabel-1.0.5 | last edit: 18.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {

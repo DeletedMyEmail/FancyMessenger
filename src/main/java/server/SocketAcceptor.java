@@ -14,12 +14,10 @@ import java.util.List;
 /**
  * Thread accepting new clients connecting to the KMes Server
  *
- * @version stabel-1.0.4 | last edit: 18.10.2022
+ * @version stabel-1.0.5 | last edit: 21.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
-
-    public static final int PORT = 4242;
 
     private final HashMap<String, InputHandler> clients;
     private final HashMap<String, List<String>> queuedMessages;
@@ -30,12 +28,12 @@ class SocketAcceptor extends Thread {
     private final SQLUtils sqlUtils;
     private boolean running;
 
-    protected SocketAcceptor() throws IOException, SQLException {
+    protected SocketAcceptor(int pPort) throws IOException, SQLException {
         clients = new HashMap<>();
         queuedMessages = new HashMap<>();
-        serverSocket = new ServerSocket(PORT);
+        serverSocket = new ServerSocket(pPort);
         encryptionUtils = new EncryptionUtils();
-        sqlUtils = new SQLUtils("src/main/resources/client/kmes_server.db");
+        sqlUtils = new SQLUtils("src/main/resources/server/kmes_server.db");
         sqlUtils.onExecute("""
                 CREATE TABLE IF NOT EXISTS User
                 (
@@ -61,7 +59,7 @@ class SocketAcceptor extends Thread {
     public void run()
     {
         running = true;
-        System.out.println("Server is now listening for clients on port "+PORT);
+        System.out.println("Server is now listening for clients on port "+serverSocket.getLocalPort());
         while (running)
         {
             try
@@ -86,6 +84,17 @@ class SocketAcceptor extends Thread {
     protected void stopAcceptingSockets() { running = false; }
 
     public static void main(String[] args) throws SQLException, IOException {
-        new SocketAcceptor().start();
+        int lPort = 4242;
+        if (args.length  > 0)
+        {
+            try {
+                lPort = Integer.parseInt(args[0]);
+            }
+            catch (NumberFormatException ex) {
+                System.out.println("Invalid port");
+                System.exit(0);
+            }
+        }
+        new SocketAcceptor(lPort).start();
     }
 }
