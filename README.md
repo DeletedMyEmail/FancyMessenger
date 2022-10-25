@@ -16,6 +16,9 @@ The following things were important to me:
 <!-- GETTING STARTED -->
 ## Getting Started
 
+Last stable version: **1.0.5**
+Last snapshot: //
+
 Download and run the [server jar](out/artifacts/KMesReworkClient/KMesReworkClient_stable-1.0.5.jar) using ```java -jar KMesReworkClient_stable-x.y.z.jar PortOnWhichTheServerRuns &```.
 
 Running a client is equaly simple. If you want to use the default server just run the [client jar](out/artifacts/KMesReworkClient/KMesReworkClient_stable-1.0.5.jar).
