@@ -1,8 +1,8 @@
 package server;
 
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
-import KLibrary.Utils.EncryptionUtils;
-import KLibrary.Utils.SQLUtils;
+import KLibrary.utils.EncryptionUtils;
+import KLibrary.utils.SQLUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;

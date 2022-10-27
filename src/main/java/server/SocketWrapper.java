@@ -1,7 +1,7 @@
 package server;
 
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
-import KLibrary.Utils.EncryptionUtils;
+import KLibrary.utils.EncryptionUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;

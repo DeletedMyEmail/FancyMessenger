@@ -4,13 +4,17 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.VBox;
@@ -30,10 +34,10 @@ import java.util.HashMap;
 /**
  * Controller for the GUI home scene
  *
- * @version v2.2.2 | last edit: 13.09.2022
+ * @version stabel-1.0.6 | last edit: 26.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
-public class HomeSceneController {
+public class  HomeSceneController {
 
     private ClientBackend backend;
 
@@ -49,10 +53,20 @@ public class HomeSceneController {
     @FXML
     public ScrollPane messagesScrollpane;
 
+    @FXML
+    public Button sendButton;
+
     HashMap<String, VBox> messageLists;
 
+    private void addNewMessageListIfAbsent(String pContact)
+    {
+        VBox lVBox = new VBox();
+        lVBox.setMaxHeight(480);
+        messageLists.putIfAbsent(pContact, lVBox);
+    }
+
     private void switchMessageList(String pContact) {
-        messageLists.putIfAbsent(pContact, new VBox());
+        addNewMessageListIfAbsent(pContact);
         messagesScrollpane.setContent(messageLists.get(pContact));
     }
 
@@ -67,6 +81,12 @@ public class HomeSceneController {
                 t1.setStyle("");
             }
         }));
+        messageTextField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                sendButton.fire();
+                event.consume();
+            }
+        });
     }
 
     @FXML
@@ -154,11 +174,9 @@ public class HomeSceneController {
     }
 
     protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
-        Platform.runLater(() -> {
-            if (messageLists.get(pUsername) == null) messageLists.put(pUsername, new VBox());
-            messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
-
-        });
+        addNewMessageListIfAbsent(pUsername);
+        messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
+        messagesScrollpane.vvalueProperty().setValue(1);
     }
 
     private Label getContactLabel(String pUsername)

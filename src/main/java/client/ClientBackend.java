@@ -1,9 +1,10 @@
 package client;
 
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
-import KLibrary.Utils.EncryptionUtils;
+import KLibrary.utils.EncryptionUtils;
+import KLibrary.utils.SQLUtils;
 
-import KLibrary.Utils.SQLUtils;
+import KLibrary.utils.SystemUtils;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -16,10 +17,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -34,7 +32,7 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version stabel-1.0.5 | last edit: 18.10.2022
+ * @version stabel-1.1.0 | last edit: 27.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
@@ -65,10 +63,17 @@ public class ClientBackend {
     public ClientBackend()
     {
         encryptionUtils = new EncryptionUtils();
-        try {
-            sqlUtils = new SQLUtils("src/main/resources/client/kmes_client.db");
+        try
+        {
+            String lKMesDirPath = SystemUtils.getLocalApplicationPath()+"/KMes";
+            File lKMesDir = new File(lKMesDirPath);
+            if (!lKMesDir.exists())
+                lKMesDir.mkdir();
+
+            sqlUtils = new SQLUtils(lKMesDirPath + "/kmes_client.db");
             createTables();
-        } catch (SQLException sqlEx) {
+        }
+        catch (SQLException sqlEx) {
             SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
         }
     }

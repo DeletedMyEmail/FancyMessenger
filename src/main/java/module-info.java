@@ -6,6 +6,7 @@ module clientside.kmesrework {
     requires org.xerial.sqlitejdbc;
     requires java.desktop;
     requires javafx.swing;
+    requires KLibrary.stable;
 
 
     opens client to javafx.fxml;

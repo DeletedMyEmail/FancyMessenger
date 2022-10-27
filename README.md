@@ -16,10 +16,15 @@ The following things were important to me:
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Download and run the [server jar](out/artifacts/KMesReworkClient/KMesReworkClient_stable-1.0.5.jar) using ``` java -jar KMesReworkClient_stable-x.y.z.jar PortOnWhichTheServerRuns &```.
+Download and run the [server jar](out/artifacts/KMesReworkClient/KMesReworkClient_stable-1.1.0.jar) using ``` java -jar KMesReworkClient_stable-x.y.z.jar PortOnWhichTheServerRuns &```.
 
-Running a client is equaly simple. If you want to use the default server just run the [client jar](out/artifacts/KMesReworkClient/KMesReworkClient_stable-1.0.5.jar).
+Running a client is equaly simple. If you want to use the default server just run the [client jar](out/artifacts/KMesReworkClient/KMesReworkClient_stable-1.1.0.jar).
 If you want to use a different self-hosted server define port and ip in [ClientBackend](src/main/java/client/ClientBackend.java).
+
+All database location are os dependent.
+Linux: ```~/KMes/kmes_server.db``` && ```~/KMes/kmes_client.db```
+Windows: ```~\AppData\Roaming\kmes_server.db``` && ```~\AppData\Roaming\kmes_server.db```
+MacOS: ```~/Library/Application Support/kmes_server.db``` && ```~/Library/Application Support/kmes_server.db```
 
 **Note:** the default server ip in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **134.122.74.216** and the default port is **4242**.
 

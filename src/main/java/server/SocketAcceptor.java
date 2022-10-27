@@ -1,9 +1,11 @@
 package server;
 
 // Own Library https://github.com/KaitoKunTatsu/KLibrary
-import KLibrary.Utils.EncryptionUtils;
-import KLibrary.Utils.SQLUtils;
+import KLibrary.utils.EncryptionUtils;
+import KLibrary.utils.SQLUtils;
+import KLibrary.utils.SystemUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.sql.SQLException;
@@ -14,7 +16,7 @@ import java.util.List;
 /**
  * Thread accepting new clients connecting to the KMes Server
  *
- * @version stabel-1.0.5 | last edit: 21.10.2022
+ * @version stabel-1.1.0 | last edit: 27.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
@@ -28,12 +30,19 @@ class SocketAcceptor extends Thread {
     private final SQLUtils sqlUtils;
     private boolean running;
 
-    protected SocketAcceptor(int pPort) throws IOException, SQLException {
+    protected SocketAcceptor(int pPort) throws IOException, SQLException
+    {
         clients = new HashMap<>();
         queuedMessages = new HashMap<>();
         serverSocket = new ServerSocket(pPort);
         encryptionUtils = new EncryptionUtils();
-        sqlUtils = new SQLUtils("src/main/resources/server/kmes_server.db");
+
+        String lKMesDirPath = SystemUtils.getLocalApplicationPath()+"/KMes";
+        File lKMesDir = new File(lKMesDirPath);
+        if (!lKMesDir.exists())
+            lKMesDir.mkdir();
+
+        sqlUtils = new SQLUtils(lKMesDirPath + "/kmes_server.db");
         sqlUtils.onExecute("""
                 CREATE TABLE IF NOT EXISTS User
                 (
