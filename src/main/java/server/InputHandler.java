@@ -61,17 +61,17 @@ class InputHandler extends Thread {
 
         try
         {
-            if (keyHandshake()) {
+            if (keyHandshake())
+            {
                 running = true;
                 ResultSet lRs = sqlUtils.onQuery("SELECT username FROM Session WHERE ip = ?", clientsIp);
-                if (!lRs.isClosed()) {
-                    lRs.next();
+                if (!lRs.isClosed() && lRs.next())
+                {
                     this.currentUser = lRs.getString("username");
                     client.writeAES("loggedIn;;"+currentUser);
                 }
                 else
                     this.currentUser = "";
-
             }
             else
             {
@@ -307,7 +307,7 @@ class InputHandler extends Thread {
     {
         try {
             ResultSet lResultSet = sqlUtils.onQuery("SELECT username FROM User WHERE username=?", pUsername);
-            return !(lResultSet.isClosed() || lResultSet.getString(1).equals(""));
+            return !(lResultSet.isClosed() || !lResultSet.next() || lResultSet.getString("username").equals(""));
         }
         catch (SQLException ex)
         {
@@ -374,14 +374,15 @@ class InputHandler extends Thread {
 
     private void addSession() throws SQLException
     {
+        System.out.println("S");
         if (currentUser.isEmpty()) return;
-
+        System.out.println("s11");
         ResultSet lRs = sqlUtils.onQuery("SELECT username FROM Session WHERE ip = ?", clientsIp);
-        lRs.next();
-        if (lRs.isClosed())
-            sqlUtils.onExecute("INSERT INTO Session VALUES (?,?)", clientsIp, currentUser);
-        else
+
+        if (!lRs.isClosed() && lRs.next())
             sqlUtils.onExecute("UPDATE Session SET username = ? WHERE ip = ?", currentUser, clientsIp);
+        else
+            sqlUtils.onExecute("INSERT INTO Session VALUES (?,?)", clientsIp, currentUser);
     }
 
     public SocketWrapper getClient() {return client;}
