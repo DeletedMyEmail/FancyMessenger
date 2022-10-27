@@ -22,9 +22,9 @@ Running a client is equaly simple. If you want to use the default server just ru
 If you want to use a different self-hosted server define port and ip in [ClientBackend](src/main/java/client/ClientBackend.java).
 
 All database location are os dependent. <br>
-Linux: ```~/KMes/kmes_server.db``` && ```~/KMes/kmes_client.db``` <br>
-Windows: ```~\AppData\Roaming\kmes_server.db``` && ```~\AppData\Roaming\kmes_server.db``` <br>
-MacOS: ```~/Library/Application Support/kmes_server.db``` && ```~/Library/Application Support/kmes_server.db``` <br>
+**Linux:** ```~/KMes/kmes_server.db``` && ```~/KMes/kmes_client.db``` <br>
+**Windows:** ```~\AppData\Roaming\kmes_server.db``` && ```~\AppData\Roaming\kmes_server.db``` <br>
+**MacOS:** ```~/Library/Application Support/kmes_server.db``` && ```~/Library/Application Support/kmes_server.db``` <br>
 
 **Note:** the default server ip in [ClientBackend](src/main/java/client/ClientBackend.java) is defined as **134.122.74.216** and the default port is **4242**.
 
