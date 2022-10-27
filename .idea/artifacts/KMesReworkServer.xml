@@ -6,18 +6,18 @@
         <element id="file-copy" path="$PROJECT_DIR$/src/main/java/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="KMesRework" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:19" />
-      <element id="library" level="project" name="KLibrary" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:win:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:win:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:win:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:win:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:19" />
-      <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:win:19" />
-      <element id="library" level="project" name="Maven: org.xerial:sqlite-jdbc:3.39.3.0" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/KLibrary_stable-1.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/19/javafx-base-19.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-base/19/javafx-base-19-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/19/javafx-controls-19.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/19/javafx-controls-19-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/19/javafx-fxml-19.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/19/javafx-fxml-19-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/19/javafx-graphics-19.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/19/javafx-graphics-19-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-swing/19/javafx-swing-19.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-swing/19/javafx-swing-19-win.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/xerial/sqlite-jdbc/3.39.3.0/sqlite-jdbc-3.39.3.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
