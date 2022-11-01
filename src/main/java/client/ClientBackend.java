@@ -5,12 +5,12 @@ import KLibrary.utils.EncryptionUtils;
 import KLibrary.utils.SQLUtils;
 
 import KLibrary.utils.SystemUtils;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -32,16 +32,15 @@ import javax.imageio.ImageIO;
  * This class acts as a client backend for the KMes Messenger. <br/>
  * Handles inputs from the KMes Server, manages the local database and controls the GUI via {@link HomeSceneController}
  *
- * @version stabel-1.1.0 | last edit: 27.10.2022
+ * @version stabel-1.1.1 | last edit: 01.11.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class ClientBackend {
 
-    // KMes Server Hostname/IP
     private static final String SERVER_IP = "134.122.74.216";
-
-    // Port of the KMes Server listening for clients
     private static final int PORT = 4242;
+
+    private final SimpleStringProperty currentUser;
 
     private final EncryptionUtils encryptionUtils;
     private SQLUtils sqlUtils;
@@ -52,8 +51,6 @@ public class ClientBackend {
     private DataOutputStream outStream;
     private SecretKey AESKey;
 
-    private String currentUser = "";
-
     /**
      * Creates an instance of this class, iniitializes utility classes and establishes a database connection
      *
@@ -62,14 +59,12 @@ public class ClientBackend {
      * */
     public ClientBackend()
     {
+        currentUser = new SimpleStringProperty("");
         encryptionUtils = new EncryptionUtils();
         try
         {
             String lKMesDirPath = SystemUtils.getLocalApplicationPath()+"/KMes";
-            File lKMesDir = new File(lKMesDirPath);
-            if (!lKMesDir.exists())
-                lKMesDir.mkdir();
-
+            SystemUtils.createDirIfNotExists(lKMesDirPath);
             sqlUtils = new SQLUtils(lKMesDirPath + "/kmes_client.db");
             createTables();
         }
@@ -110,7 +105,7 @@ public class ClientBackend {
                                 loadHistory();
                             }
                             case "loggedOut" -> {
-                                currentUser = "";
+                                currentUser.set("");
                                 SceneManager.getHomeScene().clearMessagesAndContacts();
                                 SceneManager.switchToLoginScene();
                             }
@@ -143,10 +138,8 @@ public class ClientBackend {
      *
      * @param pUsername Username of the new logged-in user
      * */
-    private void updateCurrentUser(String pUsername)
-    {
-        currentUser = pUsername;
-        SceneManager.getSettingsScene().changeUsernameText(currentUser);
+    private void updateCurrentUser(String pUsername) {
+        currentUser.set(pUsername);
         SceneManager.switchToSettingsScene();
     }
 
@@ -197,7 +190,7 @@ public class ClientBackend {
         {
             ResultSet lResult = sqlUtils.onQuery("SELECT ContactName FROM Contact WHERE AccountName='"+currentUser+"'");
 
-            while (lResult.next())
+            while (!lResult.isClosed() && lResult.next())
                 SceneManager.getHomeScene().showNewContact(lResult.getString("ContactName"));
 
             lResult = sqlUtils.onQuery("SELECT Message.Content, Message.Extention, MessageToContact.SentOrReceived, Contact.ContactName " +
@@ -208,7 +201,7 @@ public class ClientBackend {
                                                 "ON Contact.ContactID = MessageToContact.ContactID " +
                                                 "WHERE Contact.AccountName='"+currentUser+"'");
 
-            while (lResult.next())
+            while (!lResult.isClosed() && lResult.next())
                 SceneManager.getHomeScene().showNewMessage(
                         lResult.getString("ContactName"),
                         lResult.getString("Content"),
@@ -222,8 +215,10 @@ public class ClientBackend {
     }
 
     private void insertContact(String pContactName) {
-        try {
-            if (!sqlUtils.onQuery("SELECT * FROM Contact WHERE ContactName=? AND AccountName=?", pContactName, currentUser).next()) {
+        try
+        {
+            ResultSet lResultSet = sqlUtils.onQuery("SELECT * FROM Contact WHERE ContactName=? AND AccountName=?", pContactName, currentUser);
+            if (lResultSet.isClosed() || !lResultSet.next()) {
                 sqlUtils.onExecute("INSERT INTO Contact (ContactName, AccountName) VALUES(?,?)", pContactName, currentUser);
             }
             SceneManager.getHomeScene().showNewContact(pContactName);
@@ -416,10 +411,6 @@ public class ClientBackend {
                 """);
     };
 
-    public void requestLogout() throws IOException {
-        sendToServer("logout");
-    }
-
     /**
      * @return Returns the connection status to the KMes Server
      * */
@@ -431,5 +422,5 @@ public class ClientBackend {
     /**
      * @return Returns the username of the current user or an empty string if not logged in.
      * */
-    protected String getUsername() { return currentUser; }
+    protected SimpleStringProperty getUsername() { return currentUser; }
 }

@@ -1,5 +1,6 @@
 package client;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
@@ -9,7 +10,7 @@ import java.io.IOException;
 /**
  * Controller for the GUI settings scene
  *
- * @version v2.0.0 | last edit: 24.08.2022
+ * @version stabel-1.1.1 | last edit: 01.11.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class SettingsSceneController {
@@ -20,23 +21,20 @@ public class SettingsSceneController {
     public Text usernameText;
 
     @FXML
-    public void initialize()
-    {
+    public void initialize() {
         backend = SceneManager.getBackend();
+        usernameText.textProperty().bind(backend.getUsername());
     }
 
-    protected void changeUsernameText(String pUsername)
-    {
-        usernameText.setText("Current User: "+pUsername);
-    }
-
-    public void switchToMainScene(ActionEvent actionEvent)
+    @FXML
+    public void onHomeButtonClick(ActionEvent actionEvent)
     {
         SceneManager.switchToHomeScene();
     }
 
-    public void logOut(ActionEvent actionEvent) throws IOException {
-        backend.requestLogout();
+    @FXML
+    public void onLogOutButtonClick(ActionEvent actionEvent) throws IOException {
+        backend.sendToServer("logout");
     }
 }
 

@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Class which contains and handles everything in conjunction with stages and scene switches for the GUI
  *
- * @version stabel-1.0.4 | last edit: 18.10.2022
+ * @version stabel-1.1.1 | last edit: 18.10.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 public class SceneManager extends Application {

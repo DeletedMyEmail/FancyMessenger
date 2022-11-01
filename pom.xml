@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.github.kaitokuntatsu</groupId>
+            <artifactId>klibrary</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>19</version>

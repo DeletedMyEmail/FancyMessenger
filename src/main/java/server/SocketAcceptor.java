@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Thread accepting new clients connecting to the KMes Server
  *
- * @version stabel-1.1.0 | last edit: 27.10.2022
+ * @version stabel-1.1.1 | last edit: 01.11.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
 class SocketAcceptor extends Thread {
@@ -38,9 +38,7 @@ class SocketAcceptor extends Thread {
         encryptionUtils = new EncryptionUtils();
 
         String lKMesDirPath = SystemUtils.getLocalApplicationPath()+"/KMes";
-        File lKMesDir = new File(lKMesDirPath);
-        if (!lKMesDir.exists())
-            lKMesDir.mkdir();
+        SystemUtils.createDirIfNotExists(lKMesDirPath);
 
         sqlUtils = new SQLUtils(lKMesDirPath + "/kmes_server.db");
         sqlUtils.onExecute("""
