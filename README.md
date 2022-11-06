@@ -12,7 +12,9 @@ The following things were important to me:
 * a pleasant user experience
 * security (password hashing and RSA + AES for messages)
 * a good grade
+
 <br>
+
 ![Messenger Home Screen](/src/main/resources/images/homescreen.png?raw=true)
 
 <!-- GETTING STARTED -->
