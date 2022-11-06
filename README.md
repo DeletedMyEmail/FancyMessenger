@@ -3,7 +3,7 @@
 <!-- ABOUT THE PROJECT -->  
 ## About The Project
 
-<img align="right" src="https://user-images.githubusercontent.com/88390464/200165182-28c64553-d65e-4911-aae1-2fef31900f74.png" height="256" width="256">
+<img align="right" src="https://user-images.githubusercontent.com/88390464/200165182-28c64553-d65e-4911-aae1-2fef31900f74.png" height="230" width="230">
 
 Out of boredom and a school project, I started writing a messenger.
 The following things were important to me:
