@@ -13,4 +13,8 @@ module clientside.kmesrework {
     exports client;
     exports server;
     opens server to javafx.fxml;
+    exports client.controller;
+    opens client.controller to javafx.fxml;
+    exports client.model;
+    opens client.model to javafx.fxml;
 }

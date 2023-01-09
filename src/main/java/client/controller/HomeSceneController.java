@@ -1,12 +1,15 @@
-package client;
+package client.controller;
 
+import client.ServerController;
+import client.Extention;
+import client.model.HomeSceneModel;
+import client.model.SceneAndControllerModel;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -20,9 +23,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
+
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -31,41 +36,39 @@ import java.util.Objects;
  * @version stabel-1.1.1 | last edit: 01.11.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
-public class  HomeSceneController {
+public class HomeSceneController extends ControllerUtils {
 
-    private ClientBackend backend;
-
-    @FXML
-    public Text titleText;
+    private final HomeSceneModel model;
+    private final ServerController serverController;
 
     @FXML
     public TextField messageTextField;
 
     @FXML
-    public ListView<Label> contactsList;
+    public ListView<Label> contactView;
 
     @FXML
     public ScrollPane messagesScrollpane;
 
-    @FXML
-    public Button sendButton;
+    public HomeSceneController() {
+        serverController = ServerController.getInstance();
+        model = HomeSceneModel.getInstance();
+    }
 
-    HashMap<String, VBox> messageLists;
-
     @FXML
-    public void initialize()
-    {
-        backend = SceneManager.getBackend();
-        messageLists = new HashMap<>();
-        contactsList.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(() -> {
+    public void initialize() {
+        messagesScrollpane = model.getMessagesScrollpane();
+        contactView.setItems(model.getContactLabels());
+        contactView.getSelectionModel().selectedItemProperty().addListener((observableValue, o, t1) -> Platform.runLater(() -> {
             if (t1 != null) {
                 switchMessageList((t1).getText());
                 t1.setStyle("");
             }
         }));
+
         messageTextField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                sendButton.fire();
+                onSendButtonClick(null);
                 event.consume();
             }
         });
@@ -73,68 +76,73 @@ public class  HomeSceneController {
 
 
     @FXML
-    protected void onSendButtonClick(ActionEvent actionEvent)
-    {
-        Label selectedContact = contactsList.getSelectionModel().getSelectedItem();
+    public void onSendButtonClick(ActionEvent pActionEvent) {
+        Label selectedContact = contactView.getSelectionModel().getSelectedItem();
         if (selectedContact == null) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
+            showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
             return;
         }
 
-        String lReceiver = selectedContact.getText();
-        String lMsg = messageTextField.getText();
-        backend.sendMessageToOtherUser(lReceiver, lMsg);
+        model.getMessageToSend().set(selectedContact.getText() + ";;" + messageTextField.getText());
     }
 
     @FXML
-    protected void onAddContactButtonClick(ActionEvent actionEvent) {
-        SceneManager.showAddContactWindow();
+    public void onAddContactButtonClick(ActionEvent actionEvent) {
+        SceneAndControllerModel.getInstance().getAddContactStage().showAndWait();
     }
 
-    protected void clearMessagesAndContacts()
+    public void clearMessagesAndContacts()
     {
         Platform.runLater(() -> {
-            messageLists.clear();
-            messagesScrollpane.setContent(null);
-            contactsList.getSelectionModel().clearSelection();
-            contactsList.getItems().clear();
+            model.getMessageLists().clear();
+            model.getMessagesScrollpane().setContent(null);
+            contactView.getSelectionModel().clearSelection();
+            contactView.getItems().clear();
         });
     }
 
     @FXML
     public void onFileButtonClick(ActionEvent actionEvent) {
-        Label selectedContact = contactsList.getSelectionModel().getSelectedItem();
+        Label selectedContact = contactView.getSelectionModel().getSelectedItem();
         if (selectedContact == null) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
+            showAlert(Alert.AlertType.ERROR, "Please select a contact", "Error occurred while sending the message", ButtonType.OK);
             return;
         }
 
-        String lReceiver = selectedContact.getText();
-        backend.sendFile(lReceiver);
+        FileChooser lChooser = new FileChooser();
+        lChooser.setTitle("Choose a file");
+        lChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.pdf", "*.txt")
+        );
+        File lFile = lChooser.showOpenDialog(SceneAndControllerModel.getInstance().getMainStage());
+
+        serverController.sendFile(lFile, selectedContact.getText());
     }
 
     @FXML
     protected void onAccountButtonClick() {
-        if (!backend.getUsername().isEmpty().get())
-            SceneManager.switchToSettingsScene();
-        else
-            SceneManager.switchToLoginScene();
+        SceneAndControllerModel lModel = SceneAndControllerModel.getInstance();
+
+        if (!serverController.getUsername().isEmpty().get()) {
+            lModel.getMainStage().setScene(lModel.getSettingsScene());
+        }
+        else {
+            lModel.getMainStage().setScene(lModel.getLoginScene());
+        }
     }
 
-    private void addNewMessageListIfAbsent(String pContact)
-    {
+    private void addNewMessageListIfAbsent(String pContact) {
         VBox lVBox = new VBox();
         lVBox.setMaxHeight(480);
-        messageLists.putIfAbsent(pContact, lVBox);
+        model.getMessageLists().putIfAbsent(pContact, lVBox);
     }
 
     private void switchMessageList(String pContact) {
         addNewMessageListIfAbsent(pContact);
-        messagesScrollpane.setContent(messageLists.get(pContact));
+        model.getMessagesScrollpane().setContent(model.getMessageLists().get(pContact));
     }
 
-    private VBox createMessageBox(String pContent, Extention pFileExtention, boolean pReceiving)
-    {
+    private VBox createMessageBox(String pContent, Extention pFileExtention, boolean pReceiving) {
         VBox lVBox = new VBox();
         lVBox.setPrefWidth(860);
         lVBox.setPadding(new Insets(3));
@@ -189,7 +197,7 @@ public class  HomeSceneController {
                 }
 
                 lImgView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                    backend.saveFile(((ImageView)event.getSource()).getImage());
+                    serverController.saveFile(((ImageView)event.getSource()).getImage());
                 });
             }
 
@@ -202,7 +210,7 @@ public class  HomeSceneController {
 
     public void showNotification(String pContactName) {
         Label lContactLabel = getContactLabel(pContactName);
-        Label lSelectedContact = contactsList.getSelectionModel().getSelectedItem();
+        Label lSelectedContact = contactView.getSelectionModel().getSelectedItem();
 
         if (lContactLabel != null && (lSelectedContact == null || !lSelectedContact.equals(lContactLabel)))
             lContactLabel.setStyle(
@@ -210,25 +218,25 @@ public class  HomeSceneController {
             );
     }
 
-    protected void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
+    public void showNewMessage(String pUsername, String pMessage, Extention pFileExtention, boolean pReceived) {
         addNewMessageListIfAbsent(pUsername);
-        messageLists.get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
-        messagesScrollpane.vvalueProperty().setValue(1);
+        model.getMessageLists().get(pUsername).getChildren().add(createMessageBox(pMessage, pFileExtention, pReceived));
+        model.getMessagesScrollpane().vvalueProperty().setValue(1);
     }
 
     private Label getContactLabel(String pUsername)
     {
-        ObservableList<Label> lContacts = contactsList.getItems();
+        ObservableList<Label> lContacts = contactView.getItems();
         for (Label contact : lContacts) {
             if (contact.getText().equals(pUsername)) return contact;
         }
         return null;
     }
 
-    protected void showNewContact(String pUsername)
+    public void showNewContact(String pUsername)
     {
         Platform.runLater(() -> {
-            if (getContactLabel(pUsername) == null) contactsList.getItems().add(new Label(pUsername));
+            if (getContactLabel(pUsername) == null) contactView.getItems().add(new Label(pUsername));
         });
     }
 }

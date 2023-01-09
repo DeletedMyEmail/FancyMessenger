@@ -15,7 +15,7 @@ The following things were important to me:
 
 <br><br>
 
-![Messenger Home Screen](/src/main/resources/images/homescreen.png?raw=true)
+![Messenger Home Screen](/client/images/homescreen.png?raw=true)
 
 <!-- GETTING STARTED -->
 ## Getting Started

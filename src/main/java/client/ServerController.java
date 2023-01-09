@@ -5,6 +5,8 @@ import KLibrary.utils.EncryptionUtils;
 import KLibrary.utils.SQLUtils;
 
 import KLibrary.utils.SystemUtils;
+import client.controller.HomeSceneController;
+import client.model.SceneAndControllerModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
@@ -35,17 +37,18 @@ import javax.imageio.ImageIO;
  * @version stabel-1.1.1 | last edit: 01.11.2022
  * @author Joshua H. | KaitoKunTatsu#3656
  * */
-public class ClientBackend {
+public class ServerController {
 
     private static final String SERVER_IP = "134.122.74.216";
     private static final int PORT = 4242;
 
+    private static ServerController instance;
+
     private final SimpleStringProperty currentUser;
-
     private final EncryptionUtils encryptionUtils;
-    private SQLUtils sqlUtils;
+    private final SceneAndControllerModel sceneAndControllerModel;
 
-    // Connection to KMes Server
+    private SQLUtils sqlUtils;
     private Socket server;
     private DataInputStream inStream;
     private DataOutputStream outStream;
@@ -57,20 +60,25 @@ public class ClientBackend {
      * @see EncryptionUtils
      * @see SQLUtils
      * */
-    public ClientBackend()
-    {
+    private ServerController() {
+        sceneAndControllerModel = SceneAndControllerModel.getInstance();
         currentUser = new SimpleStringProperty("");
         encryptionUtils = new EncryptionUtils();
-        try
-        {
+        try {
             String lKMesDirPath = SystemUtils.getLocalApplicationPath()+"/KMes";
             SystemUtils.createDirIfNotExists(lKMesDirPath);
             sqlUtils = new SQLUtils(lKMesDirPath + "/kmes_client.db");
             createTables();
         }
         catch (SQLException sqlEx) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
+            sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "Could not load contacts and history", "Database error", ButtonType.OK);
         }
+    }
+
+    public static ServerController getInstance() {
+        if (instance == null)
+            instance = new ServerController();
+        return instance;
     }
 
     /**
@@ -82,7 +90,7 @@ public class ClientBackend {
      * @see Socket
      * @see Thread
      * */
-    protected void listenForServerInput () {
+    public void listenForServerInput() {
         new Thread(() -> {
             try {
                 while (true) // do not criticize obvious stupidity
@@ -106,14 +114,14 @@ public class ClientBackend {
                             }
                             case "loggedOut" -> {
                                 currentUser.set("");
-                                SceneManager.getHomeScene().clearMessagesAndContacts();
-                                SceneManager.switchToLoginScene();
+                                sceneAndControllerModel.getHomeSceneController().clearMessagesAndContacts();
+                                sceneAndControllerModel.getMainStage().setScene(sceneAndControllerModel.getLoginScene());
                             }
-                            case "error" -> SceneManager.showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
+                            case "error" -> sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, lInput[1], lInput[2], ButtonType.OK);
                             case "message" -> addNewMessage(lInput[1], lInput[2], true);
                             case "userExists" -> {
                                 insertContact(lInput[1]);
-                                SceneManager.showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
+                                sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.CONFIRMATION, "Successfully added" +
                                         " new contact: " + lInput[1], "New contact", ButtonType.OK);
                             }
                         }
@@ -122,7 +130,7 @@ public class ClientBackend {
             }
             catch (SocketTimeoutException | SocketException socketException)
             {
-                SceneManager.showAlert(Alert.AlertType.ERROR, "",
+                sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "",
                         "Connection to the KMesServer couldn't be established",
                         event -> System.exit(0), ButtonType.OK);
             }
@@ -140,7 +148,7 @@ public class ClientBackend {
      * */
     private void updateCurrentUser(String pUsername) {
         currentUser.set(pUsername);
-        SceneManager.switchToSettingsScene();
+        sceneAndControllerModel.getMainStage().setScene(sceneAndControllerModel.getSettingsScene());
     }
 
     /**
@@ -160,9 +168,9 @@ public class ClientBackend {
         }
 
         insertContact(pContactName);
-        SceneManager.getHomeScene().showNewContact(pContactName);
-        SceneManager.getHomeScene().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
-        SceneManager.getHomeScene().showNotification(pContactName);
+        sceneAndControllerModel.getHomeSceneController().showNewContact(pContactName);
+        sceneAndControllerModel.getHomeSceneController().showNewMessage(pContactName, lMessage, lFileExtention, pReceived);
+        sceneAndControllerModel.getHomeSceneController().showNotification(pContactName);
 
         try {
             sqlUtils.onExecute(
@@ -191,7 +199,7 @@ public class ClientBackend {
             ResultSet lResult = sqlUtils.onQuery("SELECT ContactName FROM Contact WHERE AccountName='"+currentUser+"'");
 
             while (!lResult.isClosed() && lResult.next())
-                SceneManager.getHomeScene().showNewContact(lResult.getString("ContactName"));
+                sceneAndControllerModel.getHomeSceneController().showNewContact(lResult.getString("ContactName"));
 
             lResult = sqlUtils.onQuery("SELECT Message.Content, Message.Extention, MessageToContact.SentOrReceived, Contact.ContactName " +
                                                 "FROM Message " +
@@ -201,13 +209,14 @@ public class ClientBackend {
                                                 "ON Contact.ContactID = MessageToContact.ContactID " +
                                                 "WHERE Contact.AccountName='"+currentUser+"'");
 
-            while (!lResult.isClosed() && lResult.next())
-                SceneManager.getHomeScene().showNewMessage(
+            while (!lResult.isClosed() && lResult.next()) {
+                sceneAndControllerModel.getHomeSceneController().showNewMessage(
                         lResult.getString("ContactName"),
                         lResult.getString("Content"),
                         Extention.valueOf(lResult.getString("Extention").toUpperCase()),
                         lResult.getBoolean("SentOrReceived")
                 );
+            }
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
@@ -221,9 +230,9 @@ public class ClientBackend {
             if (lResultSet.isClosed() || !lResultSet.next()) {
                 sqlUtils.onExecute("INSERT INTO Contact (ContactName, AccountName) VALUES(?,?)", pContactName, currentUser);
             }
-            SceneManager.getHomeScene().showNewContact(pContactName);
+            sceneAndControllerModel.getHomeSceneController().showNewContact(pContactName);
         } catch (SQLException sqlEx) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "Couldn't add contact", "Database error", ButtonType.OK);
+            sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "Couldn't add contact", "Database error", ButtonType.OK);
         }
     }
 
@@ -235,10 +244,8 @@ public class ClientBackend {
      * @see #establishEncryption()
      * @see EncryptionUtils
      * */
-    protected void sendToServer(String pMessage) throws IOException
-    {
-        try
-        {
+    public void sendToServer(String pMessage) throws IOException {
+        try {
             byte[] lEncrpytedMessage = EncryptionUtils.encryptAES(pMessage, AESKey);
             byte[] lMessageSizeAsBytes = ByteBuffer.allocate(4).putInt(lEncrpytedMessage.length).array();
             byte[] lConcatenated = ByteBuffer.allocate(lMessageSizeAsBytes.length+lEncrpytedMessage.length).put(lMessageSizeAsBytes).put(lEncrpytedMessage).array();
@@ -305,7 +312,7 @@ public class ClientBackend {
             addNewMessage(pReceiver, String.valueOf(lMessage), false);
         }
         catch (IOException ioEx) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
+            sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "", "Can't reach the KMes Server", ButtonType.OK);
         }
     }
 
@@ -318,26 +325,20 @@ public class ClientBackend {
      * @see #sendToServer(String)
      * @see #addNewMessage(String, String, boolean)
      * */
-    public void sendFile(String pReceiver) {
-        FileChooser lChooser = new FileChooser();
-        lChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.pdf", "*.txt")
-        );
-        lChooser.setTitle("Choose a file");
-        File lFile = lChooser.showOpenDialog(SceneManager.getStage());
-        if (lFile == null) return;
+    public void sendFile(File pFile, String pReceiver) {
+        if (pFile == null) return;
 
-        String lFileExtention = lFile.getName().substring(lFile.getName().lastIndexOf('.')+1);
+        String lFileExtention = pFile.getName().substring(pFile.getName().lastIndexOf('.')+1);
 
         try {
-            FileInputStream lFileStream = new FileInputStream(lFile);
-            byte[] lImageBytes = new byte[(int) lFile.length()];
+            FileInputStream lFileStream = new FileInputStream(pFile);
+            byte[] lImageBytes = new byte[(int) pFile.length()];
             lFileStream.read(lImageBytes);
             lFileStream.close();
             sendMessageToOtherUser(pReceiver, "[file]["+lFileExtention+"]"+Base64.getEncoder().encodeToString(lImageBytes));
         }
         catch (IOException ex) {
-            SceneManager.showAlert(Alert.AlertType.ERROR, "", "Can not convert this file");
+            sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "", "Can not convert this file");
         }
     }
 
@@ -353,12 +354,12 @@ public class ClientBackend {
         FileChooser lChooser = new FileChooser();
         lChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
-        File lFileToSaveTo = lChooser.showSaveDialog(SceneManager.getStage());
-        if (lFileToSaveTo == null) SceneManager.showAlert(Alert.AlertType.ERROR, "", "Please select a file");
-        else
-        {
-            try
-            {
+        File lFileToSaveTo = lChooser.showSaveDialog(sceneAndControllerModel.getMainStage());
+        if (lFileToSaveTo == null) {
+            sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "", "Please select a file");
+        }
+        else {
+            try {
                 lFileToSaveTo.createNewFile();
                 BufferedImage lBufferedImage = SwingFXUtils.fromFXImage(pImage, null);
                 BufferedImage imageRGB = new BufferedImage(lBufferedImage.getWidth(), lBufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -370,16 +371,15 @@ public class ClientBackend {
                 ImageIO.write(imageRGB, lFileExtension, lFileToSaveTo);
             }
             catch (IOException ioEx) {
-                SceneManager.showAlert(Alert.AlertType.ERROR, "", "Error occured while saving");
+                sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "", "Error occured while saving");
             }
             catch (SecurityException secEx) {
-                SceneManager.showAlert(Alert.AlertType.ERROR, "", "Access denied");
+                sceneAndControllerModel.getHomeSceneController().showAlert(Alert.AlertType.ERROR, "", "Access denied");
             }
         }
     }
 
-    private void createTables() throws SQLException
-    {
+    private void createTables() throws SQLException {
         sqlUtils.onExecute("""
                     create table if not exists Contact
                     (
@@ -414,7 +414,7 @@ public class ClientBackend {
     /**
      * @return Returns the connection status to the KMes Server
      * */
-    protected boolean isConnected()
+    public boolean isConnected()
     {
         return server != null && !server.isClosed();
     }
@@ -422,5 +422,5 @@ public class ClientBackend {
     /**
      * @return Returns the username of the current user or an empty string if not logged in.
      * */
-    protected SimpleStringProperty getUsername() { return currentUser; }
+    public SimpleStringProperty getUsername() { return currentUser; }
 }
